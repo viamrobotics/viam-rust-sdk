@@ -1,9 +1,57 @@
+pub mod google {
+    pub mod api {
+        include!("google.api.rs");
+    }
+    pub mod protobuf {
+        include!("google.protobuf.rs");
+    }
+}
 pub mod proto {
     pub mod api {
         pub mod component {
-            pub mod gantry {
+            pub mod board {
                 pub mod v1 {
-                    include!("proto.api.component.gantry.v1.rs");
+                    include!("proto.api.component.board.v1.rs");
+                }
+            }
+            pub mod base {
+                pub mod v1 {
+                    include!("proto.api.component.base.v1.rs");
+                }
+            }
+            pub mod inputcontroller {
+                pub mod v1 {
+                    include!("proto.api.component.inputcontroller.v1.rs");
+                }
+            }
+            pub mod sensor {
+                pub mod v1 {
+                    include!("proto.api.component.sensor.v1.rs");
+                }
+            }
+            pub mod imu {
+                pub mod v1 {
+                    include!("proto.api.component.imu.v1.rs");
+                }
+            }
+            pub mod camera {
+                pub mod v1 {
+                    include!("proto.api.component.camera.v1.rs");
+                }
+            }
+            pub mod motor {
+                pub mod v1 {
+                    include!("proto.api.component.motor.v1.rs");
+                }
+            }
+            pub mod servo {
+                pub mod v1 {
+                    include!("proto.api.component.servo.v1.rs");
+                }
+            }
+            pub mod gps {
+                pub mod v1 {
+                    include!("proto.api.component.gps.v1.rs");
                 }
             }
             pub mod posetracker {
@@ -11,9 +59,9 @@ pub mod proto {
                     include!("proto.api.component.posetracker.v1.rs");
                 }
             }
-            pub mod servo {
+            pub mod gantry {
                 pub mod v1 {
-                    include!("proto.api.component.servo.v1.rs");
+                    include!("proto.api.component.gantry.v1.rs");
                 }
             }
             pub mod forcematrix {
@@ -26,56 +74,21 @@ pub mod proto {
                     include!("proto.api.component.gripper.v1.rs");
                 }
             }
-            pub mod inputcontroller {
-                pub mod v1 {
-                    include!("proto.api.component.inputcontroller.v1.rs");
-                }
-            }
             pub mod arm {
                 pub mod v1 {
                     include!("proto.api.component.arm.v1.rs");
                 }
             }
-            pub mod board {
-                pub mod v1 {
-                    include!("proto.api.component.board.v1.rs");
-                }
-            }
-            pub mod motor {
-                pub mod v1 {
-                    include!("proto.api.component.motor.v1.rs");
-                }
-            }
-            pub mod sensor {
-                pub mod v1 {
-                    include!("proto.api.component.sensor.v1.rs");
-                }
-            }
-            pub mod gps {
-                pub mod v1 {
-                    include!("proto.api.component.gps.v1.rs");
-                }
-            }
-            pub mod base {
-                pub mod v1 {
-                    include!("proto.api.component.base.v1.rs");
-                }
-            }
-            pub mod camera {
-                pub mod v1 {
-                    include!("proto.api.component.camera.v1.rs");
-                }
-            }
-            pub mod imu {
-                pub mod v1 {
-                    include!("proto.api.component.imu.v1.rs");
-                }
-            }
         }
         pub mod service {
-            pub mod framesystem {
+            pub mod objectsegmentation {
                 pub mod v1 {
-                    include!("proto.api.service.framesystem.v1.rs");
+                    include!("proto.api.service.objectsegmentation.v1.rs");
+                }
+            }
+            pub mod navigation {
+                pub mod v1 {
+                    include!("proto.api.service.navigation.v1.rs");
                 }
             }
             pub mod objectmanipulation {
@@ -88,24 +101,19 @@ pub mod proto {
                     include!("proto.api.service.metadata.v1.rs");
                 }
             }
-            pub mod sensors {
-                pub mod v1 {
-                    include!("proto.api.service.sensors.v1.rs");
-                }
-            }
-            pub mod objectsegmentation {
-                pub mod v1 {
-                    include!("proto.api.service.objectsegmentation.v1.rs");
-                }
-            }
-            pub mod navigation {
-                pub mod v1 {
-                    include!("proto.api.service.navigation.v1.rs");
-                }
-            }
             pub mod status {
                 pub mod v1 {
                     include!("proto.api.service.status.v1.rs");
+                }
+            }
+            pub mod framesystem {
+                pub mod v1 {
+                    include!("proto.api.service.framesystem.v1.rs");
+                }
+            }
+            pub mod sensors {
+                pub mod v1 {
+                    include!("proto.api.service.sensors.v1.rs");
                 }
             }
         }
@@ -131,13 +139,5 @@ pub mod proto {
                 }
             }
         }
-    }
-}
-pub mod google {
-    pub mod api {
-        include!("google.api.rs");
-    }
-    pub mod protobuf {
-        include!("google.protobuf.rs");
     }
 }
