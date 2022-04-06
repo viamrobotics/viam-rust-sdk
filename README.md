@@ -64,7 +64,7 @@ Then to obtain a channel do :
 
 ``` rust
 let c = dial::DialConfig::builder()
-        .uri(&"test-main.33vvxnbbw9.local.viam.cloud:8080".to_string()) // Robot address
+        .uri("test-main.33vvxnbbw9.local.viam.cloud:8080") // Robot address
         .with_credentials(creds) // credentials
         .connect()
         .await?; // if the connection complete you will have a channel otherwise an error
@@ -85,7 +85,7 @@ If you want to connect to a robot without credentials then just do :
 
 ``` rust
 let c = dial::DialConfig::builder()
-        .uri(&"localhost:8080".to_string()) 
+        .uri("localhost:8080") 
         .without_credentials()
         .insecure() // you can also do allow_downgrade()
         .connect()
