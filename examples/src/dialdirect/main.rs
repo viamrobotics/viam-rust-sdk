@@ -8,7 +8,7 @@ async fn main() -> Result<()> {
         String::from("robot-location-secret"),
         String::from("9x375brdv1f7u2v6vi42a21cbzo0xuauov025wox5mg9grd5"),
     );
-    let c = dial::DialConfig::builder()
+    let c = dial::DialOptions::builder()
         .uri("test-main.33vvxnbbw9.local.viam.cloud:8080")
         .with_credentials(creds)
         .connect()
