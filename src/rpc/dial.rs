@@ -23,7 +23,7 @@ impl CredentialsExt for Credentials {
 }
 
 #[derive(Debug)]
-pub struct DialConfig {
+pub struct DialOptions {
     credentials: Option<Credentials>,
     uri: Option<Parts>,
     allow_downgrade: bool,
@@ -44,7 +44,7 @@ impl AuthMethod for WithoutCredentials {}
 #[allow(dead_code)]
 pub struct DialBuilder<T> {
     state: T,
-    config: DialConfig,
+    config: DialOptions,
 }
 
 impl<T> fmt::Debug for DialBuilder<T> {
@@ -56,11 +56,11 @@ impl<T> fmt::Debug for DialBuilder<T> {
     }
 }
 
-impl DialConfig {
+impl DialOptions {
     pub fn builder() -> DialBuilder<WantsUri> {
         DialBuilder {
             state: WantsUri(()),
-            config: DialConfig {
+            config: DialOptions {
                 credentials: None,
                 uri: None,
                 allow_downgrade: false,
@@ -77,7 +77,7 @@ impl DialBuilder<WantsUri> {
         uri_parts.path_and_query = Some(http::uri::PathAndQuery::from_static(""));
         DialBuilder {
             state: WantsCredentials(()),
-            config: DialConfig {
+            config: DialOptions {
                 credentials: None,
                 uri: Some(uri_parts),
                 allow_downgrade: false,
@@ -90,7 +90,7 @@ impl DialBuilder<WantsCredentials> {
     pub fn without_credentials(self) -> DialBuilder<WithoutCredentials> {
         DialBuilder {
             state: WithoutCredentials(()),
-            config: DialConfig {
+            config: DialOptions {
                 credentials: None,
                 uri: self.config.uri,
                 allow_downgrade: false,
@@ -101,7 +101,7 @@ impl DialBuilder<WantsCredentials> {
     pub fn with_credentials(self, creds: Credentials) -> DialBuilder<WithCredentials> {
         DialBuilder {
             state: WithCredentials(()),
-            config: DialConfig {
+            config: DialOptions {
                 credentials: Some(creds),
                 uri: self.config.uri,
                 allow_downgrade: false,
