@@ -9,16 +9,15 @@ use http::uri::Parts;
 use tonic::{metadata::MetadataValue, transport::Channel, transport::Uri, Request, Status};
 use tower::ServiceBuilder;
 
+type SecretType = String;
+
 pub trait CredentialsExt {
     fn new(r#type: String, payload: String) -> Self;
 }
 
 impl CredentialsExt for Credentials {
-    fn new(r#type: String, payload: String) -> Credentials {
-        Credentials {
-            r#type: r#type,
-            payload: payload,
-        }
+    fn new(r#type: SecretType, payload: String) -> Credentials {
+        Credentials { r#type, payload }
     }
 }
 
