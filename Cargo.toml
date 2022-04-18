@@ -8,15 +8,15 @@ edition = "2021"
 [dependencies]
 anyhow = { version = "1.0", features = ["backtrace"]}
 futures = {version = "0.3", default-features = false, features = ["alloc"]}
-prost = "0.9"
-prost-types = "0.9"
+prost = "0.10"
+prost-types = "0.10"
 futures-core = "0.3"
 futures-util = "0.3"
 tower = { version = "0.4" }
 http = "0.2"
 tokio = {version = "1.0", features = ["rt-multi-thread", "time", "fs", "macros", "net"]}
 tokio-stream = {version = "0.1", features = ["net"]}
-tonic = {version = "0.6.2",features = ["tls", "compression", "tls-roots"]}
+tonic = {version = "0.7",features = ["tls", "compression", "tls-roots"]}
 async-stream = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -27,4 +27,4 @@ webpki-roots = "0.21.1"
 
 
 [build-dependencies]
-tonic-build = {version = "0.6.2",features = ["prost", "compression"]}
+tonic-build = {version = "0.7",features = ["prost", "compression"]}

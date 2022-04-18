@@ -11,4 +11,4 @@ path = "src/dialdirect/main.rs"
 viam = {path = "../"}
 anyhow = { version = "1.0", features = ["backtrace"]}
 tokio = { version = "1.0", features = [ "rt-multi-thread", "time", "fs", "macros", "net",] }
-tonic = {version = "0.6.2",features = ["tls", "compression", "tls-roots"]}
+tonic = {version = "0.7",features = ["tls", "compression", "tls-roots"]}
