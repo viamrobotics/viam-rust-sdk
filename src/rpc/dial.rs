@@ -16,7 +16,10 @@ pub trait CredentialsExt {
 
 impl CredentialsExt for Credentials {
     fn new(r#type: SecretType, payload: String) -> Credentials {
-        Credentials { r#type, payload }
+        Credentials {
+            r#type: r#type,
+            payload,
+        }
     }
 }
 
