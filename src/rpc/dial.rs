@@ -1,9 +1,8 @@
-use anyhow::Context;
-use anyhow::Result;
-
 use crate::gen::proto::rpc::v1::{
     auth_service_client::AuthServiceClient, AuthenticateRequest, Credentials,
 };
+use anyhow::Context;
+use anyhow::Result;
 use core::fmt;
 use http::uri::Parts;
 use tonic::{metadata::MetadataValue, transport::Channel, transport::Uri, Request, Status};
