@@ -36,11 +36,11 @@ pub mod proto {
                     // @@protoc_insertion_point(proto.api.component.camera.v1)
                 }
             }
-            pub mod forcematrix {
-                // @@protoc_insertion_point(attribute:proto.api.component.forcematrix.v1)
+            pub mod generic {
+                // @@protoc_insertion_point(attribute:proto.api.component.generic.v1)
                 pub mod v1 {
-                    include!("proto.api.component.forcematrix.v1.rs");
-                    // @@protoc_insertion_point(proto.api.component.forcematrix.v1)
+                    include!("proto.api.component.generic.v1.rs");
+                    // @@protoc_insertion_point(proto.api.component.generic.v1)
                 }
             }
             pub mod gantry {
@@ -150,18 +150,18 @@ pub mod proto {
                     // @@protoc_insertion_point(proto.api.service.navigation.v1)
                 }
             }
-            pub mod objectsegmentation {
-                // @@protoc_insertion_point(attribute:proto.api.service.objectsegmentation.v1)
-                pub mod v1 {
-                    include!("proto.api.service.objectsegmentation.v1.rs");
-                    // @@protoc_insertion_point(proto.api.service.objectsegmentation.v1)
-                }
-            }
             pub mod sensors {
                 // @@protoc_insertion_point(attribute:proto.api.service.sensors.v1)
                 pub mod v1 {
                     include!("proto.api.service.sensors.v1.rs");
                     // @@protoc_insertion_point(proto.api.service.sensors.v1)
+                }
+            }
+            pub mod vision {
+                // @@protoc_insertion_point(attribute:proto.api.service.vision.v1)
+                pub mod v1 {
+                    include!("proto.api.service.vision.v1.rs");
+                    // @@protoc_insertion_point(proto.api.service.vision.v1)
                 }
             }
             pub mod status {
