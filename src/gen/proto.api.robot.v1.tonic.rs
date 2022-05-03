@@ -62,25 +62,6 @@ pub mod robot_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn resource_run_command(
-            &mut self,
-            request: impl tonic::IntoRequest<super::ResourceRunCommandRequest>,
-        ) -> Result<tonic::Response<super::ResourceRunCommandResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.robot.v1.RobotService/ResourceRunCommand",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
         pub async fn get_operations(
             &mut self,
             request: impl tonic::IntoRequest<super::GetOperationsRequest>,
@@ -147,10 +128,6 @@ pub mod robot_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with RobotServiceServer.
     #[async_trait]
     pub trait RobotService: Send + Sync + 'static {
-        async fn resource_run_command(
-            &self,
-            request: tonic::Request<super::ResourceRunCommandRequest>,
-        ) -> Result<tonic::Response<super::ResourceRunCommandResponse>, tonic::Status>;
         async fn get_operations(
             &self,
             request: tonic::Request<super::GetOperationsRequest>,
@@ -223,46 +200,6 @@ pub mod robot_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/proto.api.robot.v1.RobotService/ResourceRunCommand" => {
-                    #[allow(non_camel_case_types)]
-                    struct ResourceRunCommandSvc<T: RobotService>(pub Arc<T>);
-                    impl<
-                        T: RobotService,
-                    > tonic::server::UnaryService<super::ResourceRunCommandRequest>
-                    for ResourceRunCommandSvc<T> {
-                        type Response = super::ResourceRunCommandResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::ResourceRunCommandRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).resource_run_command(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = ResourceRunCommandSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
                 "/proto.api.robot.v1.RobotService/GetOperations" => {
                     #[allow(non_camel_case_types)]
                     struct GetOperationsSvc<T: RobotService>(pub Arc<T>);

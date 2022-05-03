@@ -1,13 +1,15 @@
 // @generated
 /// Generated client implementations.
-pub mod force_matrix_service_client {
+pub mod generic_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
+    /** GenericService services all generic commands associated with a robot
+*/
     #[derive(Debug, Clone)]
-    pub struct ForceMatrixServiceClient<T> {
+    pub struct GenericServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl ForceMatrixServiceClient<tonic::transport::Channel> {
+    impl GenericServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -18,7 +20,7 @@ pub mod force_matrix_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> ForceMatrixServiceClient<T>
+    impl<T> GenericServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -32,7 +34,7 @@ pub mod force_matrix_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> ForceMatrixServiceClient<InterceptedService<T, F>>
+        ) -> GenericServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
@@ -45,7 +47,7 @@ pub mod force_matrix_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            ForceMatrixServiceClient::new(InterceptedService::new(inner, interceptor))
+            GenericServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with `gzip`.
         ///
@@ -62,10 +64,12 @@ pub mod force_matrix_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn read_matrix(
+        /** Do sends/recieves arbitrary commands
+*/
+        pub async fn r#do(
             &mut self,
-            request: impl tonic::IntoRequest<super::ReadMatrixRequest>,
-        ) -> Result<tonic::Response<super::ReadMatrixResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::DoRequest>,
+        ) -> Result<tonic::Response<super::DoResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -77,55 +81,36 @@ pub mod force_matrix_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.component.forcematrix.v1.ForceMatrixService/ReadMatrix",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn detect_slip(
-            &mut self,
-            request: impl tonic::IntoRequest<super::DetectSlipRequest>,
-        ) -> Result<tonic::Response<super::DetectSlipResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.component.forcematrix.v1.ForceMatrixService/DetectSlip",
+                "/proto.api.component.generic.v1.GenericService/Do",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod force_matrix_service_server {
+pub mod generic_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with ForceMatrixServiceServer.
+    ///Generated trait containing gRPC methods that should be implemented for use with GenericServiceServer.
     #[async_trait]
-    pub trait ForceMatrixService: Send + Sync + 'static {
-        async fn read_matrix(
+    pub trait GenericService: Send + Sync + 'static {
+        /** Do sends/recieves arbitrary commands
+*/
+        async fn r#do(
             &self,
-            request: tonic::Request<super::ReadMatrixRequest>,
-        ) -> Result<tonic::Response<super::ReadMatrixResponse>, tonic::Status>;
-        async fn detect_slip(
-            &self,
-            request: tonic::Request<super::DetectSlipRequest>,
-        ) -> Result<tonic::Response<super::DetectSlipResponse>, tonic::Status>;
+            request: tonic::Request<super::DoRequest>,
+        ) -> Result<tonic::Response<super::DoResponse>, tonic::Status>;
     }
+    /** GenericService services all generic commands associated with a robot
+*/
     #[derive(Debug)]
-    pub struct ForceMatrixServiceServer<T: ForceMatrixService> {
+    pub struct GenericServiceServer<T: GenericService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: ForceMatrixService> ForceMatrixServiceServer<T> {
+    impl<T: GenericService> GenericServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -159,9 +144,9 @@ pub mod force_matrix_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for ForceMatrixServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for GenericServiceServer<T>
     where
-        T: ForceMatrixService,
+        T: GenericService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -177,24 +162,22 @@ pub mod force_matrix_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/proto.api.component.forcematrix.v1.ForceMatrixService/ReadMatrix" => {
+                "/proto.api.component.generic.v1.GenericService/Do" => {
                     #[allow(non_camel_case_types)]
-                    struct ReadMatrixSvc<T: ForceMatrixService>(pub Arc<T>);
-                    impl<
-                        T: ForceMatrixService,
-                    > tonic::server::UnaryService<super::ReadMatrixRequest>
-                    for ReadMatrixSvc<T> {
-                        type Response = super::ReadMatrixResponse;
+                    struct DoSvc<T: GenericService>(pub Arc<T>);
+                    impl<T: GenericService> tonic::server::UnaryService<super::DoRequest>
+                    for DoSvc<T> {
+                        type Response = super::DoResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::ReadMatrixRequest>,
+                            request: tonic::Request<super::DoRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).read_matrix(request).await };
+                            let fut = async move { (*inner).r#do(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -203,45 +186,7 @@ pub mod force_matrix_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = ReadMatrixSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/proto.api.component.forcematrix.v1.ForceMatrixService/DetectSlip" => {
-                    #[allow(non_camel_case_types)]
-                    struct DetectSlipSvc<T: ForceMatrixService>(pub Arc<T>);
-                    impl<
-                        T: ForceMatrixService,
-                    > tonic::server::UnaryService<super::DetectSlipRequest>
-                    for DetectSlipSvc<T> {
-                        type Response = super::DetectSlipResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::DetectSlipRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).detect_slip(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = DetectSlipSvc(inner);
+                        let method = DoSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -268,7 +213,7 @@ pub mod force_matrix_service_server {
             }
         }
     }
-    impl<T: ForceMatrixService> Clone for ForceMatrixServiceServer<T> {
+    impl<T: GenericService> Clone for GenericServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -278,7 +223,7 @@ pub mod force_matrix_service_server {
             }
         }
     }
-    impl<T: ForceMatrixService> Clone for _Inner<T> {
+    impl<T: GenericService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(self.0.clone())
         }
@@ -288,8 +233,7 @@ pub mod force_matrix_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: ForceMatrixService> tonic::transport::NamedService
-    for ForceMatrixServiceServer<T> {
-        const NAME: &'static str = "proto.api.component.forcematrix.v1.ForceMatrixService";
+    impl<T: GenericService> tonic::transport::NamedService for GenericServiceServer<T> {
+        const NAME: &'static str = "proto.api.component.generic.v1.GenericService";
     }
 }
