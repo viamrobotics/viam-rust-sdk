@@ -1,15 +1,13 @@
 // @generated
 /// Generated client implementations.
-pub mod metadata_service_client {
+pub mod slam_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /** A MetadataService services all resources associated with a robot
-*/
     #[derive(Debug, Clone)]
-    pub struct MetadataServiceClient<T> {
+    pub struct SlamServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl MetadataServiceClient<tonic::transport::Channel> {
+    impl SlamServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -20,7 +18,7 @@ pub mod metadata_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> MetadataServiceClient<T>
+    impl<T> SlamServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -34,7 +32,7 @@ pub mod metadata_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> MetadataServiceClient<InterceptedService<T, F>>
+        ) -> SlamServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
@@ -47,7 +45,7 @@ pub mod metadata_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            MetadataServiceClient::new(InterceptedService::new(inner, interceptor))
+            SlamServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with `gzip`.
         ///
@@ -64,12 +62,10 @@ pub mod metadata_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        /** Resources returns the list of all resources.
-*/
-        pub async fn resources(
+        pub async fn get_position(
             &mut self,
-            request: impl tonic::IntoRequest<super::ResourcesRequest>,
-        ) -> Result<tonic::Response<super::ResourcesResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::GetPositionRequest>,
+        ) -> Result<tonic::Response<super::GetPositionResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -81,36 +77,55 @@ pub mod metadata_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.service.metadata.v1.MetadataService/Resources",
+                "/proto.api.service.slam.v1.SLAMService/GetPosition",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_map(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetMapRequest>,
+        ) -> Result<tonic::Response<super::GetMapResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.slam.v1.SLAMService/GetMap",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod metadata_service_server {
+pub mod slam_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with MetadataServiceServer.
+    ///Generated trait containing gRPC methods that should be implemented for use with SlamServiceServer.
     #[async_trait]
-    pub trait MetadataService: Send + Sync + 'static {
-        /** Resources returns the list of all resources.
-*/
-        async fn resources(
+    pub trait SlamService: Send + Sync + 'static {
+        async fn get_position(
             &self,
-            request: tonic::Request<super::ResourcesRequest>,
-        ) -> Result<tonic::Response<super::ResourcesResponse>, tonic::Status>;
+            request: tonic::Request<super::GetPositionRequest>,
+        ) -> Result<tonic::Response<super::GetPositionResponse>, tonic::Status>;
+        async fn get_map(
+            &self,
+            request: tonic::Request<super::GetMapRequest>,
+        ) -> Result<tonic::Response<super::GetMapResponse>, tonic::Status>;
     }
-    /** A MetadataService services all resources associated with a robot
-*/
     #[derive(Debug)]
-    pub struct MetadataServiceServer<T: MetadataService> {
+    pub struct SlamServiceServer<T: SlamService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: MetadataService> MetadataServiceServer<T> {
+    impl<T: SlamService> SlamServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -144,9 +159,9 @@ pub mod metadata_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for MetadataServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for SlamServiceServer<T>
     where
-        T: MetadataService,
+        T: SlamService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -162,24 +177,26 @@ pub mod metadata_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/proto.api.service.metadata.v1.MetadataService/Resources" => {
+                "/proto.api.service.slam.v1.SLAMService/GetPosition" => {
                     #[allow(non_camel_case_types)]
-                    struct ResourcesSvc<T: MetadataService>(pub Arc<T>);
+                    struct GetPositionSvc<T: SlamService>(pub Arc<T>);
                     impl<
-                        T: MetadataService,
-                    > tonic::server::UnaryService<super::ResourcesRequest>
-                    for ResourcesSvc<T> {
-                        type Response = super::ResourcesResponse;
+                        T: SlamService,
+                    > tonic::server::UnaryService<super::GetPositionRequest>
+                    for GetPositionSvc<T> {
+                        type Response = super::GetPositionResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::ResourcesRequest>,
+                            request: tonic::Request<super::GetPositionRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).resources(request).await };
+                            let fut = async move {
+                                (*inner).get_position(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -188,7 +205,45 @@ pub mod metadata_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = ResourcesSvc(inner);
+                        let method = GetPositionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.service.slam.v1.SLAMService/GetMap" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetMapSvc<T: SlamService>(pub Arc<T>);
+                    impl<
+                        T: SlamService,
+                    > tonic::server::UnaryService<super::GetMapRequest>
+                    for GetMapSvc<T> {
+                        type Response = super::GetMapResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetMapRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).get_map(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetMapSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -215,7 +270,7 @@ pub mod metadata_service_server {
             }
         }
     }
-    impl<T: MetadataService> Clone for MetadataServiceServer<T> {
+    impl<T: SlamService> Clone for SlamServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -225,7 +280,7 @@ pub mod metadata_service_server {
             }
         }
     }
-    impl<T: MetadataService> Clone for _Inner<T> {
+    impl<T: SlamService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(self.0.clone())
         }
@@ -235,8 +290,7 @@ pub mod metadata_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: MetadataService> tonic::transport::NamedService
-    for MetadataServiceServer<T> {
-        const NAME: &'static str = "proto.api.service.metadata.v1.MetadataService";
+    impl<T: SlamService> tonic::transport::NamedService for SlamServiceServer<T> {
+        const NAME: &'static str = "proto.api.service.slam.v1.SLAMService";
     }
 }
