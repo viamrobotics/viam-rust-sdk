@@ -1,5 +1,5 @@
 use anyhow::Result;
-use viam::gen::proto::api::service::metadata::v1::{metadata_service_client, ResourcesRequest};
+use viam::gen::proto::api::robot::v1::{robot_service_client, ResourceNamesRequest};
 use viam::rpc::dial;
 
 #[tokio::main]
@@ -14,9 +14,9 @@ async fn main() -> Result<()> {
         .connect()
         .await?;
     println!("Get the robot's metadata");
-    let mut service = metadata_service_client::MetadataServiceClient::new(c);
+    let mut service = robot_service_client::RobotServiceClient::new(c);
     let _rsp = service
-        .resources(tonic::Request::new(ResourcesRequest {}))
+        .resource_names(tonic::Request::new(ResourceNamesRequest {}))
         .await?;
     println!("Rsp {:?}", _rsp);
     Ok(())
