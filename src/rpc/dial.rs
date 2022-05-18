@@ -5,7 +5,7 @@ use anyhow::Context;
 use anyhow::Result;
 use core::fmt;
 use http::uri::Parts;
-use tonic::{metadata::MetadataValue, transport::Channel, transport::Uri, Request, Status};
+use tonic::{metadata::AsciiMetadataValue, transport::Channel, transport::Uri, Request, Status};
 use tower::ServiceBuilder;
 
 type SecretType = String;
@@ -196,7 +196,7 @@ impl DialBuilder<WithCredentials> {
             uri.authority().unwrap().as_str(),
         )
         .await?;
-        let metadata = MetadataValue::from_str(&*format!("Bearer {}", token))?;
+        let metadata = AsciiMetadataValue::from_str(&*format!("Bearer {}", token))?;
         let channel = ServiceBuilder::new()
             .layer(tonic::service::interceptor(move |mut req: Request<()>| {
                 req.metadata_mut().insert("authorization", metadata.clone());
