@@ -39,7 +39,7 @@ At the top of the file add :
 
 ``` rust
 use anyhow::Result;
-use viam::gen::proto::api::service::metadata::v1::{metadata_service_client, ResourcesRequest};
+use viam::gen::proto::api::robot::v1::{robot_service_client, ResourceNamesRequest};
 use viam::rpc::dial;
 ```
 Replace the main function signature with :
