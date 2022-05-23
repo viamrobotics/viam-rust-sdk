@@ -73,9 +73,9 @@ let c = dial::DialConfig::builder()
 Now if we want to get the metadata of the robots we just have to do :
 
 ``` rust
-let mut service = metadata_service_client::MetadataServiceClient::new(c);
+let mut service = robot_service_client::RobotServiceClient::new(c);
     let _rsp = service
-        .resources(tonic::Request::new(ResourcesRequest {}))
+        .resource_names(tonic::Request::new(ResourceNamesRequest {}))
         .await?;
     println!("Rsp {:?}", _rsp);
 ```
