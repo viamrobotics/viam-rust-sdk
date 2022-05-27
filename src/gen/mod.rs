@@ -122,13 +122,6 @@ pub mod proto {
                     // @@protoc_insertion_point(proto.api.service.datamanager.v1)
                 }
             }
-            pub mod framesystem {
-                // @@protoc_insertion_point(attribute:proto.api.service.framesystem.v1)
-                pub mod v1 {
-                    include!("proto.api.service.framesystem.v1.rs");
-                    // @@protoc_insertion_point(proto.api.service.framesystem.v1)
-                }
-            }
             pub mod slam {
                 // @@protoc_insertion_point(attribute:proto.api.service.slam.v1)
                 pub mod v1 {

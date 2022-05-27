@@ -138,6 +138,44 @@ pub mod robot_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn frame_system_config(
+            &mut self,
+            request: impl tonic::IntoRequest<super::FrameSystemConfigRequest>,
+        ) -> Result<tonic::Response<super::FrameSystemConfigResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.robot.v1.RobotService/FrameSystemConfig",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn transform_pose(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TransformPoseRequest>,
+        ) -> Result<tonic::Response<super::TransformPoseResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.robot.v1.RobotService/TransformPose",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -163,6 +201,14 @@ pub mod robot_service_server {
             &self,
             request: tonic::Request<super::BlockForOperationRequest>,
         ) -> Result<tonic::Response<super::BlockForOperationResponse>, tonic::Status>;
+        async fn frame_system_config(
+            &self,
+            request: tonic::Request<super::FrameSystemConfigRequest>,
+        ) -> Result<tonic::Response<super::FrameSystemConfigResponse>, tonic::Status>;
+        async fn transform_pose(
+            &self,
+            request: tonic::Request<super::TransformPoseRequest>,
+        ) -> Result<tonic::Response<super::TransformPoseResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct RobotServiceServer<T: RobotService> {
@@ -372,6 +418,86 @@ pub mod robot_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = BlockForOperationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.robot.v1.RobotService/FrameSystemConfig" => {
+                    #[allow(non_camel_case_types)]
+                    struct FrameSystemConfigSvc<T: RobotService>(pub Arc<T>);
+                    impl<
+                        T: RobotService,
+                    > tonic::server::UnaryService<super::FrameSystemConfigRequest>
+                    for FrameSystemConfigSvc<T> {
+                        type Response = super::FrameSystemConfigResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::FrameSystemConfigRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).frame_system_config(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = FrameSystemConfigSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.robot.v1.RobotService/TransformPose" => {
+                    #[allow(non_camel_case_types)]
+                    struct TransformPoseSvc<T: RobotService>(pub Arc<T>);
+                    impl<
+                        T: RobotService,
+                    > tonic::server::UnaryService<super::TransformPoseRequest>
+                    for TransformPoseSvc<T> {
+                        type Response = super::TransformPoseResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TransformPoseRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).transform_pose(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = TransformPoseSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
