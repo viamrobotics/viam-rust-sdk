@@ -45,7 +45,6 @@ where
             .unwrap();
         h.uri = proxy_uri;
         let req = Request::from_parts(h, b);
-        println!("Request {:?}", &req);
         self.inner.call(req)
     }
 }
