@@ -5,8 +5,10 @@ use anyhow::Context;
 use anyhow::Result;
 use core::fmt;
 use http::uri::Parts;
-use tonic::{metadata::AsciiMetadataValue, transport::Channel, transport::Uri, Request, Status};
+use tonic::{transport::Channel, transport::Uri};
 use tower::ServiceBuilder;
+use tower_http::auth::AddAuthorization;
+use tower_http::auth::AddAuthorizationLayer;
 
 type SecretType = String;
 
@@ -157,14 +159,7 @@ async fn get_auth_token(channel: Channel, creds: Credentials, entity: &str) -> R
 }
 
 impl DialBuilder<WithCredentials> {
-    pub async fn connect(
-        self,
-    ) -> Result<
-        tonic::codegen::InterceptedService<
-            Channel,
-            impl FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, Status>,
-        >,
-    > {
+    pub async fn connect(self) -> Result<AddAuthorization<Channel>> {
         let mut uri_parts = self.config.uri.unwrap();
         if self.config.insecure {
             uri_parts.scheme = Some(http::uri::Scheme::HTTP);
@@ -196,12 +191,8 @@ impl DialBuilder<WithCredentials> {
             uri.authority().unwrap().as_str(),
         )
         .await?;
-        let metadata = AsciiMetadataValue::from_str(&*format!("Bearer {}", token))?;
         let channel = ServiceBuilder::new()
-            .layer(tonic::service::interceptor(move |mut req: Request<()>| {
-                req.metadata_mut().insert("authorization", metadata.clone());
-                Ok(req)
-            }))
+            .layer(AddAuthorizationLayer::bearer(&token))
             .service(real_channel);
         Ok(channel)
     }
