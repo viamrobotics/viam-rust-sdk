@@ -81,25 +81,6 @@ pub mod base_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn move_arc(
-            &mut self,
-            request: impl tonic::IntoRequest<super::MoveArcRequest>,
-        ) -> Result<tonic::Response<super::MoveArcResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.component.base.v1.BaseService/MoveArc",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
         pub async fn spin(
             &mut self,
             request: impl tonic::IntoRequest<super::SpinRequest>,
@@ -138,6 +119,25 @@ pub mod base_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn set_velocity(
+            &mut self,
+            request: impl tonic::IntoRequest<super::SetVelocityRequest>,
+        ) -> Result<tonic::Response<super::SetVelocityResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.component.base.v1.BaseService/SetVelocity",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn stop(
             &mut self,
             request: impl tonic::IntoRequest<super::StopRequest>,
@@ -170,10 +170,6 @@ pub mod base_service_server {
             &self,
             request: tonic::Request<super::MoveStraightRequest>,
         ) -> Result<tonic::Response<super::MoveStraightResponse>, tonic::Status>;
-        async fn move_arc(
-            &self,
-            request: tonic::Request<super::MoveArcRequest>,
-        ) -> Result<tonic::Response<super::MoveArcResponse>, tonic::Status>;
         async fn spin(
             &self,
             request: tonic::Request<super::SpinRequest>,
@@ -182,6 +178,10 @@ pub mod base_service_server {
             &self,
             request: tonic::Request<super::SetPowerRequest>,
         ) -> Result<tonic::Response<super::SetPowerResponse>, tonic::Status>;
+        async fn set_velocity(
+            &self,
+            request: tonic::Request<super::SetVelocityRequest>,
+        ) -> Result<tonic::Response<super::SetVelocityResponse>, tonic::Status>;
         async fn stop(
             &self,
             request: tonic::Request<super::StopRequest>,
@@ -286,44 +286,6 @@ pub mod base_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/proto.api.component.base.v1.BaseService/MoveArc" => {
-                    #[allow(non_camel_case_types)]
-                    struct MoveArcSvc<T: BaseService>(pub Arc<T>);
-                    impl<
-                        T: BaseService,
-                    > tonic::server::UnaryService<super::MoveArcRequest>
-                    for MoveArcSvc<T> {
-                        type Response = super::MoveArcResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::MoveArcRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).move_arc(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = MoveArcSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
                 "/proto.api.component.base.v1.BaseService/Spin" => {
                     #[allow(non_camel_case_types)]
                     struct SpinSvc<T: BaseService>(pub Arc<T>);
@@ -387,6 +349,46 @@ pub mod base_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = SetPowerSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.component.base.v1.BaseService/SetVelocity" => {
+                    #[allow(non_camel_case_types)]
+                    struct SetVelocitySvc<T: BaseService>(pub Arc<T>);
+                    impl<
+                        T: BaseService,
+                    > tonic::server::UnaryService<super::SetVelocityRequest>
+                    for SetVelocitySvc<T> {
+                        type Response = super::SetVelocityResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::SetVelocityRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).set_velocity(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = SetVelocitySvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
