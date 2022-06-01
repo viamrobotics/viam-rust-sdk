@@ -119,6 +119,25 @@ pub mod gantry_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn stop(
+            &mut self,
+            request: impl tonic::IntoRequest<super::StopRequest>,
+        ) -> Result<tonic::Response<super::StopResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.component.gantry.v1.GantryService/Stop",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -140,6 +159,10 @@ pub mod gantry_service_server {
             &self,
             request: tonic::Request<super::GetLengthsRequest>,
         ) -> Result<tonic::Response<super::GetLengthsResponse>, tonic::Status>;
+        async fn stop(
+            &self,
+            request: tonic::Request<super::StopRequest>,
+        ) -> Result<tonic::Response<super::StopResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct GantryServiceServer<T: GantryService> {
@@ -307,6 +330,43 @@ pub mod gantry_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetLengthsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.component.gantry.v1.GantryService/Stop" => {
+                    #[allow(non_camel_case_types)]
+                    struct StopSvc<T: GantryService>(pub Arc<T>);
+                    impl<
+                        T: GantryService,
+                    > tonic::server::UnaryService<super::StopRequest> for StopSvc<T> {
+                        type Response = super::StopResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::StopRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).stop(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = StopSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
