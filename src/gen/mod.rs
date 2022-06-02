@@ -157,13 +157,6 @@ pub mod proto {
                     // @@protoc_insertion_point(proto.api.service.vision.v1)
                 }
             }
-            pub mod status {
-                // @@protoc_insertion_point(attribute:proto.api.service.status.v1)
-                pub mod v1 {
-                    include!("proto.api.service.status.v1.rs");
-                    // @@protoc_insertion_point(proto.api.service.status.v1)
-                }
-            }
         }
     }
     pub mod rpc {
