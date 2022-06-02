@@ -1,2 +1,2 @@
-pub mod proxy;
+pub mod grpc_proxy;
 pub mod uds;

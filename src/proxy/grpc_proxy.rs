@@ -6,15 +6,12 @@ use tower::Service;
 #[derive(Clone, Debug)]
 pub struct GRPCProxy<T> {
     inner: T,
-    uri_parts: Uri,
+    uri: Uri,
 }
 
 impl<T> GRPCProxy<T> {
     pub fn new(inner: T, uri: Uri) -> Self {
-        GRPCProxy {
-            inner,
-            uri_parts: uri,
-        }
+        GRPCProxy { inner, uri }
     }
 }
 
@@ -36,13 +33,9 @@ where
         let b = b
             .map_err(|e| tonic::Status::new(tonic::Code::Unknown, e.to_string()))
             .boxed_unsync();
-        let from_uri = h.uri.into_parts();
-        let proxy_uri = Uri::builder()
-            .scheme(self.uri_parts.scheme_str().unwrap().clone())
-            .authority(self.uri_parts.authority().unwrap().clone())
-            .path_and_query(from_uri.path_and_query.unwrap().clone())
-            .build()
-            .unwrap();
+        let mut to_uri = self.uri.clone().into_parts();
+        to_uri.path_and_query = h.uri.into_parts().path_and_query;
+        let proxy_uri = Uri::from_parts(to_uri).unwrap();
         h.uri = proxy_uri;
         let req = Request::from_parts(h, b);
         self.inner.call(req)

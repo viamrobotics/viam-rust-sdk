@@ -1,1 +1,1 @@
-pub mod ffi;
+pub mod dial_ffi;

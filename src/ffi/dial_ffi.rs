@@ -19,6 +19,8 @@ use tower_http::{
 
 use anyhow::Result;
 
+use crate::proxy::grpc_proxy::GRPCProxy;
+
 pub struct Ffi {
     runtime: Runtime,
     jhs: Option<Vec<JoinHandle<()>>>,
@@ -85,15 +87,23 @@ fn dial_with_cred(
     let c = if allow_insec { c.allow_downgrade() } else { c };
     Ok(c)
 }
-
+/// Returns a path to a UDS proxy to a robot
+/// # Safety
+///
+/// This function should be called from another language. See rpc::dial for dial from rust
+/// # Arguments
+/// * `c_uri` a C-style string representing the robot your are proxiying to
+/// * `c_payload` a C-style string that is the robot's secret, set to NULL if you don't need authentication
+/// * `c_allow_insecure` a bool, set to true when allowing insecure connection to your robot
+/// * `rt_ptr` a pointer to a rust runtime previously obtained with init_rust_runtime
 #[no_mangle]
-pub extern "C" fn dial_direct(
+pub unsafe extern "C" fn dial_direct(
     c_uri: *const c_char,
     c_payload: *const c_char,
     c_allow_insec: bool,
     rt_ptr: Option<&mut Ffi>,
 ) -> *mut c_char {
-    let uri = unsafe {
+    let uri = {
         if let true = c_uri.is_null() {
             return ptr::null_mut();
         }
@@ -107,7 +117,7 @@ pub extern "C" fn dial_direct(
         ur
     };
     let allow_insec = c_allow_insec;
-    let payload = unsafe {
+    let payload = {
         match c_payload.is_null() {
             true => None,
             false => Some(CStr::from_ptr(c_payload)),
@@ -144,26 +154,12 @@ pub extern "C" fn dial_direct(
                     .connect()
                     .await?,
             ),
-            None => tower::util::Either::B(
-                dial_without_cred(uri.clone().to_string(), allow_insec)?
-                    .connect()
-                    .await?,
-            ),
+            None => {
+                let c = dial_without_cred(uri.clone().to_string(), allow_insec)?;
+                tower::util::Either::B(c.connect().await?)
+            }
         };
-        //let chan = Channel::builder(uri.clone()).connect().await.unwrap();
-        // let chan = ServiceBuilder::new()
-        //     .layer(
-        //         TraceLayer::new_for_http()
-        //             .make_span_with(DefaultMakeSpan::new().include_headers(true))
-        //             .on_request(DefaultOnRequest::new().level(Level::INFO))
-        //             .on_response(
-        //                 DefaultOnResponse::new()
-        //                     .level(Level::INFO)
-        //                     .latency_unit(LatencyUnit::Micros),
-        //             ),
-        //     )
-        //     .service(chan);
-        let g = proxy::proxy::GRPCProxy::new(dial, uri);
+        let g = GRPCProxy::new(dial, uri);
         let service = ServiceBuilder::new()
             .layer(
                 TraceLayer::new_for_http()
@@ -197,14 +193,18 @@ pub extern "C" fn dial_direct(
     ctx.push_handle(h);
     path.into_raw()
 }
+/// This function must be used to free the path returned by the dial_direct function
+/// # Safety
+///
+/// This function must be use from outside a rust context
+/// # Arguments
+/// * `c_char` a pointer to the string returned by dial_direct
 #[no_mangle]
-pub extern "C" fn free_string(s: *mut c_char) {
-    unsafe {
-        if s.is_null() {
-            return;
-        }
-        let _ = CString::from_raw(s);
-    };
+pub unsafe extern "C" fn free_string(s: *mut c_char) {
+    if s.is_null() {
+        return;
+    }
+    let _ = CString::from_raw(s);
 }
 
 #[no_mangle]

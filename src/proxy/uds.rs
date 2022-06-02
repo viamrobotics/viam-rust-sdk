@@ -20,7 +20,7 @@ impl UDSConnector {
         rname = format!("/tmp/proxy-{}.sock", rname);
         Self::new(rname)
     }
-    pub fn get_path<'a>(&'a self) -> &'a str {
+    pub fn get_path(&self) -> &str {
         &self.path
     }
 }
