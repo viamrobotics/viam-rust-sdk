@@ -3,8 +3,6 @@
 pub mod generic_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /** GenericService services all generic commands associated with a robot
-*/
     #[derive(Debug, Clone)]
     pub struct GenericServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -64,8 +62,6 @@ pub mod generic_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        /** Do sends/recieves arbitrary commands
-*/
         pub async fn r#do(
             &mut self,
             request: impl tonic::IntoRequest<super::DoRequest>,
@@ -94,15 +90,11 @@ pub mod generic_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with GenericServiceServer.
     #[async_trait]
     pub trait GenericService: Send + Sync + 'static {
-        /** Do sends/recieves arbitrary commands
-*/
         async fn r#do(
             &self,
             request: tonic::Request<super::DoRequest>,
         ) -> Result<tonic::Response<super::DoResponse>, tonic::Status>;
     }
-    /** GenericService services all generic commands associated with a robot
-*/
     #[derive(Debug)]
     pub struct GenericServiceServer<T: GenericService> {
         inner: _Inner<T>,

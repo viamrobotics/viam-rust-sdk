@@ -3,8 +3,6 @@
 pub mod pose_tracker_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /** A PoseTrackerService maintains all pose trackers associated with a robot
-*/
     #[derive(Debug, Clone)]
     pub struct PoseTrackerServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -64,8 +62,6 @@ pub mod pose_tracker_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        /** GetPoses returns the current pose of each body tracked by the pose tracker
-*/
         pub async fn get_poses(
             &mut self,
             request: impl tonic::IntoRequest<super::GetPosesRequest>,
@@ -94,15 +90,11 @@ pub mod pose_tracker_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with PoseTrackerServiceServer.
     #[async_trait]
     pub trait PoseTrackerService: Send + Sync + 'static {
-        /** GetPoses returns the current pose of each body tracked by the pose tracker
-*/
         async fn get_poses(
             &self,
             request: tonic::Request<super::GetPosesRequest>,
         ) -> Result<tonic::Response<super::GetPosesResponse>, tonic::Status>;
     }
-    /** A PoseTrackerService maintains all pose trackers associated with a robot
-*/
     #[derive(Debug)]
     pub struct PoseTrackerServiceServer<T: PoseTrackerService> {
         inner: _Inner<T>,
