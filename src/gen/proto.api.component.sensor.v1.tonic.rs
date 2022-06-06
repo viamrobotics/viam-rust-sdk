@@ -3,8 +3,6 @@
 pub mod sensor_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /** SensorService services all generic sensors associated with a robot
-*/
     #[derive(Debug, Clone)]
     pub struct SensorServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -64,8 +62,6 @@ pub mod sensor_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        /** GetReadings returns the readings of a sensor of the underlying robot.
-*/
         pub async fn get_readings(
             &mut self,
             request: impl tonic::IntoRequest<super::GetReadingsRequest>,
@@ -94,15 +90,11 @@ pub mod sensor_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with SensorServiceServer.
     #[async_trait]
     pub trait SensorService: Send + Sync + 'static {
-        /** GetReadings returns the readings of a sensor of the underlying robot.
-*/
         async fn get_readings(
             &self,
             request: tonic::Request<super::GetReadingsRequest>,
         ) -> Result<tonic::Response<super::GetReadingsResponse>, tonic::Status>;
     }
-    /** SensorService services all generic sensors associated with a robot
-*/
     #[derive(Debug)]
     pub struct SensorServiceServer<T: SensorService> {
         inner: _Inner<T>,
