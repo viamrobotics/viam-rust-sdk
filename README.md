@@ -91,3 +91,50 @@ let c = dial::DialConfig::builder()
         .connect()
         .await?; // if the connection complete you will have a channel otherwise an error
 ```
+
+## Using FFI (Foreign Functions Interface)
+The rust sdk exposes a few functions conforming to the platform's C calling convention. Most languages support calling C code but their particular implementation is beyond the scope of this README. However we provide example in C++.
+
+### Set up
+For now we only support Unix-like systems. Before continuing make sure that GRPCCpp has been installed on your system.
+Navigate to :
+
+``` shell
+cd examples/ffi/cpp
+# Then
+make buf
+# Note that to build the robot API you will need a BUF_TOKEN, if you don't have one you can still run the echo example
+BUF_TOKEN=<your-token> make buf
+```
+
+### Echo example
+The echo example communicate with the goutils sample server, navigate to your goutils clone and run
+
+``` shell
+go run rpc/examples/echo/server/cmd/main.go
+```
+Take note of the signaling port and replace the port value in ffi_echo.cc with yours like this :
+
+``` c++
+dial_direct("http://127.0.0.1:<your-port>", NULL, true, ptr);
+```
+Then run 
+
+``` shell
+make ffi_echo && ./ffi_echo
+```
+
+### Robot example
+The robot example communicate with a rdk server
+Update the dial_direct function with your address and secret in the file ffi_robot.cc
+
+``` c++
+dial_direct("<robot-address>",
+            "<robot-secret>",
+            false, ptr);
+```
+Then run 
+
+``` shell
+make ffi_robot && ./ffi_robot
+```

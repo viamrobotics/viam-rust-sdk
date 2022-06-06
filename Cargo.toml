@@ -3,6 +3,8 @@ name = "viam"
 version = "0.0.1"
 edition = "2021"
 
+[lib]
+crate-type = ["cdylib","lib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -13,7 +15,7 @@ prost-types = "0.10"
 futures-core = "0.3"
 futures-util = "0.3"
 tower = { version = "0.4" }
-http = "0.2"
+http = "0.2.7"
 tokio = {version = "1.0", features = ["rt-multi-thread", "time", "fs", "macros", "net"]}
 tokio-stream = {version = "0.1", features = ["net"]}
 tonic = {version = "0.7",features = ["tls", "compression", "tls-roots"]}
@@ -23,7 +25,12 @@ serde_json = "1.0"
 rand = "0.8.5"
 tokio-rustls = { version = "0.23.3"}
 webpki-roots = "0.21.1"
-
+tracing = {version = "0.1.34"}
+tracing-subscriber = {version = "0.3.11", features = ["env-filter"]}
+http-body = {version = "0.4.4"}
+libc = {version = "0.2"}
+hyper = { version = "0.14.18", features = ["full"]  }
+tower-http = { version = "0.3.3", features = ["add-extension","auth","propagate-header","set-header","sensitive-headers","trace","compression-gzip"]}
 
 
 [build-dependencies]
