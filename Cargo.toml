@@ -9,29 +9,51 @@ crate-type = ["cdylib","lib"]
 
 [dependencies]
 anyhow = { version = "1.0", features = ["backtrace"]}
-futures = {version = "0.3", default-features = false, features = ["alloc"]}
-prost = "0.10"
-prost-types = "0.10"
+async-stream = "0.2"
+async_once = "0.2.6"
+awaitgroup = "0.6.0"
+base64 = "0.13.0"
+byteorder = "1.4.3"
+bytes = "1.1.0"
+derivative = "2.2.0"
+futures = {version = "0.3", default-features = false, features = ["alloc", "executor"]}
 futures-core = "0.3"
 futures-util = "0.3"
-tower = { version = "0.4" }
 http = "0.2.7"
-tokio = {version = "1.0", features = ["rt-multi-thread", "time", "fs", "macros", "net"]}
-tokio-stream = {version = "0.1", features = ["net"]}
-tonic = {version = "0.7",features = ["tls", "compression", "tls-roots"]}
-async-stream = "0.2"
+http-body = {version = "0.4.4"}
+hyper = { version = "0.14.18", features = ["full"]  }
+# CR erodkin: do we need interceptor?
+interceptor = "0.7.6"
+libc = {version = "0.2"}
+log = "0.4.17"
+# CR erodkin: do we need prost/prost-types?
+prost = "0.10"
+prost-types = "0.10"
+#delete protobuf from here probably. 
+protobuf = "3.0.3"
+protobuf-json-mapping = "3.0.3"
+protobuf-support = "3.0.3"
+# do we need rand/rcgen?
+rand = "0.8.5"
+rcgen = "0.8.14"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-rand = "0.8.5"
-tokio-rustls = { version = "0.23.3"}
-webpki-roots = "0.21.1"
+tokio = {version = "1.19", features = ["rt-multi-thread", "time", "fs", "macros", "net"]}
+tokio-stream = {version = "0.1", features = ["net"]}
+tokio-rustls = { version = "0.23.4"}
+# CR erodkin: do we need prost feature in tonic?
+tonic = {version = "0.7.2",features = ["prost", "tls", "compression", "tls-roots",]}
+tower = { version = "0.4" }
+tower-http = { version = "0.3.3", features = ["add-extension","auth","propagate-header","set-header","sensitive-headers","trace","compression-gzip"]}
 tracing = {version = "0.1.34"}
 tracing-subscriber = {version = "0.3.11", features = ["env-filter"]}
-http-body = {version = "0.4.4"}
-libc = {version = "0.2"}
-hyper = { version = "0.14.18", features = ["full"]  }
-tower-http = { version = "0.3.3", features = ["add-extension","auth","propagate-header","set-header","sensitive-headers","trace","compression-gzip"]}
+webpki-roots = "0.21.1"
+webrtc = "0.4.0"
 
 
 [build-dependencies]
-tonic-build = {version = "0.7",features = ["prost", "compression"]}
+tonic-build = {version = "0.7.2",features = ["prost", "compression"]}
+
+[patch.crates-io]
+webrtc = { path = "../../rust/webrtc" }
+webrtc-data = { version = "0.3.3", path = "../../rust/data" }
