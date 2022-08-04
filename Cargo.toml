@@ -10,8 +10,6 @@ crate-type = ["cdylib","lib"]
 [dependencies]
 anyhow = { version = "1.0", features = ["backtrace"]}
 async-stream = "0.2"
-async_once = "0.2.6"
-awaitgroup = "0.6.0"
 base64 = "0.13.0"
 byteorder = "1.4.3"
 bytes = "1.1.0"

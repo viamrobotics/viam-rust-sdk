@@ -1,4 +1,5 @@
 use super::{client_channel::*, webrtc::Options};
+use crate::gen::google;
 use crate::gen::proto::rpc::v1::{
     auth_service_client::AuthServiceClient, AuthenticateRequest, Credentials,
 };
@@ -22,7 +23,6 @@ use anyhow::{Context, Result};
 use core::fmt;
 use std::hint;
 use std::str::FromStr;
-use std::sync::Once;
 use std::{
     collections::HashMap,
     sync::{
@@ -33,25 +33,17 @@ use std::{
     time::Duration,
 };
 use tonic::body::BoxBody;
-use tonic::codegen::{http, BoxFuture, InterceptedService};
-use tonic::metadata::{Ascii, Binary, BinaryMetadataValue, MetadataValue};
-use tonic::{
-    metadata::AsciiMetadataValue,
-    transport::{Body, Channel, Uri},
-    Request, Status,
-};
+use tonic::codegen::{http, BoxFuture};
+use tonic::transport::{Body, Channel, Uri};
 use tower::{Service, ServiceBuilder};
 use tower_http::auth::AddAuthorization;
 use tower_http::auth::AddAuthorizationLayer;
-use tower_http::sensitive_headers::SetSensitiveHeaders;
 use tower_http::set_header::{SetRequestHeader, SetRequestHeaderLayer};
-use tower_http::ServiceBuilderExt;
 
 type SecretType = String;
 
 #[derive(Clone)]
-// CR erodkin: rename
-pub enum GenericChannel {
+pub enum ViamChannel {
     Direct(Channel),
     Webrtc(Arc<WebrtcClientChannel>),
 }
@@ -66,7 +58,7 @@ impl CredentialsExt for Credentials {
     }
 }
 
-impl Service<http::Request<BoxBody>> for GenericChannel {
+impl Service<http::Request<BoxBody>> for ViamChannel {
     type Response = http::Response<Body>;
     type Error = tonic::transport::Error;
     type Future = BoxFuture<Self::Response, Self::Error>;
@@ -227,7 +219,7 @@ impl<T: AuthMethod> DialBuilder<T> {
 }
 
 impl DialBuilder<WithoutCredentials> {
-    pub async fn connect(self) -> Result<GenericChannel> {
+    pub async fn connect(self) -> Result<ViamChannel> {
         // CR erodkin: delete me. but first test me.
         println!("doing anything without credentials la la la");
         let mut uri_parts = self.config.uri.unwrap();
@@ -253,10 +245,10 @@ impl DialBuilder<WithoutCredentials> {
             }
             Ok(c) => c,
         };
+
+        // TODO (RSDK-517) make maybe_connect_via_webrtc take a more generic type so we don't
+        // need to add these dummy layers.
         let intercepted_channel = ServiceBuilder::new()
-            //.layer(tonic::service::interceptor(Ok))
-            // CR erodkin: sad that we have this here at all. can we avoid it?
-            // CR erodkin: can we use the AddAuthorizationLayer again, or are we sol on that?
             .layer(AddAuthorizationLayer::basic(
                 "fake username",
                 "fake password",
@@ -268,10 +260,10 @@ impl DialBuilder<WithoutCredentials> {
             .service(channel.clone());
 
         match maybe_connect_via_webrtc(uri, intercepted_channel.clone()).await {
-            Ok(webrtc_channel) => Ok(GenericChannel::Webrtc(webrtc_channel)),
+            Ok(webrtc_channel) => Ok(ViamChannel::Webrtc(webrtc_channel)),
             Err(e) => {
                 log::error!("error connecting via webrtc: {e}. Attempting to connect directly");
-                Ok(GenericChannel::Direct(channel.clone()))
+                Ok(ViamChannel::Direct(channel.clone()))
             }
         }
     }
@@ -292,7 +284,7 @@ async fn get_auth_token(channel: &mut Channel, creds: Credentials, entity: &str)
 }
 
 impl DialBuilder<WithCredentials> {
-    pub async fn connect(self) -> Result<AddAuthorization<GenericChannel>> {
+    pub async fn connect(self) -> Result<AddAuthorization<ViamChannel>> {
         let mut uri_parts = self.config.uri.unwrap();
         if self.config.insecure {
             uri_parts.scheme = Some(Scheme::HTTP);
@@ -328,45 +320,22 @@ impl DialBuilder<WithCredentials> {
             domain,
         )
         .await?;
-        // CR erodkin: this sure is ugly! see if we can't fix it up. looks like nicolas already
-        // figured out how, check out the main branch
-        let metadata = AsciiMetadataValue::try_from(&*format!("Bearer {}", token))?;
-        let host = AsciiMetadataValue::try_from(domain)?;
-        //let host = BinaryMetadataValue::fro(domain);
-        // CR erodkin: see if we need webrtc layer at all
-        //let webrtc_layer = tonic::service::interceptor(move |mut req: Request<()>| {
-        //req.metadata_mut().insert("authorization", metadata.clone());
-        //req.metadata_mut().insert("rpc-host", host.clone());
-        //req.metadata_mut()
-        //.insert("content-type", "application/grpc+tonic".parse().unwrap());
-        //Ok(req)
-        //});
 
         let channel = ServiceBuilder::new()
-            //.override_request_header(HeaderName::from_static("rpc-host"), host.clone())
             .layer(AddAuthorizationLayer::bearer(&token))
             .layer(SetRequestHeaderLayer::overriding(
                 HeaderName::from_static("rpc-host"),
-                HeaderValue::from_str(domain)?, //domain,
-                                                //host.clone(),
+                HeaderValue::from_str(domain)?,
             ))
-            //.layer(SetRequestHeader::overriding("rpc-host", host.clone())
-            //.layer(webrtc_layer)
             .service(real_channel.clone());
-        //Ok(channel)
-
-        //let channel = ServiceBuilder::new()
-        //.layer(&layer)
-        //.service(real_channel.clone());
 
         let channel = match maybe_connect_via_webrtc(uri.clone(), channel.clone()).await {
-            Ok(webrtc_channel) => GenericChannel::Webrtc(webrtc_channel),
+            Ok(webrtc_channel) => ViamChannel::Webrtc(webrtc_channel),
             Err(e) => {
                 log::error!(
-                    "Unable to establish webrtc connection due to error {e}. 
-                    Attempting direct connection."
+                    "Unable to establish webrtc connection due to error {e}. Attempting direct connection."
                 );
-                GenericChannel::Direct(real_channel.clone())
+                ViamChannel::Direct(real_channel.clone())
             }
         };
 
@@ -376,26 +345,61 @@ impl DialBuilder<WithCredentials> {
     }
 }
 
-async fn send_done_once(
-    sent_done: Arc<AtomicBool>,
-    uuid: String,
+async fn send_done_or_error_update(
+    update: CallUpdateRequest,
     channel: AddAuthorization<SetRequestHeader<Channel, HeaderValue>>,
-) -> Result<()> {
-    if sent_done.load(Ordering::SeqCst) {
-        return Ok(());
-    }
-    sent_done.store(true, Ordering::SeqCst);
-    let update_request = CallUpdateRequest {
-        uuid,
-        update: Some(Update::Done(true)),
-    };
+) {
     let mut signaling_client = SignalingServiceClient::new(channel.clone());
 
-    signaling_client
-        .call_update(update_request)
+    if let Err(e) = signaling_client
+        .call_update(update)
         .await
         .map_err(anyhow::Error::from)
         .map(|_| ())
+    {
+        log::error!("Error sending done or error update: {e}");
+    }
+}
+
+async fn send_error_once(
+    sent_error: Arc<AtomicBool>,
+    uuid: &String,
+    err: &anyhow::Error,
+    channel: AddAuthorization<SetRequestHeader<Channel, HeaderValue>>,
+) {
+    if sent_error.load(Ordering::SeqCst) {
+        return;
+    }
+
+    let err = google::rpc::Status {
+        code: google::rpc::Code::Unknown.into(),
+        message: err.to_string(),
+        details: Vec::new(),
+    };
+    sent_error.store(true, Ordering::SeqCst);
+    let update_request = CallUpdateRequest {
+        uuid: uuid.to_string(),
+        update: Some(Update::Error(err)),
+    };
+
+    send_done_or_error_update(update_request, channel).await
+}
+
+async fn send_done_once(
+    sent_done: Arc<AtomicBool>,
+    uuid: &String,
+    channel: AddAuthorization<SetRequestHeader<Channel, HeaderValue>>,
+) {
+    if sent_done.load(Ordering::SeqCst) {
+        return;
+    }
+    sent_done.store(true, Ordering::SeqCst);
+    let update_request = CallUpdateRequest {
+        uuid: uuid.to_string(),
+        update: Some(Update::Done(true)),
+    };
+
+    send_done_or_error_update(update_request, channel).await
 }
 
 async fn maybe_connect_via_webrtc(
@@ -420,13 +424,9 @@ async fn maybe_connect_via_webrtc(
     let (peer_connection, data_channel) =
         webrtc::new_peer_connection_for_client(config, webrtc_options.disable_trickle_ice).await?;
 
-    // CR erodkin: handle the "send error" cases!
     let sent_done_or_error = Arc::new(AtomicBool::new(false));
-    // CR erodkin: do we need this clone?
-    let sent_done2 = sent_done_or_error.clone();
     let uuid_lock = Arc::new(RwLock::new("".to_string()));
     let uuid2 = uuid_lock.clone();
-
     let is_open = Arc::new(AtomicBool::new(false));
     let is_open_read = is_open.clone();
 
@@ -442,9 +442,9 @@ async fn maybe_connect_via_webrtc(
 
     if !webrtc_options.disable_trickle_ice {
         let offer = peer_connection.create_offer(None).await?;
-        let channel_clone = channel.clone();
-        let uuid_lock_clone = uuid_lock.clone();
-        let sent_done_or_error_clone = sent_done_or_error.clone();
+        let channel2 = channel.clone();
+        let uuid_lock2 = uuid_lock.clone();
+        let sent_done_or_error2 = sent_done_or_error.clone();
 
         let ice_done = Arc::new(AtomicBool::new(false));
         let exchange_done = exchange_done.clone();
@@ -459,15 +459,15 @@ async fn maybe_connect_via_webrtc(
                 if exchange_done.load(Ordering::SeqCst) {
                     return Box::pin(async move {});
                 }
-                let channel = channel_clone.clone();
-                let sent_done_or_error = sent_done_or_error_clone.clone();
+                let channel = channel2.clone();
+                let sent_done_or_error = sent_done_or_error2.clone();
                 let ice_done = ice_done.clone();
-                let uuid_lock_clone = uuid_lock_clone.clone();
+                let uuid_lock = uuid_lock2.clone();
                 Box::pin(async move {
                     if ice_done.load(Ordering::SeqCst) {
                         return;
                     }
-                    let uuid = uuid_lock_clone.read().unwrap().to_string();
+                    let uuid = uuid_lock.read().unwrap().to_string();
                     let mut signaling_client = SignalingServiceClient::new(channel.clone());
                     match ice_candidate {
                         Some(ice_candidate) => {
@@ -492,11 +492,7 @@ async fn maybe_connect_via_webrtc(
                         }
                         None => {
                             ice_done.store(true, Ordering::SeqCst);
-                            if let Err(e) =
-                                send_done_once(sent_done_or_error, uuid, channel.clone()).await
-                            {
-                                log::error!("Error in sending done update: {e}");
-                            }
+                            send_done_once(sent_done_or_error, &uuid, channel.clone()).await;
                         }
                     }
                 })
@@ -519,95 +515,147 @@ async fn maybe_connect_via_webrtc(
     let mut call_client = signaling_client.call(call_request).await?.into_inner();
 
     let channel2 = channel.clone();
-    tokio::spawn(
-        // CR erodkin: so many unwraps, I bet we can make this better
-        async move {
-            // CR erodkin: probably we'd want here to do something here to exit
-            // the loop when we're done. maybe something like
-            // tokio:sync:mpsc:chanel ala offer-answer/offer.rs, line 286? also so much
-            // nesting! less indenting would be cool.
-            // CR erodkin: exit once we finish ice connecting probably
-            //CR erodkin: this fixes everything... but why?
-            tokio::time::sleep(Duration::from_secs(1)).await;
+    let sent_done_or_error2 = sent_done_or_error.clone();
+    tokio::spawn(async move {
+        //CR erodkin: this fixes everything... but why?
+        tokio::time::sleep(Duration::from_secs(1)).await;
+        let init_received = AtomicBool::new(false);
+        let sent_done_or_error = sent_done_or_error2;
 
-            loop {
-                let call_response = match call_client.message().await {
-                    Ok(cr) => cr,
-                    Err(e) => {
-                        log::error!("Error processing call response: {e}");
-                        continue;
+        loop {
+            let call_response = match call_client.message().await {
+                Ok(cr) => cr,
+                Err(e) => {
+                    log::error!("Error processing call response: {e}");
+                    continue;
+                }
+            };
+
+            let stage = call_response.map(|resp| resp.stage).flatten();
+
+            //if let Some(response) = call_response {
+            //match response.stage {
+            match stage {
+                Some(Stage::Init(init)) => {
+                    if init_received.load(Ordering::SeqCst) {
+                        let uuid = uuid2.read().unwrap().to_string();
+                        send_error_once(
+                            sent_done_or_error.clone(),
+                            &uuid,
+                            &anyhow::anyhow!("Init received more than once"),
+                            channel2.clone(),
+                        )
+                        .await;
+                        break;
                     }
-                };
+                    init_received.store(true, Ordering::SeqCst);
+                    {
+                        let mut uuid_s = uuid2.write().unwrap();
+                        *uuid_s = response.uuid.clone();
+                    }
 
-                if let Some(response) = call_response {
-                    log::info!("got call_response: {:?}", response);
-                    match response.stage {
-                        Some(Stage::Init(init)) => {
-                            {
-                                let mut uuid_s = uuid_lock.write().unwrap();
-                                *uuid_s = response.uuid.clone();
-                            }
+                    let answer = match decode_sdp(init.sdp) {
+                        Ok(a) => a,
+                        Err(e) => {
+                            send_error_once(
+                                sent_done_or_error.clone(),
+                                &response.uuid,
+                                &e,
+                                channel2.clone(),
+                            )
+                            .await;
+                            break;
+                        }
+                    };
 
-                            let answer = match decode_sdp(init.sdp) {
-                                Ok(a) => a,
-                                Err(e) => {
-                                    log::error!("error decoding sdp answer: {e}");
-                                    continue;
-                                }
-                            };
+                    if let Err(e) = client_channel2
+                        .base_channel
+                        .peer_connection
+                        .set_remote_description(answer)
+                        .await
+                    {
+                        send_error_once(
+                            sent_done_or_error.clone(),
+                            &response.uuid,
+                            &(anyhow::Error::from(e)),
+                            channel2.clone(),
+                        )
+                        .await;
+                        break;
+                    }
+                    remote_description_set.store(true, Ordering::SeqCst);
+                    if webrtc_options.disable_trickle_ice {
+                        send_done_once(
+                            sent_done_or_error.clone(),
+                            &response.uuid,
+                            channel2.clone(),
+                        )
+                        .await;
+                        break;
+                    }
+                }
 
+                Some(Stage::Update(update)) => {
+                    let uuid = uuid2.read().unwrap().to_string();
+                    if !init_received.load(Ordering::SeqCst) {
+                        send_error_once(
+                            sent_done_or_error.clone(),
+                            &uuid,
+                            &anyhow::anyhow!("Got update before init stage"),
+                            channel2.clone(),
+                        )
+                        .await;
+                        break;
+                    }
+
+                    if response.uuid != *uuid2.read().unwrap() {
+                        send_error_once(
+                            sent_done_or_error.clone(),
+                            &uuid,
+                            &anyhow::anyhow!(
+                                "uuid mismatch: have {}, want {}",
+                                response.uuid,
+                                uuid,
+                            ),
+                            channel2.clone(),
+                        )
+                        .await;
+                        break;
+                    }
+                    match ice_candidate_from_proto(update.candidate) {
+                        Ok(candidate) => {
                             if let Err(e) = client_channel2
                                 .base_channel
                                 .peer_connection
-                                .set_remote_description(answer)
+                                .add_ice_candidate(candidate)
                                 .await
                             {
-                                // CR erodkin: probably send error message and be done here?
-                                log::error!("Error setting remote description: {e}");
-                                break;
-                            }
-                            remote_description_set.store(true, Ordering::SeqCst);
-                            if let Err(e) = send_done_once(
-                                sent_done_or_error.clone(),
-                                response.uuid,
-                                channel2.clone(),
-                            )
-                            .await
-                            {
-                                log::error!("Error calling update : {e}");
+                                send_error_once(
+                                    sent_done_or_error.clone(),
+                                    &uuid,
+                                    &anyhow::Error::from(e),
+                                    channel2.clone(),
+                                )
+                                .await;
                                 break;
                             }
                         }
-
-                        Some(Stage::Update(update)) => {
-                            if response.uuid != *uuid_lock.read().unwrap() {
-                                return Err(anyhow::anyhow!(
-                                    "uuid mismatch: have {}, want {}",
-                                    response.uuid,
-                                    *uuid_lock.read().unwrap()
-                                ));
-                            }
-                            if let Some(candidate) = update.candidate {
-                                let candidate = ice_candidate_from_proto(candidate).unwrap();
-                                if let Err(e) = client_channel2
-                                    .base_channel
-                                    .peer_connection
-                                    .add_ice_candidate(candidate)
-                                    .await
-                                {
-                                    log::error!(
-                                        "error adding ice candidate to peer connection: {e}"
-                                    )
-                                }
-                            }
-                        }
-                        None => continue,
+                        Err(e) => log::error!("Error adding ice candidate: {e}"),
                     }
                 }
+                None => {
+                    let uuid = uuid2.read().unwrap().to_string();
+                    send_done_once(sent_done_or_error.clone(), &uuid, channel2.clone()).await;
+                    break;
+                }
             }
-            Ok(())
-        },
-    );
+            //} else {
+            //let uuid = uuid2.read().unwrap().to_string();
+            //send_done_once(sent_done_or_error.clone(), &uuid, channel2.clone()).await;
+            //break;
+            //}
+        }
+    });
 
     // CR erodkin: make a ticket for this
     // TODO: create separate authorization if external_auth_addr and/or creds.Type is `Some`
@@ -617,10 +665,9 @@ async fn maybe_connect_via_webrtc(
     }
 
     exchange_done.store(true, Ordering::SeqCst);
-    let uuid = uuid2.read().unwrap().to_string();
-    if let Err(e) = send_done_once(sent_done2, uuid, channel.clone()).await {
-        log::error!("error sending Done update: {e}");
-    }
+    let uuid = uuid_lock.read().unwrap().to_string();
+    send_done_once(sent_done_or_error, &uuid, channel.clone()).await;
+
     Ok(client_channel)
 }
 
@@ -634,16 +681,21 @@ async fn ice_candidate_to_proto(ice_candidate: RTCIceCandidate) -> Result<IceCan
     })
 }
 
-fn ice_candidate_from_proto(proto: IceCandidate) -> Result<RTCIceCandidateInit> {
-    let proto_sdpm: usize = proto.sdpm_line_index().try_into()?;
-    let sdp_mline_index: Option<u16> = proto_sdpm.try_into().ok();
+fn ice_candidate_from_proto(proto: Option<IceCandidate>) -> Result<RTCIceCandidateInit> {
+    match proto {
+        Some(proto) => {
+            let proto_sdpm: usize = proto.sdpm_line_index().try_into()?;
+            let sdp_mline_index: Option<u16> = proto_sdpm.try_into().ok();
 
-    Ok(RTCIceCandidateInit {
-        candidate: proto.candidate.clone(),
-        sdp_mid: Some(proto.sdp_mid().to_string()),
-        sdp_mline_index,
-        username_fragment: Some(proto.username_fragment().to_string()),
-    })
+            Ok(RTCIceCandidateInit {
+                candidate: proto.candidate.clone(),
+                sdp_mid: Some(proto.sdp_mid().to_string()),
+                sdp_mline_index,
+                username_fragment: Some(proto.username_fragment().to_string()),
+            })
+        }
+        None => Err(anyhow::anyhow!("No ice candidate provided")),
+    }
 }
 
 fn decode_sdp(sdp: String) -> Result<RTCSessionDescription> {

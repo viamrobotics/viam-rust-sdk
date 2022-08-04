@@ -16,7 +16,6 @@ pub struct ActiveWebrtcClientStream {
     pub client_stream: Arc<Mutex<WebrtcClientStream>>,
 }
 
-// CR erodkin: consider if pub should be restricted to crate
 pub struct WebrtcClientStream {
     pub stream: Stream,
     pub message_sender: Sender<Vec<u8>>,
@@ -68,16 +67,12 @@ impl WebrtcClientStream {
                 if status_code == 0 {
                     None
                 } else {
-                    Some(format!("Code={status_code} message={message}"))
+                    Some(anyhow::anyhow!("Code={status_code} message={message}"))
                 }
             }
         };
 
-        // CR erodkin: pretty ugly, can we clean this up?
-        match err {
-            None => self.close_with_recv_error(&mut None),
-            Some(err) => self.close_with_recv_error(&mut Some(&anyhow::anyhow!(err))),
-        }
+        self.close_with_recv_error(&mut err.as_ref())
     }
 
     pub fn close_with_recv_error(&self, err: &mut Option<&anyhow::Error>) {

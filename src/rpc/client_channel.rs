@@ -31,8 +31,6 @@ pub struct WebrtcClientChannel {
 pub struct WebrtcBaseChannel {
     pub peer_connection: Arc<RTCPeerConnection>,
     pub data_channel: Arc<RTCDataChannel>,
-    // CR erodkin: make sure this is right
-    //ready: Channel,
     closed_reason: AtomicPtr<Option<anyhow::Error>>,
     closed: AtomicBool,
 }
@@ -53,7 +51,6 @@ impl WebrtcClientChannel {
         let channel = Arc::new(channel);
         let ret_channel = channel.clone();
 
-        // CR erodkin: we need on_error, probably some others
         data_channel
             .on_message(Box::new(move |msg: DataChannelMessage| {
                 let channel = channel.clone();
@@ -95,17 +92,32 @@ impl WebrtcClientChannel {
         let streams = self.streams.lock().unwrap();
         let response = Response::decode(&*msg.data.to_vec())?;
         let active_stream = match response.stream.as_ref() {
-            None => return Ok(()),
-            Some(stream) => streams.get(&stream.id),
+            None => {
+                log::error!(
+                    "no stream associated with response {:?}: discarding response",
+                    response
+                );
+                return Ok(());
+            }
+            Some(stream) => streams.get(&stream.id).ok_or_else(|| {
+                anyhow::anyhow!(
+                    "No stream found for id {}: discarding response {:?}",
+                    &stream.id,
+                    response
+                )
+            }),
         };
 
         let message_sent = match active_stream {
-            Some(active_stream) => active_stream
+            Ok(active_stream) => active_stream
                 .client_stream
                 .lock()
                 .unwrap()
                 .on_response(response),
-            None => Ok(false),
+            Err(e) => {
+                log::error!("{e}");
+                return Ok(());
+            }
         }?;
         drop(streams);
         self.message_ready.store(message_sent, Ordering::SeqCst);
@@ -204,10 +216,6 @@ impl WebrtcClientChannel {
             .map(|_: usize| ())
     }
 
-    pub async fn close_with_reason(&self, err: anyhow::Error) -> Result<()> {
-        self.base_channel.close_with_reason(err).await
-    }
-
     pub fn close_stream_with_recv_error(&self, stream_id: u64, error: anyhow::Error) {
         let mut stream_lock = self.streams.lock().unwrap();
         match stream_lock.remove(&stream_id) {
@@ -240,7 +248,7 @@ impl WebrtcBaseChannel {
         dc.on_error(Box::new(move |err: webrtc::Error| {
             let c = c.clone();
             Box::pin(async move {
-                if let Err(e) = c.close_with_reason(anyhow::Error::from(err)).await {
+                if let Err(e) = c.close_with_reason(Some(anyhow::Error::from(err))).await {
                     log::error!("error closing channel: {e}")
                 }
             })
@@ -249,16 +257,29 @@ impl WebrtcBaseChannel {
         channel
     }
 
-    async fn close_with_reason(&self, err: anyhow::Error) -> Result<()> {
+    async fn close_with_reason(&self, err: Option<anyhow::Error>) -> Result<()> {
+        let mut err = err;
         if self.closed.load(Ordering::SeqCst) {
             return Ok(());
         }
         self.closed.store(true, Ordering::SeqCst);
-        self.closed_reason.store(&mut Some(err), Ordering::SeqCst);
+        self.closed_reason.store(&mut err, Ordering::SeqCst);
 
         self.peer_connection
             .close()
             .await
             .map_err(anyhow::Error::from)
+    }
+
+    pub async fn close(&self) -> Result<()> {
+        self.close_with_reason(None).await
+    }
+
+    pub fn is_closed(&self) -> bool {
+        self.closed.load(Ordering::SeqCst)
+    }
+
+    pub fn closed_reason(&self) -> *mut Option<anyhow::Error> {
+        self.closed_reason.load(Ordering::SeqCst)
     }
 }
