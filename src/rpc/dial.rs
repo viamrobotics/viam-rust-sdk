@@ -520,32 +520,30 @@ async fn maybe_connect_via_webrtc(
         //CR erodkin: this fixes everything... but why?
         tokio::time::sleep(Duration::from_secs(1)).await;
         let init_received = AtomicBool::new(false);
-        let sent_done_or_error = sent_done_or_error2;
+        let sent_done = sent_done_or_error2;
 
         loop {
-            let call_response = match call_client.message().await {
-                Ok(cr) => cr,
+            let response = match call_client.message().await {
+                Ok(cr) => match cr {
+                    Some(cr) => cr,
+                    None => {
+                        let uuid = uuid2.read().unwrap().to_string();
+                        send_done_once(sent_done.clone(), &uuid, channel2.clone()).await;
+                        break;
+                    }
+                },
                 Err(e) => {
                     log::error!("Error processing call response: {e}");
                     continue;
                 }
             };
 
-            let stage = call_response.map(|resp| resp.stage).flatten();
-
-            //if let Some(response) = call_response {
-            //match response.stage {
-            match stage {
+            match response.stage {
                 Some(Stage::Init(init)) => {
                     if init_received.load(Ordering::SeqCst) {
                         let uuid = uuid2.read().unwrap().to_string();
-                        send_error_once(
-                            sent_done_or_error.clone(),
-                            &uuid,
-                            &anyhow::anyhow!("Init received more than once"),
-                            channel2.clone(),
-                        )
-                        .await;
+                        let e = anyhow::anyhow!("Init received more than once");
+                        send_error_once(sent_done.clone(), &uuid, &e, channel2.clone()).await;
                         break;
                     }
                     init_received.store(true, Ordering::SeqCst);
@@ -558,7 +556,7 @@ async fn maybe_connect_via_webrtc(
                         Ok(a) => a,
                         Err(e) => {
                             send_error_once(
-                                sent_done_or_error.clone(),
+                                sent_done.clone(),
                                 &response.uuid,
                                 &e,
                                 channel2.clone(),
@@ -574,23 +572,14 @@ async fn maybe_connect_via_webrtc(
                         .set_remote_description(answer)
                         .await
                     {
-                        send_error_once(
-                            sent_done_or_error.clone(),
-                            &response.uuid,
-                            &(anyhow::Error::from(e)),
-                            channel2.clone(),
-                        )
-                        .await;
+                        let e = anyhow::Error::from(e);
+                        send_error_once(sent_done.clone(), &response.uuid, &e, channel2.clone())
+                            .await;
                         break;
                     }
                     remote_description_set.store(true, Ordering::SeqCst);
                     if webrtc_options.disable_trickle_ice {
-                        send_done_once(
-                            sent_done_or_error.clone(),
-                            &response.uuid,
-                            channel2.clone(),
-                        )
-                        .await;
+                        send_done_once(sent_done.clone(), &response.uuid, channel2.clone()).await;
                         break;
                     }
                 }
@@ -598,28 +587,18 @@ async fn maybe_connect_via_webrtc(
                 Some(Stage::Update(update)) => {
                     let uuid = uuid2.read().unwrap().to_string();
                     if !init_received.load(Ordering::SeqCst) {
-                        send_error_once(
-                            sent_done_or_error.clone(),
-                            &uuid,
-                            &anyhow::anyhow!("Got update before init stage"),
-                            channel2.clone(),
-                        )
-                        .await;
+                        let e = anyhow::anyhow!("Got update before init stage");
+                        send_error_once(sent_done.clone(), &uuid, &e, channel2.clone()).await;
                         break;
                     }
 
                     if response.uuid != *uuid2.read().unwrap() {
-                        send_error_once(
-                            sent_done_or_error.clone(),
-                            &uuid,
-                            &anyhow::anyhow!(
-                                "uuid mismatch: have {}, want {}",
-                                response.uuid,
-                                uuid,
-                            ),
-                            channel2.clone(),
-                        )
-                        .await;
+                        let e = anyhow::anyhow!(
+                            "uuid mismatch: have {}, want {}",
+                            response.uuid,
+                            uuid,
+                        );
+                        send_error_once(sent_done.clone(), &uuid, &e, channel2.clone()).await;
                         break;
                     }
                     match ice_candidate_from_proto(update.candidate) {
@@ -630,35 +609,21 @@ async fn maybe_connect_via_webrtc(
                                 .add_ice_candidate(candidate)
                                 .await
                             {
-                                send_error_once(
-                                    sent_done_or_error.clone(),
-                                    &uuid,
-                                    &anyhow::Error::from(e),
-                                    channel2.clone(),
-                                )
-                                .await;
+                                let e = anyhow::Error::from(e);
+                                send_error_once(sent_done.clone(), &uuid, &e, channel2.clone())
+                                    .await;
                                 break;
                             }
                         }
                         Err(e) => log::error!("Error adding ice candidate: {e}"),
                     }
                 }
-                None => {
-                    let uuid = uuid2.read().unwrap().to_string();
-                    send_done_once(sent_done_or_error.clone(), &uuid, channel2.clone()).await;
-                    break;
-                }
+                None => continue,
             }
-            //} else {
-            //let uuid = uuid2.read().unwrap().to_string();
-            //send_done_once(sent_done_or_error.clone(), &uuid, channel2.clone()).await;
-            //break;
-            //}
         }
     });
 
-    // CR erodkin: make a ticket for this
-    // TODO: create separate authorization if external_auth_addr and/or creds.Type is `Some`
+    // TODO (GOUT-11): create separate authorization if external_auth_addr and/or creds.Type is `Some`
 
     while !is_open_read.load(Ordering::SeqCst) {
         hint::spin_loop();

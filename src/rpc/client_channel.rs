@@ -155,7 +155,7 @@ impl WebrtcClientChannel {
             stream: Some(stream.clone()),
             r#type: Some(Type::Headers(headers)),
         };
-        let header_vec = prost::Message::encode_to_vec(&headers);
+        let header_vec = Message::encode_to_vec(&headers);
         self.send(&header_vec).await
     }
 
@@ -192,7 +192,7 @@ impl WebrtcClientChannel {
                 })),
             };
 
-            let request = prost::Message::encode_to_vec(&request);
+            let request = Message::encode_to_vec(&request);
             if let Err(e) = self.send(&request).await {
                 log::error!("error sending message: {e}");
                 return Err(e);
