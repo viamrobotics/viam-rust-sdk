@@ -4,8 +4,8 @@ name = "example"
 version = "0.0.1"
 
 [[bin]]
-name = "test-dialdirect"
-path = "src/dialdirect/main.rs"
+name = "test-dial"
+path = "src/dial/main.rs"
 
 [dependencies]
 viam = {path = "../"}

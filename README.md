@@ -16,7 +16,7 @@ Next run the following command `curl --proto '=https' --tlsv1.2 -sSf https://sh.
 ## Getting Started
 First you may want to build the SDK library, to do so navigate to the root of the repository and run `cargo build` this should pull all the dependencies and hopefully build the library!
 You can locally build the library documentation by running `cargo doc --open`, it will open your browser pointing to the documentation
-Lastly you can run one of the examples by navigation to the examples folder and run `cargo run --bin test-dialdirect`
+Lastly you can run one of the examples by navigation to the examples folder and run `cargo run --bin test-dial`
 
 ## Usage
 Tu use the SDK and connect to an RDK server you will need to setup a couple of things.

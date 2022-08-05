@@ -22,7 +22,6 @@ use ::webrtc::peer_connection::sdp::session_description::RTCSessionDescription;
 use anyhow::{Context, Result};
 use core::fmt;
 use std::hint;
-use std::str::FromStr;
 use std::{
     collections::HashMap,
     sync::{
@@ -225,20 +224,23 @@ impl<T: AuthMethod> DialBuilder<T> {
 
 impl DialBuilder<WithoutCredentials> {
     pub async fn connect(self) -> Result<ViamChannel> {
-        // CR erodkin: delete me. but first test me.
-        println!("doing anything without credentials la la la");
+        // TODO: test me
         let mut uri_parts = self.config.uri.unwrap();
         if self.config.insecure {
             uri_parts.scheme = Some(Scheme::HTTP);
         }
         let uri = Uri::from_parts(uri_parts)?;
+        let uri2 = uri.clone();
+        let uri = infer_remote_uri_from_authority(uri);
+        let domain = uri2.authority().to_owned().unwrap().as_str();
         let channel = Channel::builder(uri.clone())
             .connect()
             .await
             .with_context(|| format!("Connecting to {:?}", uri.clone()));
         let channel = match channel {
             Err(e) => {
-                if self.config.allow_downgrade {
+                if true {
+                    //if self.config.allow_downgrade {
                     let mut uri_parts = uri.clone().into_parts();
                     uri_parts.scheme = Some(Scheme::HTTP);
                     let uri = Uri::from_parts(uri_parts)?;
@@ -259,8 +261,8 @@ impl DialBuilder<WithoutCredentials> {
                 "fake password",
             ))
             .layer(SetRequestHeaderLayer::overriding(
-                HeaderName::from_str("fake")?,
-                HeaderValue::from_str("fake")?,
+                HeaderName::from_static("rpc-host"),
+                HeaderValue::from_str(domain)?,
             ))
             .service(channel.clone());
 
@@ -299,7 +301,7 @@ impl DialBuilder<WithCredentials> {
         let uri2 = uri.clone();
         let domain = uri2.authority().to_owned().unwrap().as_str();
 
-        let uri = infer_remote_uri_from_domain(uri);
+        let uri = infer_remote_uri_from_authority(uri);
 
         let real_channel = match Channel::builder(uri.clone())
             .connect()
@@ -525,7 +527,6 @@ async fn maybe_connect_via_webrtc(
         let init_received = AtomicBool::new(false);
         let sent_done = sent_done_or_error2;
 
-        println!("entering the loop");
         log::info!("entering the loop");
         loop {
             let response = match call_client.message().await {
@@ -627,7 +628,6 @@ async fn maybe_connect_via_webrtc(
                 None => continue,
             }
         }
-        println!("Exited the loop");
     });
 
     // TODO (GOUT-11): create separate authorization if external_auth_addr and/or creds.Type is `Some`
@@ -680,7 +680,7 @@ fn encode_sdp(sdp: RTCSessionDescription) -> Result<String> {
     Ok(base64::encode(sdp))
 }
 
-pub fn infer_remote_uri_from_domain(uri: Uri) -> Uri {
+pub fn infer_remote_uri_from_authority(uri: Uri) -> Uri {
     let is_local_connection = uri
         .authority()
         .map(Authority::as_str)
