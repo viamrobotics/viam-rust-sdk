@@ -1,7 +1,4 @@
-use crate::gen::proto::rpc::{
-    v1::Credentials,
-    webrtc::v1::{IceServer, WebRtcConfig},
-};
+use crate::gen::proto::rpc::webrtc::v1::{IceServer, WebRtcConfig};
 use anyhow::Result;
 use bytes::Bytes;
 use http::Uri;
@@ -27,17 +24,10 @@ use webrtc::{
 
 #[derive(Default)]
 pub struct Options {
-    pub disable: bool,
+    pub disable_trickle_ice: bool,
+    pub config: RTCConfiguration,
     pub signaling_insecure: bool,
     pub signaling_server_address: String,
-    pub signaling_auth_entity: String,
-    pub signaling_external_auth_address: String,
-    pub signaling_external_auth_to_entity: String,
-    pub signaling_external_auth_insecure: String,
-    pub signaling_credentials: Credentials,
-    pub disable_trickle_ice: bool,
-    pub allow_auto_detect_auth_options: bool,
-    pub config: RTCConfiguration,
 }
 
 impl Options {
@@ -145,7 +135,7 @@ pub async fn new_peer_connection_for_client(
         ..Default::default()
     };
 
-    let renegotiation_channel_init = RTCDataChannelInit {
+    let negotiation_channel_init = RTCDataChannelInit {
         negotiated: Some(true),
         ordered: Some(true),
         id: Some(1),
@@ -171,7 +161,7 @@ pub async fn new_peer_connection_for_client(
         .await?;
 
     let negotiation_channel = peer_connection
-        .create_data_channel("negotiation", Some(renegotiation_channel_init))
+        .create_data_channel("negotiation", Some(negotiation_channel_init))
         .await?;
 
     let nc = negotiation_channel.clone();
