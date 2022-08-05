@@ -100,6 +100,28 @@ pub mod vision_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn get_detections_from_camera(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetDetectionsFromCameraRequest>,
+        ) -> Result<
+                tonic::Response<super::GetDetectionsFromCameraResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.vision.v1.VisionService/GetDetectionsFromCamera",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn get_detections(
             &mut self,
             request: impl tonic::IntoRequest<super::GetDetectionsRequest>,
@@ -199,6 +221,13 @@ pub mod vision_service_server {
             &self,
             request: tonic::Request<super::AddDetectorRequest>,
         ) -> Result<tonic::Response<super::AddDetectorResponse>, tonic::Status>;
+        async fn get_detections_from_camera(
+            &self,
+            request: tonic::Request<super::GetDetectionsFromCameraRequest>,
+        ) -> Result<
+                tonic::Response<super::GetDetectionsFromCameraResponse>,
+                tonic::Status,
+            >;
         async fn get_detections(
             &self,
             request: tonic::Request<super::GetDetectionsRequest>,
@@ -347,6 +376,48 @@ pub mod vision_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = AddDetectorSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.service.vision.v1.VisionService/GetDetectionsFromCamera" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetDetectionsFromCameraSvc<T: VisionService>(pub Arc<T>);
+                    impl<
+                        T: VisionService,
+                    > tonic::server::UnaryService<super::GetDetectionsFromCameraRequest>
+                    for GetDetectionsFromCameraSvc<T> {
+                        type Response = super::GetDetectionsFromCameraResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::GetDetectionsFromCameraRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_detections_from_camera(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetDetectionsFromCameraSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
