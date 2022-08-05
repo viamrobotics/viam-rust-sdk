@@ -27,7 +27,7 @@ impl WebrtcBaseStream {
         self.closed_reason.store(&mut err, Ordering::SeqCst);
     }
 
-    pub(crate) fn process_message(&mut self, message: PacketMessage) -> Result<Vec<u8>> {
+    pub fn process_message(&mut self, message: PacketMessage) -> Result<Vec<u8>> {
         if message.data.is_empty() && message.eom {
             return Ok(Vec::new());
         }

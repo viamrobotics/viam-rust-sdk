@@ -239,8 +239,7 @@ impl DialBuilder<WithoutCredentials> {
             .with_context(|| format!("Connecting to {:?}", uri.clone()));
         let channel = match channel {
             Err(e) => {
-                if true {
-                    //if self.config.allow_downgrade {
+                if self.config.allow_downgrade {
                     let mut uri_parts = uri.clone().into_parts();
                     uri_parts.scheme = Some(Scheme::HTTP);
                     let uri = Uri::from_parts(uri_parts)?;
@@ -283,11 +282,8 @@ async fn get_auth_token(channel: &mut Channel, creds: Credentials, entity: &str)
         credentials: Some(creds),
     };
 
-    let rsp = auth_service.authenticate(req).await;
-    match rsp {
-        Err(e) => Err(anyhow::anyhow!("Err acquiring auth token: {}", e)),
-        Ok(rsp) => Ok(rsp.into_inner().access_token),
-    }
+    let rsp = auth_service.authenticate(req).await?;
+    Ok(rsp.into_inner().access_token)
 }
 
 impl DialBuilder<WithCredentials> {
@@ -527,7 +523,6 @@ async fn maybe_connect_via_webrtc(
         let init_received = AtomicBool::new(false);
         let sent_done = sent_done_or_error2;
 
-        log::info!("entering the loop");
         loop {
             let response = match call_client.message().await {
                 Ok(cr) => match cr {
@@ -543,7 +538,6 @@ async fn maybe_connect_via_webrtc(
                     continue;
                 }
             };
-            log::info!("response: {response:?}");
 
             match response.stage {
                 Some(Stage::Init(init)) => {
@@ -632,6 +626,7 @@ async fn maybe_connect_via_webrtc(
 
     // TODO (GOUT-11): create separate authorization if external_auth_addr and/or creds.Type is `Some`
 
+    // Delay returning the client channel until data channel is open, so we don't lose messages
     while !is_open_read.load(Ordering::SeqCst) {
         hint::spin_loop();
     }
@@ -695,7 +690,7 @@ pub fn infer_remote_uri_from_authority(uri: Uri) -> Uri {
     uri
 }
 
-pub(crate) fn uri_parts_with_defaults(uri: &str) -> Parts {
+fn uri_parts_with_defaults(uri: &str) -> Parts {
     let mut uri_parts = uri.parse::<Uri>().unwrap().into_parts();
     uri_parts.scheme = Some(Scheme::HTTPS);
     uri_parts.path_and_query = Some(PathAndQuery::from_static(""));

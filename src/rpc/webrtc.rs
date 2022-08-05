@@ -31,7 +31,7 @@ pub struct Options {
 }
 
 impl Options {
-    pub(crate) fn infer_signaling_server_address(uri: &Uri) -> Option<(String, bool)> {
+    pub fn infer_signaling_server_address(uri: &Uri) -> Option<(String, bool)> {
         let path = uri.to_string();
         if path.contains(".viam.cloud") {
             Some(("app.viam.com:443".to_string(), true))
@@ -42,7 +42,7 @@ impl Options {
         }
     }
 
-    pub(crate) fn infer_from_uri(uri: Uri) -> Self {
+    pub fn infer_from_uri(uri: Uri) -> Self {
         match Self::infer_signaling_server_address(&uri) {
             None => Options {
                 config: default_configuration(),
