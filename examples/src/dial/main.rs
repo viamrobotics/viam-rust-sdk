@@ -25,16 +25,14 @@ async fn dial_direct() -> Result<tonic::Response<ResourceNamesResponse>> {
 }
 
 async fn dial_webrtc() -> Result<tonic::Response<ResourceNamesResponse>> {
-    //let creds = dial::CredentialsExt::new(
-    //"robot-location-secret".to_string(),
-    //"ytexnwei4fu1xv9csoqxfv4ckl3htsb49mzzey5t15xo9swy".to_string(),
-    //);
+    let creds = dial::CredentialsExt::new(
+        "robot-location-secret".to_string(),
+        "ytexnwei4fu1xv9csoqxfv4ckl3htsb49mzzey5t15xo9swy".to_string(),
+    );
 
     let c = dial::DialOptions::builder()
-        .uri("127.0.0.1:57989")
-        //.uri("webrtc-test-main.jkek76kqnh.viam.cloud")
-        .without_credentials()
-        //.with_credentials(creds)
+        .uri("webrtc-test-main.jkek76kqnh.viam.cloud")
+        .with_credentials(creds)
         .connect()
         .await?;
 
