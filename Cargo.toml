@@ -9,7 +9,6 @@ crate-type = ["cdylib","lib"]
 
 [dependencies]
 anyhow = { version = "1.0", features = ["backtrace"]}
-async-stream = "0.2"
 base64 = "0.13.0"
 byteorder = "1.4.3"
 bytes = "1.1.0"
@@ -20,27 +19,18 @@ futures-util = "0.3"
 http = "0.2.7"
 http-body = {version = "0.4.4"}
 hyper = { version = "0.14.18", features = ["full"]  }
-# CR erodkin: do we need interceptor?
 interceptor = "0.7.6"
 libc = {version = "0.2"}
 log = "0.4.17"
-# CR erodkin: do we need prost/prost-types?
 prost = "0.10"
 prost-types = "0.10"
-#delete protobuf from here probably. 
-protobuf = "3.0.3"
-protobuf-json-mapping = "3.0.3"
-protobuf-support = "3.0.3"
-# do we need rand/rcgen?
 rand = "0.8.5"
-rcgen = "0.8.14"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = {version = "1.19", features = ["rt-multi-thread", "time", "fs", "macros", "net"]}
 tokio-stream = {version = "0.1", features = ["net"]}
 tokio-rustls = { version = "0.23.4"}
-# CR erodkin: do we need prost feature in tonic?
-tonic = {version = "0.7.2",features = ["prost", "tls", "compression", "tls-roots",]}
+tonic = {version = "0.7.2",features = [ "tls", "compression", "tls-roots",]}
 tower = { version = "0.4" }
 tower-http = { version = "0.3.3", features = ["add-extension","auth","propagate-header","set-header","sensitive-headers","trace","compression-gzip"]}
 tracing = {version = "0.1.34"}
