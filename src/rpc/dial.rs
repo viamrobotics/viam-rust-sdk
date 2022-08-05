@@ -30,7 +30,6 @@ use std::{
         Arc, RwLock,
     },
     task::{Context as TaskContext, Poll},
-    time::Duration,
 };
 use tonic::body::BoxBody;
 use tonic::codegen::{http, BoxFuture};
@@ -78,7 +77,13 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
                 let fut = async move {
                     let (parts, body) = request.into_parts();
 
-                    let stream = channel.new_stream().lock().unwrap().stream.clone();
+                    let stream = channel
+                        .new_stream()
+                        .lock()
+                        .unwrap()
+                        .base_stream
+                        .stream
+                        .clone();
                     let stream_id = stream.id;
                     let metadata = Some(metadata_from_parts(&parts));
                     let headers = RequestHeaders {
@@ -517,11 +522,11 @@ async fn maybe_connect_via_webrtc(
     let channel2 = channel.clone();
     let sent_done_or_error2 = sent_done_or_error.clone();
     tokio::spawn(async move {
-        //CR erodkin: this fixes everything... but why?
-        tokio::time::sleep(Duration::from_secs(1)).await;
         let init_received = AtomicBool::new(false);
         let sent_done = sent_done_or_error2;
 
+        println!("entering the loop");
+        log::info!("entering the loop");
         loop {
             let response = match call_client.message().await {
                 Ok(cr) => match cr {
@@ -537,6 +542,7 @@ async fn maybe_connect_via_webrtc(
                     continue;
                 }
             };
+            log::info!("response: {response:?}");
 
             match response.stage {
                 Some(Stage::Init(init)) => {
@@ -621,6 +627,7 @@ async fn maybe_connect_via_webrtc(
                 None => continue,
             }
         }
+        println!("Exited the loop");
     });
 
     // TODO (GOUT-11): create separate authorization if external_auth_addr and/or creds.Type is `Some`

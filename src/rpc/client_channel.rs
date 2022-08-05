@@ -1,4 +1,4 @@
-use super::client_stream::*;
+use super::{base_channel::*, base_stream::*, client_stream::*};
 use crate::gen::proto::rpc::webrtc::v1::{
     request::Type, PacketMessage, Request, RequestHeaders, RequestMessage, Response, Stream,
 };
@@ -26,13 +26,6 @@ pub struct WebrtcClientChannel {
     stream_id_counter: AtomicU64,
     message_ready: AtomicBool,
     pub streams: Mutex<HashMap<u64, ActiveWebrtcClientStream>>,
-}
-
-pub struct WebrtcBaseChannel {
-    pub peer_connection: Arc<RTCPeerConnection>,
-    pub data_channel: Arc<RTCDataChannel>,
-    closed_reason: AtomicPtr<Option<anyhow::Error>>,
-    closed: AtomicBool,
 }
 
 impl WebrtcClientChannel {
@@ -70,13 +63,17 @@ impl WebrtcClientChannel {
 
         let (message_sender, message_receiver) = std::sync::mpsc::channel();
 
-        let client_stream = Arc::new(Mutex::new(WebrtcClientStream {
+        let base_stream = WebrtcBaseStream {
             stream,
             message_sender,
             message_receiver,
             closed: AtomicBool::new(false),
             packet_buffer: Vec::new(),
             closed_reason: AtomicPtr::new(&mut None),
+        };
+
+        let client_stream = Arc::new(Mutex::new(WebrtcClientStream {
+            base_stream,
             headers_received: AtomicBool::new(false),
             trailers_received: AtomicBool::new(false),
         }));
@@ -136,6 +133,7 @@ impl WebrtcClientChannel {
                     .client_stream
                     .lock()
                     .unwrap()
+                    .base_stream
                     .message_receiver
                     .recv()?;
 
@@ -223,63 +221,11 @@ impl WebrtcClientChannel {
                 .client_stream
                 .lock()
                 .unwrap()
+                .base_stream
                 .close_with_recv_error(&mut Some(&error)),
             None => {
                 log::error!("attempted to close stream with id {stream_id}, but it wasn't found!")
             }
         }
-    }
-}
-
-impl WebrtcBaseChannel {
-    pub async fn new(
-        peer_connection: Arc<RTCPeerConnection>,
-        data_channel: Arc<RTCDataChannel>,
-    ) -> Arc<Self> {
-        let dc = data_channel.clone();
-        let channel = Arc::new(Self {
-            peer_connection,
-            data_channel,
-            closed_reason: AtomicPtr::new(&mut None),
-            closed: AtomicBool::new(false),
-        });
-
-        let c = channel.clone();
-        dc.on_error(Box::new(move |err: webrtc::Error| {
-            let c = c.clone();
-            Box::pin(async move {
-                if let Err(e) = c.close_with_reason(Some(anyhow::Error::from(err))).await {
-                    log::error!("error closing channel: {e}")
-                }
-            })
-        }))
-        .await;
-        channel
-    }
-
-    async fn close_with_reason(&self, err: Option<anyhow::Error>) -> Result<()> {
-        let mut err = err;
-        if self.closed.load(Ordering::SeqCst) {
-            return Ok(());
-        }
-        self.closed.store(true, Ordering::SeqCst);
-        self.closed_reason.store(&mut err, Ordering::SeqCst);
-
-        self.peer_connection
-            .close()
-            .await
-            .map_err(anyhow::Error::from)
-    }
-
-    pub async fn close(&self) -> Result<()> {
-        self.close_with_reason(None).await
-    }
-
-    pub fn is_closed(&self) -> bool {
-        self.closed.load(Ordering::SeqCst)
-    }
-
-    pub fn closed_reason(&self) -> *mut Option<anyhow::Error> {
-        self.closed_reason.load(Ordering::SeqCst)
     }
 }

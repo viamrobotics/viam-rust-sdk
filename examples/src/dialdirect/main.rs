@@ -16,12 +16,16 @@ async fn main() -> Result<()> {
     let creds = dial::CredentialsExt::new(
         String::from("robot-location-secret"),
         //String::from("huwbahasm4zt3un5hfag7oy1d0lseie5uzr9camkolxh81g4"),
+        //String::from("67uwqotidsyb2guk0qz514qxjefdtjvwthnr2vbqz2qa9tc5"),
         String::from("ytexnwei4fu1xv9csoqxfv4ckl3htsb49mzzey5t15xo9swy"), // webrtc
                                                                           //String::from("og3d31ekzzxyopx44m37o4wcg1tz2oyisl4kxu4gbqiyvpfe"), // franke
     );
     let c = dial::DialOptions::builder()
         //.uri("vg2105m04.6099bd9d94.viam.cloud")
         .uri("webrtc-test-main.jkek76kqnh.viam.cloud")
+        //.uri("my-cool-robot-main.ue1p0073ug.local.robot.viaminternal:8080")
+        //.uri("my-cool-robot-main.ue1p0073ug.robot.viaminternal")
+        //.uri("my-cool-robot-main.ue1p0073ug.viam.cloud")
         //.uri("webrtc-test-main.jkek76kqnh.local.viam.cloud:8080")
         //.uri("franke-main.6xs7zv3bxz.viam.cloud")
         //.uri("https://app.viam.com:443")

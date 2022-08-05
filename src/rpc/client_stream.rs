@@ -1,28 +1,19 @@
+use super::base_stream::*;
 use crate::gen::proto::rpc::webrtc::v1::{
-    response::Type, PacketMessage, Response, ResponseHeaders, ResponseMessage, ResponseTrailers,
-    Stream,
+    response::Type, Response, ResponseHeaders, ResponseMessage, ResponseTrailers,
 };
 use anyhow::Result;
-use bytes::BufMut;
 use std::sync::{
-    atomic::{AtomicBool, AtomicPtr, Ordering},
-    mpsc::{Receiver, Sender},
+    atomic::{AtomicBool, Ordering},
     Arc, Mutex,
 };
-
-const MAX_MESSAGE_SIZE: usize = 1 << 25;
 
 pub struct ActiveWebrtcClientStream {
     pub client_stream: Arc<Mutex<WebrtcClientStream>>,
 }
 
 pub struct WebrtcClientStream {
-    pub stream: Stream,
-    pub message_sender: Sender<Vec<u8>>,
-    pub message_receiver: Receiver<Vec<u8>>,
-    pub closed: AtomicBool,
-    pub packet_buffer: Vec<u8>,
-    pub closed_reason: AtomicPtr<Option<anyhow::Error>>,
+    pub base_stream: WebrtcBaseStream,
     pub headers_received: AtomicBool,
     pub trailers_received: AtomicBool,
 }
@@ -40,10 +31,10 @@ impl WebrtcClientStream {
         };
 
         if let Some(message) = response.packet_message {
-            match self.pack_message(message) {
+            match self.base_stream.process_message(message) {
                 Ok(data) => {
                     if !data.is_empty() {
-                        self.message_sender.send(data)?;
+                        self.base_stream.message_sender.send(data)?;
                         message_sent = true;
                     }
                 }
@@ -72,16 +63,7 @@ impl WebrtcClientStream {
             }
         };
 
-        self.close_with_recv_error(&mut err.as_ref())
-    }
-
-    pub fn close_with_recv_error(&self, err: &mut Option<&anyhow::Error>) {
-        if self.closed.load(Ordering::SeqCst) {
-            return;
-        }
-        let mut err = err.map(|e| anyhow::anyhow!(e.to_string()));
-        self.closed.store(true, Ordering::SeqCst);
-        self.closed_reason.store(&mut err, Ordering::SeqCst);
+        self.base_stream.close_with_recv_error(&mut err.as_ref())
     }
 
     // processes response. returns true iff a message was sent
@@ -90,13 +72,13 @@ impl WebrtcClientStream {
             Some(Type::Headers(headers)) => {
                 if self.headers_received.load(Ordering::SeqCst) {
                     let err = anyhow::format_err!("headers already received");
-                    self.close_with_recv_error(&mut Some(&err));
+                    self.base_stream.close_with_recv_error(&mut Some(&err));
                     return Err(err);
                 }
 
                 if self.trailers_received.load(Ordering::SeqCst) {
                     let err = anyhow::format_err!("headers received after trailers");
-                    self.close_with_recv_error(&mut Some(&err));
+                    self.base_stream.close_with_recv_error(&mut Some(&err));
                     return Err(err);
                 }
 
@@ -106,13 +88,13 @@ impl WebrtcClientStream {
             Some(Type::Message(message)) => {
                 if !self.headers_received.load(Ordering::SeqCst) {
                     let err = anyhow::format_err!("headers not yet received");
-                    self.close_with_recv_error(&mut Some(&err));
+                    self.base_stream.close_with_recv_error(&mut Some(&err));
                     return Err(err);
                 }
 
                 if self.trailers_received.load(Ordering::SeqCst) {
                     let err = anyhow::format_err!("new messages received after trailers");
-                    self.close_with_recv_error(&mut Some(&err));
+                    self.base_stream.close_with_recv_error(&mut Some(&err));
                     return Err(err);
                 }
 
@@ -125,31 +107,5 @@ impl WebrtcClientStream {
             }
             None => Ok(false),
         }
-    }
-
-    fn reset_packet_buffer(&mut self) {
-        self.packet_buffer = vec![]
-    }
-
-    fn pack_message(&mut self, message: PacketMessage) -> Result<Vec<u8>> {
-        if message.data.is_empty() && message.eom {
-            return Ok(Vec::new());
-        }
-        if message.data.len() + self.packet_buffer.len() > MAX_MESSAGE_SIZE {
-            let e = Err(anyhow::anyhow!(
-                "message size larger than max {}, discarding",
-                MAX_MESSAGE_SIZE
-            ));
-            self.reset_packet_buffer();
-            return e;
-        }
-
-        self.packet_buffer.put_slice(&message.data);
-        if message.eom {
-            let ret = self.packet_buffer.clone();
-            self.reset_packet_buffer();
-            return Ok(ret);
-        }
-        Ok(Vec::new())
     }
 }
