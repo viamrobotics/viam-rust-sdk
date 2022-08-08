@@ -249,6 +249,8 @@ impl DialBuilder<WithoutCredentials> {
         let uri2 = uri.clone();
         let uri = infer_remote_uri_from_authority(uri);
         let domain = uri2.authority().to_owned().unwrap().as_str();
+        let domain = amend_domain_if_local(domain);
+
         let channel = Channel::builder(uri.clone())
             .connect()
             .await
@@ -737,4 +739,14 @@ fn metadata_from_parts(parts: &http::request::Parts) -> Metadata {
         md.insert(k, v);
     }
     Metadata { md }
+}
+
+fn amend_domain_if_local(domain: &str) -> &str {
+    let localhost = "127.0.0.1";
+    let localhost_hum = "localhost";
+    if domain.contains(localhost) || domain.contains(localhost_hum) {
+        "localhost:8080"
+    } else {
+        domain
+    }
 }
