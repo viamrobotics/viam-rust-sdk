@@ -127,6 +127,7 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
 #[derive(Debug)]
 pub struct DialOptions {
     credentials: Option<Credentials>,
+    webrtc_options: Option<Options>,
     uri: Option<Parts>,
     allow_downgrade: bool,
     insecure: bool,
@@ -167,6 +168,7 @@ impl DialOptions {
                 uri: None,
                 allow_downgrade: false,
                 insecure: false,
+                webrtc_options: None,
             },
         }
     }
@@ -182,6 +184,7 @@ impl DialBuilder<WantsUri> {
                 uri: Some(uri_parts),
                 allow_downgrade: false,
                 insecure: false,
+                webrtc_options: None,
             },
         }
     }
@@ -195,6 +198,7 @@ impl DialBuilder<WantsCredentials> {
                 uri: self.config.uri,
                 allow_downgrade: false,
                 insecure: false,
+                webrtc_options: None,
             },
         }
     }
@@ -206,6 +210,7 @@ impl DialBuilder<WantsCredentials> {
                 uri: self.config.uri,
                 allow_downgrade: false,
                 insecure: false,
+                webrtc_options: None,
             },
         }
     }
@@ -220,11 +225,22 @@ impl<T: AuthMethod> DialBuilder<T> {
         self.config.allow_downgrade = true;
         self
     }
+
+    pub fn disable_webrtc(mut self) -> Self {
+        let webrtc_options = Options::default().disable_webrtc();
+        self.config.webrtc_options = Some(webrtc_options);
+        self
+    }
 }
 
 impl DialBuilder<WithoutCredentials> {
     pub async fn connect(self) -> Result<ViamChannel> {
         // TODO: test me
+        let webrtc_options = self.config.webrtc_options;
+        let disable_webrtc = match &webrtc_options {
+            Some(options) => options.disable_webrtc,
+            None => false,
+        };
         let mut uri_parts = self.config.uri.unwrap();
         if self.config.insecure {
             uri_parts.scheme = Some(Scheme::HTTP);
@@ -265,11 +281,15 @@ impl DialBuilder<WithoutCredentials> {
             ))
             .service(channel.clone());
 
-        match maybe_connect_via_webrtc(uri, intercepted_channel.clone()).await {
-            Ok(webrtc_channel) => Ok(ViamChannel::Webrtc(webrtc_channel)),
-            Err(e) => {
-                log::error!("error connecting via webrtc: {e}. Attempting to connect directly");
-                Ok(ViamChannel::Direct(channel.clone()))
+        if disable_webrtc {
+            Ok(ViamChannel::Direct(channel.clone()))
+        } else {
+            match maybe_connect_via_webrtc(uri, intercepted_channel.clone(), webrtc_options).await {
+                Ok(webrtc_channel) => Ok(ViamChannel::Webrtc(webrtc_channel)),
+                Err(e) => {
+                    log::error!("error connecting via webrtc: {e}. Attempting to connect directly");
+                    Ok(ViamChannel::Direct(channel.clone()))
+                }
             }
         }
     }
@@ -288,6 +308,11 @@ async fn get_auth_token(channel: &mut Channel, creds: Credentials, entity: &str)
 
 impl DialBuilder<WithCredentials> {
     pub async fn connect(self) -> Result<AddAuthorization<ViamChannel>> {
+        let webrtc_options = self.config.webrtc_options;
+        let disable_webrtc = match &webrtc_options {
+            Some(options) => options.disable_webrtc,
+            None => false,
+        };
         let mut uri_parts = self.config.uri.unwrap();
         if self.config.insecure {
             uri_parts.scheme = Some(Scheme::HTTP);
@@ -332,13 +357,17 @@ impl DialBuilder<WithCredentials> {
             ))
             .service(real_channel.clone());
 
-        let channel = match maybe_connect_via_webrtc(uri.clone(), channel.clone()).await {
-            Ok(webrtc_channel) => ViamChannel::Webrtc(webrtc_channel),
-            Err(e) => {
-                log::error!(
+        let channel = if disable_webrtc {
+            ViamChannel::Direct(real_channel.clone())
+        } else {
+            match maybe_connect_via_webrtc(uri.clone(), channel.clone(), webrtc_options).await {
+                Ok(webrtc_channel) => ViamChannel::Webrtc(webrtc_channel),
+                Err(e) => {
+                    log::error!(
                     "Unable to establish webrtc connection due to error {e}. Attempting direct connection."
                 );
-                ViamChannel::Direct(real_channel.clone())
+                    ViamChannel::Direct(real_channel.clone())
+                }
             }
         };
 
@@ -408,8 +437,9 @@ async fn send_done_once(
 async fn maybe_connect_via_webrtc(
     uri: Uri,
     channel: AddAuthorization<SetRequestHeader<Channel, HeaderValue>>,
+    webrtc_options: Option<Options>,
 ) -> Result<Arc<WebrtcClientChannel>> {
-    let webrtc_options = Options::infer_from_uri(uri.clone());
+    let webrtc_options = webrtc_options.unwrap_or_else(|| Options::infer_from_uri(uri.clone()));
     let mut signaling_client = SignalingServiceClient::new(channel.clone());
     let response = match signaling_client
         .optional_web_rtc_config(OptionalWebRtcConfigRequest::default())

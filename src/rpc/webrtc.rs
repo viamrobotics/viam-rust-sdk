@@ -1,6 +1,7 @@
 use crate::gen::proto::rpc::webrtc::v1::{IceServer, WebRtcConfig};
 use anyhow::Result;
 use bytes::Bytes;
+use core::fmt;
 use http::Uri;
 use interceptor::registry::Registry;
 use std::{hint, sync::Arc};
@@ -24,10 +25,33 @@ use webrtc::{
 
 #[derive(Default)]
 pub struct Options {
+    pub disable_webrtc: bool,
     pub disable_trickle_ice: bool,
     pub config: RTCConfiguration,
     pub signaling_insecure: bool,
     pub signaling_server_address: String,
+}
+
+impl fmt::Debug for Options {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Options")
+            .field("disable_webrtc", &format_args!("{}", self.disable_webrtc))
+            .field(
+                "disable_trickle_ice",
+                &format_args!("{}", self.disable_trickle_ice),
+            )
+            // RTCConfiguration does not derive Debug
+            .field("config", &format_args!("{}", "<Opaque>"))
+            .field(
+                "signaling_insecure",
+                &format_args!("{}", self.signaling_insecure),
+            )
+            .field(
+                "signaling_server_address",
+                &format_args!("{}", self.signaling_server_address),
+            )
+            .finish()
+    }
 }
 
 impl Options {
@@ -55,6 +79,11 @@ impl Options {
                 ..Default::default()
             },
         }
+    }
+
+    pub fn disable_webrtc(mut self) -> Self {
+        self.disable_webrtc = true;
+        self
     }
 }
 

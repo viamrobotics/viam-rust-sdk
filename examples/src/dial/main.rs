@@ -13,6 +13,7 @@ async fn dial_direct() -> Result<tonic::Response<ResourceNamesResponse>> {
     let c = dial::DialOptions::builder()
         .uri("test-main.33vvxnbbw9.local.viam.cloud:8080")
         .with_credentials(creds)
+        .disable_webrtc()
         .connect()
         .await?;
 
