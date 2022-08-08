@@ -235,7 +235,6 @@ impl<T: AuthMethod> DialBuilder<T> {
 
 impl DialBuilder<WithoutCredentials> {
     pub async fn connect(self) -> Result<ViamChannel> {
-        // TODO: test me
         let webrtc_options = self.config.webrtc_options;
         let disable_webrtc = match &webrtc_options {
             Some(options) => options.disable_webrtc,
