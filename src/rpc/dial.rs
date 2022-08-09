@@ -743,7 +743,7 @@ fn metadata_from_parts(parts: &http::request::Parts) -> Metadata {
 fn amend_domain_if_local(domain: &str) -> &str {
     let localhost = "127.0.0.1";
     let localhost_hum = "localhost";
-    if domain.contains(localhost) || domain.contains(localhost_hum) {
+    if domain.starts_with(localhost) || domain.starts_with(localhost_hum) {
         "localhost:8080"
     } else {
         domain
