@@ -62,10 +62,10 @@ pub mod motion_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn r#move(
+        pub async fn plan_and_move(
             &mut self,
-            request: impl tonic::IntoRequest<super::MoveRequest>,
-        ) -> Result<tonic::Response<super::MoveResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::PlanAndMoveRequest>,
+        ) -> Result<tonic::Response<super::PlanAndMoveResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -77,7 +77,26 @@ pub mod motion_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.service.motion.v1.MotionService/Move",
+                "/proto.api.service.motion.v1.MotionService/PlanAndMove",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn move_single_component(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MoveSingleComponentRequest>,
+        ) -> Result<tonic::Response<super::MoveSingleComponentResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.motion.v1.MotionService/MoveSingleComponent",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -109,10 +128,14 @@ pub mod motion_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with MotionServiceServer.
     #[async_trait]
     pub trait MotionService: Send + Sync + 'static {
-        async fn r#move(
+        async fn plan_and_move(
             &self,
-            request: tonic::Request<super::MoveRequest>,
-        ) -> Result<tonic::Response<super::MoveResponse>, tonic::Status>;
+            request: tonic::Request<super::PlanAndMoveRequest>,
+        ) -> Result<tonic::Response<super::PlanAndMoveResponse>, tonic::Status>;
+        async fn move_single_component(
+            &self,
+            request: tonic::Request<super::MoveSingleComponentRequest>,
+        ) -> Result<tonic::Response<super::MoveSingleComponentResponse>, tonic::Status>;
         async fn get_pose(
             &self,
             request: tonic::Request<super::GetPoseRequest>,
@@ -177,23 +200,26 @@ pub mod motion_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/proto.api.service.motion.v1.MotionService/Move" => {
+                "/proto.api.service.motion.v1.MotionService/PlanAndMove" => {
                     #[allow(non_camel_case_types)]
-                    struct MoveSvc<T: MotionService>(pub Arc<T>);
+                    struct PlanAndMoveSvc<T: MotionService>(pub Arc<T>);
                     impl<
                         T: MotionService,
-                    > tonic::server::UnaryService<super::MoveRequest> for MoveSvc<T> {
-                        type Response = super::MoveResponse;
+                    > tonic::server::UnaryService<super::PlanAndMoveRequest>
+                    for PlanAndMoveSvc<T> {
+                        type Response = super::PlanAndMoveResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::MoveRequest>,
+                            request: tonic::Request<super::PlanAndMoveRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).r#move(request).await };
+                            let fut = async move {
+                                (*inner).plan_and_move(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -202,7 +228,47 @@ pub mod motion_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = MoveSvc(inner);
+                        let method = PlanAndMoveSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.service.motion.v1.MotionService/MoveSingleComponent" => {
+                    #[allow(non_camel_case_types)]
+                    struct MoveSingleComponentSvc<T: MotionService>(pub Arc<T>);
+                    impl<
+                        T: MotionService,
+                    > tonic::server::UnaryService<super::MoveSingleComponentRequest>
+                    for MoveSingleComponentSvc<T> {
+                        type Response = super::MoveSingleComponentResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::MoveSingleComponentRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).move_single_component(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = MoveSingleComponentSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
