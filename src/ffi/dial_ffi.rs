@@ -110,12 +110,11 @@ fn dial_with_cred(
 /// * `rt_ptr` a pointer to a rust runtime previously obtained with init_rust_runtime
 /// * `disable_webrtc` a bool, set to true to force only direct connection
 #[no_mangle]
-unsafe extern "C" fn dial(
+pub unsafe extern "C" fn dial(
     c_uri: *const c_char,
     c_payload: *const c_char,
     c_allow_insec: bool,
     rt_ptr: Option<&mut Ffi>,
-    disable_webrtc: bool,
 ) -> *mut c_char {
     let uri = {
         if let true = c_uri.is_null() {
@@ -161,20 +160,18 @@ unsafe extern "C" fn dial(
         }
     };
     let (tx, rx) = oneshot::channel::<()>();
+    let uri_str = uri.to_string();
+    // if the uri is local then we can connect directly.
+    let disable_webrtc = uri_str.contains(".local");
     let server = match ctx.runtime.block_on(async move {
         let dial = match payload {
             Some(p) => tower::util::Either::A(
-                dial_with_cred(
-                    uri.clone().to_string(),
-                    p.to_str()?,
-                    allow_insec,
-                    disable_webrtc,
-                )?
-                .connect()
-                .await?,
+                dial_with_cred(uri_str, p.to_str()?, allow_insec, disable_webrtc)?
+                    .connect()
+                    .await?,
             ),
             None => {
-                let c = dial_without_cred(uri.clone().to_string(), allow_insec, disable_webrtc)?;
+                let c = dial_without_cred(uri_str, allow_insec, disable_webrtc)?;
                 tower::util::Either::B(c.connect().await?)
             }
         };
@@ -211,42 +208,6 @@ unsafe extern "C" fn dial(
     });
     ctx.push_handle(h);
     path.into_raw()
-}
-
-/// Returns a path to a UDS proxy to a robot
-/// # Safety
-///
-/// This function should be called from another language. See rpc::dial for dial from rust
-/// # Arguments
-/// * `c_uri` a C-style string representing the robot your are proxiying to
-/// * `c_payload` a C-style string that is the robot's secret, set to NULL if you don't need authentication
-/// * `c_allow_insecure` a bool, set to true when allowing insecure connection to your robot
-/// * `rt_ptr` a pointer to a rust runtime previously obtained with init_rust_runtime
-pub unsafe extern "C" fn dial_direct(
-    c_uri: *const c_char,
-    c_payload: *const c_char,
-    c_allow_insec: bool,
-    rt_ptr: Option<&mut Ffi>,
-) -> *mut c_char {
-    dial(c_uri, c_payload, c_allow_insec, rt_ptr, true)
-}
-
-/// Returns a path to a UDS proxy to a robot
-/// # Safety
-///
-/// This function should be called from another language. See rpc::dial for dial from rust
-/// # Arguments
-/// * `c_uri` a C-style string representing the robot your are proxiying to
-/// * `c_payload` a C-style string that is the robot's secret, set to NULL if you don't need authentication
-/// * `c_allow_insecure` a bool, set to true when allowing insecure connection to your robot
-/// * `rt_ptr` a pointer to a rust runtime previously obtained with init_rust_runtime
-pub unsafe extern "C" fn dial_webrtc(
-    c_uri: *const c_char,
-    c_payload: *const c_char,
-    c_allow_insec: bool,
-    rt_ptr: Option<&mut Ffi>,
-) -> *mut c_char {
-    dial(c_uri, c_payload, c_allow_insec, rt_ptr, false)
 }
 
 /// This function must be used to free the path returned by the dial_direct function

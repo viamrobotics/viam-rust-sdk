@@ -19,12 +19,12 @@ pub struct WebrtcBaseStream {
 
 impl WebrtcBaseStream {
     pub fn close_with_recv_error(&self, err: &mut Option<&anyhow::Error>) {
-        if self.closed.load(Ordering::SeqCst) {
+        if self.closed.load(Ordering::Acquire) {
             return;
         }
         let mut err = err.map(|e| anyhow::anyhow!(e.to_string()));
-        self.closed.store(true, Ordering::SeqCst);
-        self.closed_reason.store(&mut err, Ordering::SeqCst);
+        self.closed.store(true, Ordering::Release);
+        self.closed_reason.store(&mut err, Ordering::Release);
     }
 
     pub fn process_message(&mut self, message: PacketMessage) -> Result<Vec<u8>> {

@@ -72,6 +72,7 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
         match self {
             Self::Direct(channel) => Box::pin(channel.call(request)),
             Self::Webrtc(channel) => {
+                let mut status_code = StatusCode::OK;
                 let channel = channel.clone();
                 let fut = async move {
                     let (parts, body) = request.into_parts();
@@ -94,24 +95,27 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
                     if let Err(e) = channel.write_headers(&stream, headers).await {
                         log::error!("error writing headers: {e}");
                         channel.close_stream_with_recv_error(stream_id, e);
+                        status_code = StatusCode::METHOD_NOT_ALLOWED;
                     }
 
                     let data = hyper::body::to_bytes(body).await.unwrap().to_vec();
                     if let Err(e) = channel.write_message(false, Some(stream), data).await {
                         log::error!("error sending message: {e}");
                         channel.close_stream_with_recv_error(stream_id, e);
+                        status_code = StatusCode::METHOD_NOT_ALLOWED;
                     };
                     let recv = match channel.recv_from_stream(stream_id) {
                         Ok(recv) => recv,
                         Err(e) => {
                             log::error!("error receiving response from stream: {e}");
                             channel.close_stream_with_recv_error(stream_id, e);
+                            status_code = StatusCode::SERVICE_UNAVAILABLE;
                             Vec::new()
                         }
                     };
 
                     let response = http::response::Response::builder()
-                        .status(StatusCode::OK)
+                        .status(status_code)
                         .header("content-type", "application/grpc+tonic")
                         .version(Version::HTTP_2)
                         .body(Body::from(recv))
@@ -400,7 +404,7 @@ async fn send_error_once(
     err: &anyhow::Error,
     channel: AddAuthorization<SetRequestHeader<Channel, HeaderValue>>,
 ) {
-    if sent_error.load(Ordering::SeqCst) {
+    if sent_error.load(Ordering::Acquire) {
         return;
     }
 
@@ -409,7 +413,7 @@ async fn send_error_once(
         message: err.to_string(),
         details: Vec::new(),
     };
-    sent_error.store(true, Ordering::SeqCst);
+    sent_error.store(true, Ordering::Release);
     let update_request = CallUpdateRequest {
         uuid: uuid.to_string(),
         update: Some(Update::Error(err)),
@@ -423,10 +427,10 @@ async fn send_done_once(
     uuid: &String,
     channel: AddAuthorization<SetRequestHeader<Channel, HeaderValue>>,
 ) {
-    if sent_done.load(Ordering::SeqCst) {
+    if sent_done.load(Ordering::Acquire) {
         return;
     }
-    sent_done.store(true, Ordering::SeqCst);
+    sent_done.store(true, Ordering::Release);
     let update_request = CallUpdateRequest {
         uuid: uuid.to_string(),
         update: Some(Update::Done(true)),
@@ -466,7 +470,7 @@ async fn maybe_connect_via_webrtc(
 
     data_channel
         .on_open(Box::new(move || {
-            is_open.store(true, Ordering::SeqCst);
+            is_open.store(true, Ordering::Release);
             Box::pin(async move {})
         }))
         .await;
@@ -486,11 +490,11 @@ async fn maybe_connect_via_webrtc(
         peer_connection
             .on_ice_candidate(Box::new(move |ice_candidate: Option<RTCIceCandidate>| {
                 let remote_description_set = remote_description_set.clone();
-                while !remote_description_set.load(Ordering::SeqCst) {
+                while !remote_description_set.load(Ordering::Acquire) {
                     hint::spin_loop();
                 }
 
-                if exchange_done.load(Ordering::SeqCst) {
+                if exchange_done.load(Ordering::Acquire) {
                     return Box::pin(async move {});
                 }
                 let channel = channel2.clone();
@@ -498,14 +502,14 @@ async fn maybe_connect_via_webrtc(
                 let ice_done = ice_done.clone();
                 let uuid_lock = uuid_lock2.clone();
                 Box::pin(async move {
-                    if ice_done.load(Ordering::SeqCst) {
+                    if ice_done.load(Ordering::Acquire) {
                         return;
                     }
                     let uuid = uuid_lock.read().unwrap().to_string();
                     let mut signaling_client = SignalingServiceClient::new(channel.clone());
                     match ice_candidate {
                         Some(ice_candidate) => {
-                            if sent_done_or_error.load(Ordering::SeqCst) {
+                            if sent_done_or_error.load(Ordering::Acquire) {
                                 return;
                             }
                             let proto_candidate = ice_candidate_to_proto(ice_candidate).await;
@@ -525,7 +529,7 @@ async fn maybe_connect_via_webrtc(
                             }
                         }
                         None => {
-                            ice_done.store(true, Ordering::SeqCst);
+                            ice_done.store(true, Ordering::Release);
                             send_done_once(sent_done_or_error, &uuid, channel.clone()).await;
                         }
                     }
@@ -572,13 +576,13 @@ async fn maybe_connect_via_webrtc(
 
             match response.stage {
                 Some(Stage::Init(init)) => {
-                    if init_received.load(Ordering::SeqCst) {
+                    if init_received.load(Ordering::Acquire) {
                         let uuid = uuid2.read().unwrap().to_string();
                         let e = anyhow::anyhow!("Init received more than once");
                         send_error_once(sent_done.clone(), &uuid, &e, channel2.clone()).await;
                         break;
                     }
-                    init_received.store(true, Ordering::SeqCst);
+                    init_received.store(true, Ordering::Release);
                     {
                         let mut uuid_s = uuid2.write().unwrap();
                         *uuid_s = response.uuid.clone();
@@ -609,7 +613,7 @@ async fn maybe_connect_via_webrtc(
                             .await;
                         break;
                     }
-                    remote_description_set.store(true, Ordering::SeqCst);
+                    remote_description_set.store(true, Ordering::Release);
                     if webrtc_options.disable_trickle_ice {
                         send_done_once(sent_done.clone(), &response.uuid, channel2.clone()).await;
                         break;
@@ -618,7 +622,7 @@ async fn maybe_connect_via_webrtc(
 
                 Some(Stage::Update(update)) => {
                     let uuid = uuid2.read().unwrap().to_string();
-                    if !init_received.load(Ordering::SeqCst) {
+                    if !init_received.load(Ordering::Acquire) {
                         let e = anyhow::anyhow!("Got update before init stage");
                         send_error_once(sent_done.clone(), &uuid, &e, channel2.clone()).await;
                         break;
@@ -658,11 +662,11 @@ async fn maybe_connect_via_webrtc(
     // TODO (GOUT-11): create separate authorization if external_auth_addr and/or creds.Type is `Some`
 
     // Delay returning the client channel until data channel is open, so we don't lose messages
-    while !is_open_read.load(Ordering::SeqCst) {
+    while !is_open_read.load(Ordering::Acquire) {
         hint::spin_loop();
     }
 
-    exchange_done.store(true, Ordering::SeqCst);
+    exchange_done.store(true, Ordering::Release);
     let uuid = uuid_lock.read().unwrap().to_string();
     send_done_once(sent_done_or_error, &uuid, channel.clone()).await;
 

@@ -15,27 +15,23 @@ pub struct ActiveWebrtcClientStream {
 pub struct WebrtcClientStream {
     pub base_stream: WebrtcBaseStream,
     pub headers_received: AtomicBool,
+    pub message_sent: AtomicBool,
     pub trailers_received: AtomicBool,
 }
 
 impl WebrtcClientStream {
     fn process_headers(&mut self, _headers: ResponseHeaders) {
-        self.headers_received.store(true, Ordering::SeqCst)
+        self.headers_received.store(true, Ordering::Release)
     }
 
-    // processes a response message. Return value is true iff a message was sent.
-    fn process_message(&mut self, response: ResponseMessage) -> Result<bool> {
-        let mut message_sent = false;
-        if self.trailers_received.load(Ordering::SeqCst) {
-            return Ok(message_sent);
-        };
-
+    // processes a response message
+    fn process_message(&mut self, response: ResponseMessage) -> Result<()> {
         if let Some(message) = response.packet_message {
             match self.base_stream.process_message(message) {
                 Ok(data) => {
                     if !data.is_empty() {
                         self.base_stream.message_sender.send(data)?;
-                        message_sent = true;
+                        self.message_sent.store(true, Ordering::Release);
                     }
                 }
 
@@ -44,11 +40,11 @@ impl WebrtcClientStream {
                 }
             }
         }
-        Ok(message_sent)
+        Ok(())
     }
 
     fn process_trailers(&mut self, trailers: ResponseTrailers) {
-        self.trailers_received.store(true, Ordering::SeqCst);
+        self.trailers_received.store(true, Ordering::Release);
 
         let err = match trailers.status {
             None => None,
@@ -66,17 +62,18 @@ impl WebrtcClientStream {
         self.base_stream.close_with_recv_error(&mut err.as_ref())
     }
 
-    // processes response. returns true iff a message was sent
+    // processes response. returns true if and only if a message was sent and we're done
+    // processing (i.e., trailers were processed)
     pub fn on_response(&mut self, response: Response) -> Result<bool> {
         match &response.r#type {
             Some(Type::Headers(headers)) => {
-                if self.headers_received.load(Ordering::SeqCst) {
+                if self.headers_received.load(Ordering::Acquire) {
                     let err = anyhow::format_err!("headers already received");
                     self.base_stream.close_with_recv_error(&mut Some(&err));
                     return Err(err);
                 }
 
-                if self.trailers_received.load(Ordering::SeqCst) {
+                if self.trailers_received.load(Ordering::Acquire) {
                     let err = anyhow::format_err!("headers received after trailers");
                     self.base_stream.close_with_recv_error(&mut Some(&err));
                     return Err(err);
@@ -86,24 +83,24 @@ impl WebrtcClientStream {
                 Ok(false)
             }
             Some(Type::Message(message)) => {
-                if !self.headers_received.load(Ordering::SeqCst) {
+                if !self.headers_received.load(Ordering::Acquire) {
                     let err = anyhow::format_err!("headers not yet received");
                     self.base_stream.close_with_recv_error(&mut Some(&err));
                     return Err(err);
                 }
 
-                if self.trailers_received.load(Ordering::SeqCst) {
+                if self.trailers_received.load(Ordering::Acquire) {
                     let err = anyhow::format_err!("new messages received after trailers");
                     self.base_stream.close_with_recv_error(&mut Some(&err));
                     return Err(err);
                 }
 
-                self.process_message(message.to_owned())
+                self.process_message(message.to_owned()).map(|()| false)
             }
 
             Some(Type::Trailers(trailers)) => {
                 self.process_trailers(trailers.to_owned());
-                Ok(false)
+                Ok(self.message_sent.load(Ordering::Acquire))
             }
             None => Ok(false),
         }

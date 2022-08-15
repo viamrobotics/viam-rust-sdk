@@ -1,4 +1,4 @@
-use http::uri::Uri;
+use http::uri::{Scheme, Uri};
 use hyper::body::HttpBody;
 use hyper::Request;
 use std::task::{Context, Poll};
@@ -35,6 +35,9 @@ where
             .boxed_unsync();
         let mut to_uri = self.uri.clone().into_parts();
         to_uri.path_and_query = h.uri.into_parts().path_and_query;
+        if to_uri.scheme.is_none() {
+            to_uri.scheme = Some(Scheme::HTTPS)
+        }
         let proxy_uri = Uri::from_parts(to_uri).unwrap();
         h.uri = proxy_uri;
         let req = Request::from_parts(h, b);

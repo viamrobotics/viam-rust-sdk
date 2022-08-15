@@ -41,11 +41,11 @@ impl WebrtcBaseChannel {
 
     async fn close_with_reason(&self, err: Option<anyhow::Error>) -> Result<()> {
         let mut err = err;
-        if self.closed.load(Ordering::SeqCst) {
+        if self.closed.load(Ordering::Acquire) {
             return Ok(());
         }
-        self.closed.store(true, Ordering::SeqCst);
-        self.closed_reason.store(&mut err, Ordering::SeqCst);
+        self.closed.store(true, Ordering::Release);
+        self.closed_reason.store(&mut err, Ordering::Release);
 
         self.peer_connection
             .close()
@@ -58,10 +58,10 @@ impl WebrtcBaseChannel {
     }
 
     pub fn is_closed(&self) -> bool {
-        self.closed.load(Ordering::SeqCst)
+        self.closed.load(Ordering::Acquire)
     }
 
     pub fn closed_reason(&self) -> *mut Option<anyhow::Error> {
-        self.closed_reason.load(Ordering::SeqCst)
+        self.closed_reason.load(Ordering::Acquire)
     }
 }

@@ -12,6 +12,4 @@ viam = {path = "../"}
 anyhow = { version = "1.0", features = ["backtrace"]}
 tokio = { version = "1.19", features = [ "rt-multi-thread", "time", "fs", "macros", "net", ] }
 tonic = {version = "0.7.2",features = ["tls", "compression", "tls-roots"]}
-# TODO: replace with official webrtc library once changes are merged
-webrtc = { git = "https://github.com/stuqdog/webrtc" }
 env_logger = "0.9.0"

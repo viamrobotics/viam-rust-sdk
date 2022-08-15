@@ -58,7 +58,7 @@ impl WebrtcClientChannel {
     }
 
     pub fn new_stream(&self) -> Arc<Mutex<WebrtcClientStream>> {
-        let id = self.stream_id_counter.fetch_add(1, Ordering::SeqCst);
+        let id = self.stream_id_counter.fetch_add(1, Ordering::AcqRel);
         let stream = Stream { id };
 
         let (message_sender, message_receiver) = std::sync::mpsc::channel();
@@ -74,6 +74,7 @@ impl WebrtcClientChannel {
 
         let client_stream = Arc::new(Mutex::new(WebrtcClientStream {
             base_stream,
+            message_sent: AtomicBool::new(false),
             headers_received: AtomicBool::new(false),
             trailers_received: AtomicBool::new(false),
         }));
@@ -117,12 +118,12 @@ impl WebrtcClientChannel {
             }
         }?;
         drop(streams);
-        self.message_ready.store(message_sent, Ordering::SeqCst);
+        self.message_ready.store(message_sent, Ordering::Release);
         Ok(())
     }
 
     pub fn recv_from_stream(&self, stream_id: u64) -> Result<Vec<u8>> {
-        while !self.message_ready.load(Ordering::SeqCst) {
+        while !self.message_ready.load(Ordering::Acquire) {
             hint::spin_loop();
         }
         let streams_lock = self.streams.lock().unwrap();
@@ -141,7 +142,7 @@ impl WebrtcClientChannel {
                 let len: u32 = msg.len().try_into()?;
                 message_buf.write_u32::<BigEndian>(len)?;
                 message_buf.append(&mut msg);
-                self.message_ready.store(false, Ordering::SeqCst);
+                self.message_ready.store(false, Ordering::Release);
                 Ok(message_buf)
             }
             None => Ok(Vec::new()),

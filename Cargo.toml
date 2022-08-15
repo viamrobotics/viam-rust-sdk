@@ -36,9 +36,11 @@ tower-http = { version = "0.3.3", features = ["add-extension","auth","propagate-
 tracing = {version = "0.1.34"}
 tracing-subscriber = {version = "0.3.11", features = ["env-filter"]}
 webpki-roots = "0.21.1"
-# TODO: replace with official webrtc library once changes are merged
-webrtc = { git = "https://github.com/stuqdog/webrtc" }
 
 
 [build-dependencies]
 tonic-build = {version = "0.7.2",features = ["prost", "compression"]}
+
+# TODO: replace with crates.io implementation of official webrtc-rs crate once webrtc-data crate is updated
+[dependencies.webrtc]
+git = "https://github.com/stuqdog/webrtc"
