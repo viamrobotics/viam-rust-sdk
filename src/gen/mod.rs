@@ -50,11 +50,11 @@ pub mod proto {
                     // @@protoc_insertion_point(proto.api.component.gantry.v1)
                 }
             }
-            pub mod movementsensor {
-                // @@protoc_insertion_point(attribute:proto.api.component.movementsensor.v1)
+            pub mod gps {
+                // @@protoc_insertion_point(attribute:proto.api.component.gps.v1)
                 pub mod v1 {
-                    include!("proto.api.component.movementsensor.v1.rs");
-                    // @@protoc_insertion_point(proto.api.component.movementsensor.v1)
+                    include!("proto.api.component.gps.v1.rs");
+                    // @@protoc_insertion_point(proto.api.component.gps.v1)
                 }
             }
             pub mod gripper {
@@ -62,6 +62,13 @@ pub mod proto {
                 pub mod v1 {
                     include!("proto.api.component.gripper.v1.rs");
                     // @@protoc_insertion_point(proto.api.component.gripper.v1)
+                }
+            }
+            pub mod imu {
+                // @@protoc_insertion_point(attribute:proto.api.component.imu.v1)
+                pub mod v1 {
+                    include!("proto.api.component.imu.v1.rs");
+                    // @@protoc_insertion_point(proto.api.component.imu.v1)
                 }
             }
             pub mod inputcontroller {
