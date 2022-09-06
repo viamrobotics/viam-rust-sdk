@@ -5,7 +5,7 @@ use crate::{
     gen::proto::rpc::webrtc::v1::{
         request::Type, PacketMessage, Request, RequestHeaders, RequestMessage, Response, Stream,
     },
-    rpc::webrtc::AtomicBoolFuture,
+    rpc::webrtc::PollableAtomicBool,
 };
 use anyhow::Result;
 use byteorder::{BigEndian, WriteBytesExt};
@@ -127,7 +127,7 @@ impl WebRTCClientChannel {
     }
 
     pub async fn recv_from_stream(&self, stream_id: u64) -> Result<Vec<u8>> {
-        let message_ready = AtomicBoolFuture::new(self.message_ready.clone());
+        let message_ready = PollableAtomicBool::new(self.message_ready.clone());
         if webrtc_action_with_timeout(message_ready).await.is_err() {
             return Err(anyhow::anyhow!(
                 "Timed out receiving message from base stream"

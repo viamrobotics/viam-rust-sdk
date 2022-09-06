@@ -16,7 +16,7 @@ use crate::{
     gen::proto::rpc::v1::{
         auth_service_client::AuthServiceClient, AuthenticateRequest, Credentials,
     },
-    rpc::webrtc::AtomicBoolFuture,
+    rpc::webrtc::PollableAtomicBool,
 };
 use ::http::header::HeaderName;
 use ::http::{
@@ -484,7 +484,6 @@ async fn maybe_connect_via_webrtc(
 
     data_channel
         .on_open(Box::new(move || {
-            println!("We opened the data channel");
             is_open.store(true, Ordering::Release);
             Box::pin(async move {})
         }))
@@ -513,7 +512,7 @@ async fn maybe_connect_via_webrtc(
                 let ice_done = ice_done.clone();
                 let uuid_lock = uuid_lock2.clone();
                 Box::pin(async move {
-                    let remote_description_set = AtomicBoolFuture::new(remote_description_set);
+                    let remote_description_set = PollableAtomicBool::new(remote_description_set);
                     if webrtc_action_with_timeout(remote_description_set)
                         .await
                         .is_err()
@@ -682,7 +681,7 @@ async fn maybe_connect_via_webrtc(
     });
 
     let is_open_read = is_open_read.clone();
-    let is_open = AtomicBoolFuture::new(is_open_read);
+    let is_open = PollableAtomicBool::new(is_open_read);
 
     // TODO (GOUT-11): create separate authorization if external_auth_addr and/or creds.Type is `Some`
 
