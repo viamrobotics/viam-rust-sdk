@@ -11,7 +11,6 @@ async fn main() -> Result<()> {
         .uri("localhost:50551")
         .without_credentials()
         .allow_downgrade()
-        .disable_webrtc()
         .connect()
         .await?;
 
