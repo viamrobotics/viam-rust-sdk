@@ -45,4 +45,3 @@ tonic-build = {version = "0.7.2",features = ["prost", "compression"]}
 # crate is updated to 0.5.0
 [dependencies.webrtc]
 git = "https://github.com/stuqdog/webrtc"
-branch = "fix-datachannel-id-setting"

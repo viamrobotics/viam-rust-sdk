@@ -7,6 +7,10 @@ version = "0.0.1"
 name = "test-dial"
 path = "src/dial/main.rs"
 
+#[[bin]]
+#name = "test-echo"
+#path = "src/echo/main.rs"
+
 [dependencies]
 viam = {path = "../"}
 anyhow = { version = "1.0", features = ["backtrace"]}

@@ -478,12 +478,13 @@ async fn maybe_connect_via_webrtc(
 
     let sent_done_or_error = Arc::new(AtomicBool::new(false));
     let uuid_lock = Arc::new(RwLock::new("".to_string()));
-    let uuid2 = uuid_lock.clone();
+    let uuid_for_ice_gathering_thread = uuid_lock.clone();
     let is_open = Arc::new(AtomicBool::new(false));
     let is_open_read = is_open.clone();
 
     data_channel
         .on_open(Box::new(move || {
+            println!("We opened the data channel");
             is_open.store(true, Ordering::Release);
             Box::pin(async move {})
         }))
@@ -567,13 +568,15 @@ async fn maybe_connect_via_webrtc(
     };
 
     let client_channel = WebRTCClientChannel::new(peer_connection, data_channel).await;
-    let client_channel2 = client_channel.clone();
+    let client_channel_for_ice_gathering_thread = client_channel.clone();
     let mut signaling_client = SignalingServiceClient::new(channel.clone());
     let mut call_client = signaling_client.call(call_request).await?.into_inner();
 
     let channel2 = channel.clone();
     let sent_done_or_error2 = sent_done_or_error.clone();
     tokio::spawn(async move {
+        let uuid = uuid_for_ice_gathering_thread;
+        let client_channel = client_channel_for_ice_gathering_thread;
         let init_received = AtomicBool::new(false);
         let sent_done = sent_done_or_error2;
 
@@ -582,7 +585,7 @@ async fn maybe_connect_via_webrtc(
                 Ok(cr) => match cr {
                     Some(cr) => cr,
                     None => {
-                        let uuid = uuid2.read().unwrap().to_string();
+                        let uuid = uuid.read().unwrap().to_string();
                         send_done_once(sent_done.clone(), &uuid, channel2.clone()).await;
                         break;
                     }
@@ -596,14 +599,14 @@ async fn maybe_connect_via_webrtc(
             match response.stage {
                 Some(Stage::Init(init)) => {
                     if init_received.load(Ordering::Acquire) {
-                        let uuid = uuid2.read().unwrap().to_string();
+                        let uuid = uuid.read().unwrap().to_string();
                         let e = anyhow::anyhow!("Init received more than once");
                         send_error_once(sent_done.clone(), &uuid, &e, channel2.clone()).await;
                         break;
                     }
                     init_received.store(true, Ordering::Release);
                     {
-                        let mut uuid_s = uuid2.write().unwrap();
+                        let mut uuid_s = uuid.write().unwrap();
                         *uuid_s = response.uuid.clone();
                     }
 
@@ -621,7 +624,7 @@ async fn maybe_connect_via_webrtc(
                         }
                     };
 
-                    if let Err(e) = client_channel2
+                    if let Err(e) = client_channel
                         .base_channel
                         .peer_connection
                         .set_remote_description(answer)
@@ -640,32 +643,32 @@ async fn maybe_connect_via_webrtc(
                 }
 
                 Some(Stage::Update(update)) => {
-                    let uuid = uuid2.read().unwrap().to_string();
+                    let uuid_s = uuid.read().unwrap().to_string();
                     if !init_received.load(Ordering::Acquire) {
                         let e = anyhow::anyhow!("Got update before init stage");
-                        send_error_once(sent_done.clone(), &uuid, &e, channel2.clone()).await;
+                        send_error_once(sent_done.clone(), &uuid_s, &e, channel2.clone()).await;
                         break;
                     }
 
-                    if response.uuid != *uuid2.read().unwrap() {
+                    if response.uuid != *uuid.read().unwrap() {
                         let e = anyhow::anyhow!(
                             "uuid mismatch: have {}, want {}",
                             response.uuid,
-                            uuid,
+                            uuid_s,
                         );
-                        send_error_once(sent_done.clone(), &uuid, &e, channel2.clone()).await;
+                        send_error_once(sent_done.clone(), &uuid_s, &e, channel2.clone()).await;
                         break;
                     }
                     match ice_candidate_from_proto(update.candidate) {
                         Ok(candidate) => {
-                            if let Err(e) = client_channel2
+                            if let Err(e) = client_channel
                                 .base_channel
                                 .peer_connection
                                 .add_ice_candidate(candidate)
                                 .await
                             {
                                 let e = anyhow::Error::from(e);
-                                send_error_once(sent_done.clone(), &uuid, &e, channel2.clone())
+                                send_error_once(sent_done.clone(), &uuid_s, &e, channel2.clone())
                                     .await;
                                 break;
                             }

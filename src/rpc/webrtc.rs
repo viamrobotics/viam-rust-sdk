@@ -31,7 +31,7 @@ use webrtc::{
 };
 
 // set to 20sec to match _defaultOfferDeadline in goutils/rpc/wrtc_call_queue.go
-const WEBRTC_TIMEOUT: Duration = Duration::from_secs(2);
+const WEBRTC_TIMEOUT: Duration = Duration::from_secs(20);
 
 #[derive(Default)]
 pub struct Options {
