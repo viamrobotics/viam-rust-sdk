@@ -7,11 +7,11 @@ use viam::rpc::dial;
 async fn dial_direct() -> Result<tonic::Response<ResourceNamesResponse>> {
     let creds = dial::CredentialsExt::new(
         "robot-location-secret".to_string(),
-        "9x375brdv1f7u2v6vi42a21cbzo0xuauov025wox5mg9grd5".to_string(),
+        "ytexnwei4fu1xv9csoqxfv4ckl3htsb49mzzey5t15xo9swy".to_string(),
     );
 
     let c = dial::DialOptions::builder()
-        .uri("test-main.33vvxnbbw9.local.viam.cloud:8080")
+        .uri("webrtc-test-main.jkek76kqnh.local.viam.cloud:8080")
         .with_credentials(creds)
         .disable_webrtc()
         .connect()

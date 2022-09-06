@@ -41,6 +41,8 @@ webpki-roots = "0.21.1"
 [build-dependencies]
 tonic-build = {version = "0.7.2",features = ["prost", "compression"]}
 
-# TODO: replace with crates.io implementation of official webrtc-rs crate once webrtc-data crate is updated
+# TODO: replace with crates.io implementation of official webrtc-rs crate once webrtc
+# crate is updated to 0.5.0
 [dependencies.webrtc]
 git = "https://github.com/stuqdog/webrtc"
+branch = "fix-datachannel-id-setting"

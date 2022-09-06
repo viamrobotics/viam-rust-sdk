@@ -8,18 +8,18 @@ use std::sync::{
     Arc, Mutex,
 };
 
-pub struct ActiveWebrtcClientStream {
-    pub client_stream: Arc<Mutex<WebrtcClientStream>>,
+pub struct ActiveWebRTCClientStream {
+    pub client_stream: Arc<Mutex<WebRTCClientStream>>,
 }
 
-pub struct WebrtcClientStream {
-    pub base_stream: WebrtcBaseStream,
+pub struct WebRTCClientStream {
+    pub base_stream: WebRTCBaseStream,
     pub headers_received: AtomicBool,
     pub message_sent: AtomicBool,
     pub trailers_received: AtomicBool,
 }
 
-impl WebrtcClientStream {
+impl WebRTCClientStream {
     fn process_headers(&mut self, _headers: ResponseHeaders) {
         self.headers_received.store(true, Ordering::Release)
     }
@@ -30,7 +30,7 @@ impl WebrtcClientStream {
             match self.base_stream.process_message(message) {
                 Ok(data) => {
                     if !data.is_empty() {
-                        self.base_stream.message_sender.send(data)?;
+                        self.base_stream.message_sender.try_send(data)?;
                         self.message_sent.store(true, Ordering::Release);
                     }
                 }

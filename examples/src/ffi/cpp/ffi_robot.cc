@@ -40,7 +40,7 @@ public:
 		return;
     }
 	for(auto i = 0; i < resp.resources_size(); i++){
-		std::cout << "Ressource " << i << " " << resp.resources(i).type() << std::endl;
+		std::cout << "Resource " << i << " " << resp.resources(i).type() << std::endl;
 			}
   }
 
@@ -52,8 +52,8 @@ int main(int argc, char *argv[]) {
 
   void *ptr = init_rust_runtime();
   char *path = dial("https://test-main.33vvxnbbw9.local.viam.cloud:8080",
-                    "9x375brdv1f7u2v6vi42a21cbzo0xuauov025wox5mg9grd5",
-                    false, ptr);
+					"9x375brdv1f7u2v6vi42a21cbzo0xuauov025wox5mg9grd5",
+					false, ptr);
   if(path == NULL){
 	  free_rust_runtime(ptr);
 	  return 1;

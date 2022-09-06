@@ -1,8 +1,8 @@
-use super::{client_channel::*, webrtc::Options};
-use crate::gen::google;
-use crate::gen::proto::rpc::v1::{
-    auth_service_client::AuthServiceClient, AuthenticateRequest, Credentials,
+use super::{
+    client_channel::*,
+    webrtc::{webrtc_action_with_timeout, Options},
 };
+use crate::gen::google;
 use crate::gen::proto::rpc::webrtc::v1::{
     call_response::Stage, call_update_request::Update,
     signaling_service_client::SignalingServiceClient, CallUpdateRequest,
@@ -12,6 +12,12 @@ use crate::gen::proto::rpc::webrtc::v1::{
     CallRequest, IceCandidate, Metadata, RequestHeaders, Strings,
 };
 use crate::rpc::webrtc;
+use crate::{
+    gen::proto::rpc::v1::{
+        auth_service_client::AuthServiceClient, AuthenticateRequest, Credentials,
+    },
+    rpc::webrtc::AtomicBoolFuture,
+};
 use ::http::header::HeaderName;
 use ::http::{
     uri::{Authority, Parts, PathAndQuery, Scheme},
@@ -21,7 +27,6 @@ use ::webrtc::ice_transport::ice_candidate::{RTCIceCandidate, RTCIceCandidateIni
 use ::webrtc::peer_connection::sdp::session_description::RTCSessionDescription;
 use anyhow::{Context, Result};
 use core::fmt;
-use std::hint;
 use std::{
     collections::HashMap,
     sync::{
@@ -43,7 +48,7 @@ type SecretType = String;
 #[derive(Clone)]
 pub enum ViamChannel {
     Direct(Channel),
-    Webrtc(Arc<WebrtcClientChannel>),
+    WebRTC(Arc<WebRTCClientChannel>),
 }
 
 pub trait CredentialsExt {
@@ -64,14 +69,14 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
     fn poll_ready(&mut self, cx: &mut TaskContext<'_>) -> Poll<Result<(), Self::Error>> {
         match self {
             Self::Direct(channel) => channel.poll_ready(cx),
-            Self::Webrtc(_channel) => Poll::Ready(Ok(())),
+            Self::WebRTC(_channel) => Poll::Ready(Ok(())),
         }
     }
 
     fn call(&mut self, request: http::Request<BoxBody>) -> Self::Future {
         match self {
             Self::Direct(channel) => Box::pin(channel.call(request)),
-            Self::Webrtc(channel) => {
+            Self::WebRTC(channel) => {
                 let mut status_code = StatusCode::OK;
                 let channel = channel.clone();
                 let fut = async move {
@@ -87,7 +92,11 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
                     let stream_id = stream.id;
                     let metadata = Some(metadata_from_parts(&parts));
                     let headers = RequestHeaders {
-                        method: parts.uri.to_string(),
+                        method: parts
+                            .uri
+                            .path_and_query()
+                            .map(PathAndQuery::to_string)
+                            .unwrap_or_default(),
                         metadata,
                         timeout: None,
                     };
@@ -104,7 +113,12 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
                         channel.close_stream_with_recv_error(stream_id, e);
                         status_code = StatusCode::METHOD_NOT_ALLOWED;
                     };
-                    let recv = match channel.recv_from_stream(stream_id) {
+
+                    let recv_from_stream = channel.recv_from_stream(stream_id);
+                    let recv = match webrtc_action_with_timeout(recv_from_stream)
+                        .await
+                        .and_then(|recv| recv)
+                    {
                         Ok(recv) => recv,
                         Err(e) => {
                             log::error!("error receiving response from stream: {e}");
@@ -290,7 +304,7 @@ impl DialBuilder<WithoutCredentials> {
             Ok(ViamChannel::Direct(channel.clone()))
         } else {
             match maybe_connect_via_webrtc(uri, intercepted_channel.clone(), webrtc_options).await {
-                Ok(webrtc_channel) => Ok(ViamChannel::Webrtc(webrtc_channel)),
+                Ok(webrtc_channel) => Ok(ViamChannel::WebRTC(webrtc_channel)),
                 Err(e) => {
                     log::error!("error connecting via webrtc: {e}. Attempting to connect directly");
                     Ok(ViamChannel::Direct(channel.clone()))
@@ -366,10 +380,10 @@ impl DialBuilder<WithCredentials> {
             ViamChannel::Direct(real_channel.clone())
         } else {
             match maybe_connect_via_webrtc(uri.clone(), channel.clone(), webrtc_options).await {
-                Ok(webrtc_channel) => ViamChannel::Webrtc(webrtc_channel),
+                Ok(webrtc_channel) => ViamChannel::WebRTC(webrtc_channel),
                 Err(e) => {
                     log::error!(
-                    "Unable to establish webrtc connection due to error {e}. Attempting direct connection."
+                    "Unable to establish webrtc connection due to error: [{e}]. Attempting direct connection."
                 );
                     ViamChannel::Direct(real_channel.clone())
                 }
@@ -443,7 +457,7 @@ async fn maybe_connect_via_webrtc(
     uri: Uri,
     channel: AddAuthorization<SetRequestHeader<Channel, HeaderValue>>,
     webrtc_options: Option<Options>,
-) -> Result<Arc<WebrtcClientChannel>> {
+) -> Result<Arc<WebRTCClientChannel>> {
     let webrtc_options = webrtc_options.unwrap_or_else(|| Options::infer_from_uri(uri.clone()));
     let mut signaling_client = SignalingServiceClient::new(channel.clone());
     let response = match signaling_client
@@ -490,10 +504,6 @@ async fn maybe_connect_via_webrtc(
         peer_connection
             .on_ice_candidate(Box::new(move |ice_candidate: Option<RTCIceCandidate>| {
                 let remote_description_set = remote_description_set.clone();
-                while !remote_description_set.load(Ordering::Acquire) {
-                    hint::spin_loop();
-                }
-
                 if exchange_done.load(Ordering::Acquire) {
                     return Box::pin(async move {});
                 }
@@ -502,6 +512,15 @@ async fn maybe_connect_via_webrtc(
                 let ice_done = ice_done.clone();
                 let uuid_lock = uuid_lock2.clone();
                 Box::pin(async move {
+                    let remote_description_set = AtomicBoolFuture::new(remote_description_set);
+                    if webrtc_action_with_timeout(remote_description_set)
+                        .await
+                        .is_err()
+                    {
+                        log::info!("timed out on_ice_candidate; remote description was never set");
+                        return;
+                    }
+
                     if ice_done.load(Ordering::Acquire) {
                         return;
                     }
@@ -547,7 +566,7 @@ async fn maybe_connect_via_webrtc(
         disable_trickle: webrtc_options.disable_trickle_ice,
     };
 
-    let client_channel = WebrtcClientChannel::new(peer_connection, data_channel).await;
+    let client_channel = WebRTCClientChannel::new(peer_connection, data_channel).await;
     let client_channel2 = client_channel.clone();
     let mut signaling_client = SignalingServiceClient::new(channel.clone());
     let mut call_client = signaling_client.call(call_request).await?.into_inner();
@@ -659,11 +678,14 @@ async fn maybe_connect_via_webrtc(
         }
     });
 
+    let is_open_read = is_open_read.clone();
+    let is_open = AtomicBoolFuture::new(is_open_read);
+
     // TODO (GOUT-11): create separate authorization if external_auth_addr and/or creds.Type is `Some`
 
     // Delay returning the client channel until data channel is open, so we don't lose messages
-    while !is_open_read.load(Ordering::Acquire) {
-        hint::spin_loop();
+    if webrtc_action_with_timeout(is_open).await.is_err() {
+        return Err(anyhow::anyhow!("Timed out opening data channel."));
     }
 
     exchange_done.store(true, Ordering::Release);
@@ -745,7 +767,7 @@ fn metadata_from_parts(parts: &http::request::Parts) -> Metadata {
 }
 
 fn amend_domain_if_local(domain: &str) -> &str {
-    let localhost = "127.0.0.1";
+    let localhost = "127.";
     let localhost_hum = "localhost";
     if domain.starts_with(localhost) || domain.starts_with(localhost_hum) {
         "localhost:8080"

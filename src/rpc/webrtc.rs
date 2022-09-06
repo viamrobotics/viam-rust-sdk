@@ -2,9 +2,15 @@ use crate::gen::proto::rpc::webrtc::v1::{IceServer, WebRtcConfig};
 use anyhow::Result;
 use bytes::Bytes;
 use core::fmt;
+use futures::Future;
 use http::Uri;
-use interceptor::registry::Registry;
-use std::{hint, sync::Arc};
+use std::{
+    hint,
+    pin::Pin,
+    sync::{atomic::AtomicBool, Arc},
+    task::{Context, Poll},
+    time::Duration,
+};
 use webrtc::{
     api::{
         interceptor_registry, media_engine::MediaEngine, setting_engine::SettingEngine, APIBuilder,
@@ -16,12 +22,16 @@ use webrtc::{
     },
     ice::mdns::MulticastDnsMode,
     ice_transport::ice_server::RTCIceServer,
+    interceptor::registry::Registry,
     peer_connection::{
         configuration::RTCConfiguration, peer_connection_state::RTCPeerConnectionState,
         sdp::session_description::RTCSessionDescription, signaling_state::RTCSignalingState,
         RTCPeerConnection,
     },
 };
+
+// set to 20sec to match _defaultOfferDeadline in goutils/rpc/wrtc_call_queue.go
+const WEBRTC_TIMEOUT: Duration = Duration::from_secs(2);
 
 #[derive(Default)]
 pub struct Options {
@@ -30,6 +40,30 @@ pub struct Options {
     pub config: RTCConfiguration,
     pub signaling_insecure: bool,
     pub signaling_server_address: String,
+}
+
+// an Arc<AtomicBool> that is pollable as a future. Pending when false, Ready(()) when true
+pub(crate) struct AtomicBoolFuture {
+    inner: Arc<AtomicBool>,
+}
+
+impl AtomicBoolFuture {
+    pub(crate) fn new(inner: Arc<AtomicBool>) -> Self {
+        Self { inner }
+    }
+}
+
+// implementing Future for AtomicBool allows us to use an AtomicBool in a `tokio::select!`
+// statement
+impl Future for AtomicBoolFuture {
+    type Output = ();
+
+    fn poll(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
+        match self.inner.load(std::sync::atomic::Ordering::Acquire) {
+            false => Poll::Pending,
+            true => Poll::Ready(()),
+        }
+    }
 }
 
 impl fmt::Debug for Options {
@@ -56,6 +90,8 @@ impl fmt::Debug for Options {
 
 impl Options {
     pub fn infer_signaling_server_address(uri: &Uri) -> Option<(String, bool)> {
+        // TODO(RSDK-235): remove hard coding of signaling server
+        // address and prefer SRV lookup instead
         let path = uri.to_string();
         if path.contains(".viam.cloud") {
             Some(("app.viam.com:443".to_string(), true))
@@ -158,16 +194,14 @@ pub async fn new_peer_connection_for_client(
     let peer_connection = Arc::new(web_api.new_peer_connection(config).await?);
 
     let data_channel_init = RTCDataChannelInit {
-        negotiated: Some(true),
+        negotiated: Some(0),
         ordered: Some(true),
-        id: Some(0),
         ..Default::default()
     };
 
     let negotiation_channel_init = RTCDataChannelInit {
-        negotiated: Some(true),
+        negotiated: Some(1),
         ordered: Some(true),
-        id: Some(1),
         ..Default::default()
     };
 
@@ -231,12 +265,39 @@ pub async fn new_peer_connection_for_client(
         let mut receiver = peer_connection.gathering_complete_promise().await;
         peer_connection.set_local_description(offer).await?;
 
-        // Block until ICE gathering is complete since we signal back one complete SDP and
-        // do not want to wait on trickle ice
-        while receiver.recv().await.is_some() {
-            hint::spin_loop();
-        }
+        // TODO(RSDK-596): impl future here so we don't spin loop, which prevents this
+        // from actually timing out.
+        let promise_gathering_completed = async move {
+            // Block until ICE gathering is complete since we signal back one complete SDP and
+            // do not want to wait on trickle ice
+            while receiver.recv().await.is_some() {
+                hint::spin_loop();
+            }
+        };
+
+        webrtc_action_with_timeout(promise_gathering_completed).await?;
     }
 
     Ok((peer_connection, data_channel))
+}
+
+pub async fn webrtc_action_with_timeout<T>(f: impl Future<Output = T>) -> Result<T> {
+    tokio::pin! {
+        let timeout = tokio::time::sleep(WEBRTC_TIMEOUT);
+        let f = f;
+    }
+
+    loop {
+        tokio::select! {
+                _ = &mut timeout =>
+                {
+                    return Err(anyhow::anyhow!("Action timed out"));
+
+                }
+                res = &mut f => {
+                return Ok(res);
+
+            }
+        }
+    }
 }

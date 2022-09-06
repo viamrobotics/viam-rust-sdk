@@ -1,14 +1,12 @@
 use crate::gen::proto::rpc::webrtc::v1::{PacketMessage, Stream};
 use anyhow::Result;
 use bytes::BufMut;
-use std::sync::{
-    atomic::{AtomicBool, AtomicPtr, Ordering},
-    mpsc::{Receiver, Sender},
-};
+use std::sync::atomic::{AtomicBool, AtomicPtr, Ordering};
+use tokio::sync::mpsc::{Receiver, Sender};
 
 const MAX_MESSAGE_SIZE: usize = 1 << 25;
 
-pub struct WebrtcBaseStream {
+pub struct WebRTCBaseStream {
     pub stream: Stream,
     pub message_sender: Sender<Vec<u8>>,
     pub message_receiver: Receiver<Vec<u8>>,
@@ -17,7 +15,7 @@ pub struct WebrtcBaseStream {
     pub closed_reason: AtomicPtr<Option<anyhow::Error>>,
 }
 
-impl WebrtcBaseStream {
+impl WebRTCBaseStream {
     pub fn close_with_recv_error(&self, err: &mut Option<&anyhow::Error>) {
         if self.closed.load(Ordering::Acquire) {
             return;

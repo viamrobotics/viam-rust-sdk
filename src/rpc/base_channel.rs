@@ -6,14 +6,14 @@ use std::sync::{
 use webrtc::{data_channel::RTCDataChannel, peer_connection::RTCPeerConnection};
 
 // see golang/client_stream.go
-pub struct WebrtcBaseChannel {
+pub struct WebRTCBaseChannel {
     pub peer_connection: Arc<RTCPeerConnection>,
     pub data_channel: Arc<RTCDataChannel>,
     closed_reason: AtomicPtr<Option<anyhow::Error>>,
     closed: AtomicBool,
 }
 
-impl WebrtcBaseChannel {
+impl WebRTCBaseChannel {
     pub async fn new(
         peer_connection: Arc<RTCPeerConnection>,
         data_channel: Arc<RTCDataChannel>,

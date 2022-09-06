@@ -5,7 +5,9 @@ use tokio::sync::oneshot;
 use tokio::task::JoinHandle;
 use tracing::Level;
 
-use crate::rpc::{self, dial::DialBuilder};
+use crate::rpc::dial::{
+    CredentialsExt, DialBuilder, DialOptions, WithCredentials, WithoutCredentials,
+};
 use libc::c_char;
 
 use crate::proxy;
@@ -65,10 +67,8 @@ fn dial_without_cred(
     uri: String,
     allow_insec: bool,
     disable_webrtc: bool,
-) -> Result<DialBuilder<rpc::dial::WithoutCredentials>> {
-    let c = rpc::dial::DialOptions::builder()
-        .uri(&uri)
-        .without_credentials();
+) -> Result<DialBuilder<WithoutCredentials>> {
+    let c = DialOptions::builder().uri(&uri).without_credentials();
     let c = if disable_webrtc {
         c.disable_webrtc()
     } else {
@@ -83,14 +83,9 @@ fn dial_with_cred(
     payload: &str,
     allow_insec: bool,
     disable_webrtc: bool,
-) -> Result<DialBuilder<rpc::dial::WithCredentials>> {
-    let creds = rpc::dial::CredentialsExt::new(
-        String::from("robot-location-secret"),
-        String::from(payload),
-    );
-    let c = rpc::dial::DialOptions::builder()
-        .uri(&uri)
-        .with_credentials(creds);
+) -> Result<DialBuilder<WithCredentials>> {
+    let creds = CredentialsExt::new(String::from("robot-location-secret"), String::from(payload));
+    let c = DialOptions::builder().uri(&uri).with_credentials(creds);
     let c = if disable_webrtc {
         c.disable_webrtc()
     } else {
@@ -117,7 +112,7 @@ pub unsafe extern "C" fn dial(
     rt_ptr: Option<&mut Ffi>,
 ) -> *mut c_char {
     let uri = {
-        if let true = c_uri.is_null() {
+        if c_uri.is_null() {
             return ptr::null_mut();
         }
         let ur = match Uri::from_maybe_shared(CStr::from_ptr(c_uri).to_bytes()) {

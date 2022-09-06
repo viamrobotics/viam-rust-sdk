@@ -1,13 +1,17 @@
-use super::{base_channel::*, base_stream::*, client_stream::*};
-use crate::gen::proto::rpc::webrtc::v1::{
-    request::Type, PacketMessage, Request, RequestHeaders, RequestMessage, Response, Stream,
+use super::{
+    base_channel::*, base_stream::*, client_stream::*, webrtc::webrtc_action_with_timeout,
+};
+use crate::{
+    gen::proto::rpc::webrtc::v1::{
+        request::Type, PacketMessage, Request, RequestHeaders, RequestMessage, Response, Stream,
+    },
+    rpc::webrtc::AtomicBoolFuture,
 };
 use anyhow::Result;
 use byteorder::{BigEndian, WriteBytesExt};
 use prost::Message;
 use std::{
     collections::HashMap,
-    hint,
     sync::{
         atomic::{AtomicBool, AtomicPtr, AtomicU64, Ordering},
         Arc, Mutex,
@@ -21,22 +25,22 @@ use webrtc::{
 // see golang/client_stream.go
 const MAX_REQUEST_MESSAGE_PACKET_DATA_SIZE: usize = 16373;
 
-pub struct WebrtcClientChannel {
-    pub base_channel: Arc<WebrtcBaseChannel>,
+pub struct WebRTCClientChannel {
+    pub base_channel: Arc<WebRTCBaseChannel>,
     stream_id_counter: AtomicU64,
-    message_ready: AtomicBool,
-    pub streams: Mutex<HashMap<u64, ActiveWebrtcClientStream>>,
+    message_ready: Arc<AtomicBool>,
+    pub streams: Mutex<HashMap<u64, ActiveWebRTCClientStream>>,
 }
 
-impl WebrtcClientChannel {
+impl WebRTCClientChannel {
     pub async fn new(
         peer_connection: Arc<RTCPeerConnection>,
         data_channel: Arc<RTCDataChannel>,
     ) -> Arc<Self> {
-        let base_channel = WebrtcBaseChannel::new(peer_connection, data_channel.clone()).await;
+        let base_channel = WebRTCBaseChannel::new(peer_connection, data_channel.clone()).await;
         let channel = Self {
             base_channel,
-            message_ready: AtomicBool::new(false),
+            message_ready: Arc::new(AtomicBool::new(false)),
             streams: Mutex::new(HashMap::new()),
             stream_id_counter: AtomicU64::new(0),
         };
@@ -57,13 +61,13 @@ impl WebrtcClientChannel {
         ret_channel
     }
 
-    pub fn new_stream(&self) -> Arc<Mutex<WebrtcClientStream>> {
+    pub fn new_stream(&self) -> Arc<Mutex<WebRTCClientStream>> {
         let id = self.stream_id_counter.fetch_add(1, Ordering::AcqRel);
         let stream = Stream { id };
 
-        let (message_sender, message_receiver) = std::sync::mpsc::channel();
+        let (message_sender, message_receiver) = tokio::sync::mpsc::channel(1);
 
-        let base_stream = WebrtcBaseStream {
+        let base_stream = WebRTCBaseStream {
             stream,
             message_sender,
             message_receiver,
@@ -72,14 +76,14 @@ impl WebrtcClientChannel {
             closed_reason: AtomicPtr::new(&mut None),
         };
 
-        let client_stream = Arc::new(Mutex::new(WebrtcClientStream {
+        let client_stream = Arc::new(Mutex::new(WebRTCClientStream {
             base_stream,
             message_sent: AtomicBool::new(false),
             headers_received: AtomicBool::new(false),
             trailers_received: AtomicBool::new(false),
         }));
 
-        let stream = ActiveWebrtcClientStream {
+        let stream = ActiveWebRTCClientStream {
             client_stream: client_stream.clone(),
         };
         let _ = self.streams.lock().unwrap().insert(id, stream);
@@ -122,10 +126,14 @@ impl WebrtcClientChannel {
         Ok(())
     }
 
-    pub fn recv_from_stream(&self, stream_id: u64) -> Result<Vec<u8>> {
-        while !self.message_ready.load(Ordering::Acquire) {
-            hint::spin_loop();
+    pub async fn recv_from_stream(&self, stream_id: u64) -> Result<Vec<u8>> {
+        let message_ready = AtomicBoolFuture::new(self.message_ready.clone());
+        if webrtc_action_with_timeout(message_ready).await.is_err() {
+            return Err(anyhow::anyhow!(
+                "Timed out receiving message from base stream"
+            ));
         }
+
         let streams_lock = self.streams.lock().unwrap();
 
         match (*streams_lock).get(&stream_id) {
@@ -136,7 +144,7 @@ impl WebrtcClientChannel {
                     .unwrap()
                     .base_stream
                     .message_receiver
-                    .recv()?;
+                    .try_recv()?;
 
                 let mut message_buf = vec![0u8];
                 let len: u32 = msg.len().try_into()?;
