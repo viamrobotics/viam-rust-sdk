@@ -1,0 +1,30 @@
+name: License Finder
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      REPO_READ_TOKEN:
+        required: true
+  pull_request:
+    branches: ['main']
+  push:
+
+jobs:
+  license_finder:
+    name: Audit 3rd-Party Licenses
+    runs-on: [x64, qemu-host]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64-cache
+      options: --platform linux/amd64
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out code in rdk directory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Run license finder
+        run: |
+          sudo -u testbot bash -lc 'license_finder'
