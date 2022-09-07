@@ -33,5 +33,4 @@ jobs:
           override: true
 
       - name: Run license finder
-        run: |
-          sudo -u testbot bash -lc 'license_finder'
+        run: license_finder
