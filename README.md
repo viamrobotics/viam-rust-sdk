@@ -50,6 +50,27 @@ async fn main() -> Result<()> {
     println!("Hello, world!");
 }
 ```
+### Echo Streaming Example
+The echo example communicates with the goutils sample server. It demonstrates individual, streamed, and bidirectional communication. To test, navigate to your goutils clone and run
+
+``` shell
+go run rpc/examples/echo/server/cmd/main.go
+```
+Take note of the signaling port and replace the port value in examples/src/echo/main.rs with yours like this :
+
+``` rust
+let c = dial::DialOptions::builder()
+    .uri("localhost:<your-port>")
+    .without_credentials()
+    .allow_downgrade()
+    .connect
+    .await?;
+```
+Then, from the `examples/` directory, run 
+
+``` shell
+cargo run --bin test-echo
+```
 ### Connecting to a robot
 
 If you are connecting to a robot with authentication you will need to create credentials :
@@ -88,6 +109,17 @@ let c = dial::DialConfig::builder()
         .uri("localhost:8080") 
         .without_credentials()
         .insecure() // you can also do allow_downgrade()
+        .connect()
+        .await?; // if the connection complete you will have a channel otherwise an error
+```
+
+Note also that this will attempt to connect over webRTC by default. To override and only use direct gRPC calls, add a `disable_webrtc()` call to your dial builder, like so:
+
+``` rust
+let c = dial::DialConfig::builder()
+        .uri("test-main.33vvxnbbw9.local.viam.cloud:8080") // Robot address
+        .with_credentials(creds) // credentials
+        .disable_webrtc() // forces gRPC connection
         .connect()
         .await?; // if the connection complete you will have a channel otherwise an error
 ```
