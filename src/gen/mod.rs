@@ -15,6 +15,13 @@ pub mod proto {
                     // @@protoc_insertion_point(proto.api.component.arm.v1)
                 }
             }
+            pub mod audioinput {
+                // @@protoc_insertion_point(attribute:proto.api.component.audioinput.v1)
+                pub mod v1 {
+                    include!("proto.api.component.audioinput.v1.rs");
+                    // @@protoc_insertion_point(proto.api.component.audioinput.v1)
+                }
+            }
             pub mod base {
                 // @@protoc_insertion_point(attribute:proto.api.component.base.v1)
                 pub mod v1 {

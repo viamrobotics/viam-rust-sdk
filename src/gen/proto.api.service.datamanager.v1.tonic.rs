@@ -62,8 +62,6 @@ pub mod data_manager_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        /** Sync performs a sync of the non-synced files for the specified service name,
-*/
         pub async fn sync(
             &mut self,
             request: impl tonic::IntoRequest<super::SyncRequest>,
@@ -92,8 +90,6 @@ pub mod data_manager_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with DataManagerServiceServer.
     #[async_trait]
     pub trait DataManagerService: Send + Sync + 'static {
-        /** Sync performs a sync of the non-synced files for the specified service name,
-*/
         async fn sync(
             &self,
             request: tonic::Request<super::SyncRequest>,

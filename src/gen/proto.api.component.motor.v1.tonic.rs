@@ -157,10 +157,10 @@ pub mod motor_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn get_features(
+        pub async fn get_properties(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetFeaturesRequest>,
-        ) -> Result<tonic::Response<super::GetFeaturesResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::GetPropertiesRequest>,
+        ) -> Result<tonic::Response<super::GetPropertiesResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -172,7 +172,7 @@ pub mod motor_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.component.motor.v1.MotorService/GetFeatures",
+                "/proto.api.component.motor.v1.MotorService/GetProperties",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -243,10 +243,10 @@ pub mod motor_service_server {
             &self,
             request: tonic::Request<super::GetPositionRequest>,
         ) -> Result<tonic::Response<super::GetPositionResponse>, tonic::Status>;
-        async fn get_features(
+        async fn get_properties(
             &self,
-            request: tonic::Request<super::GetFeaturesRequest>,
-        ) -> Result<tonic::Response<super::GetFeaturesResponse>, tonic::Status>;
+            request: tonic::Request<super::GetPropertiesRequest>,
+        ) -> Result<tonic::Response<super::GetPropertiesResponse>, tonic::Status>;
         async fn stop(
             &self,
             request: tonic::Request<super::StopRequest>,
@@ -506,25 +506,25 @@ pub mod motor_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/proto.api.component.motor.v1.MotorService/GetFeatures" => {
+                "/proto.api.component.motor.v1.MotorService/GetProperties" => {
                     #[allow(non_camel_case_types)]
-                    struct GetFeaturesSvc<T: MotorService>(pub Arc<T>);
+                    struct GetPropertiesSvc<T: MotorService>(pub Arc<T>);
                     impl<
                         T: MotorService,
-                    > tonic::server::UnaryService<super::GetFeaturesRequest>
-                    for GetFeaturesSvc<T> {
-                        type Response = super::GetFeaturesResponse;
+                    > tonic::server::UnaryService<super::GetPropertiesRequest>
+                    for GetPropertiesSvc<T> {
+                        type Response = super::GetPropertiesResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetFeaturesRequest>,
+                            request: tonic::Request<super::GetPropertiesRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).get_features(request).await
+                                (*inner).get_properties(request).await
                             };
                             Box::pin(fut)
                         }
@@ -534,7 +534,7 @@ pub mod motor_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetFeaturesSvc(inner);
+                        let method = GetPropertiesSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

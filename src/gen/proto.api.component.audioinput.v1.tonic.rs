@@ -1,13 +1,13 @@
 // @generated
 /// Generated client implementations.
-pub mod motion_service_client {
+pub mod audio_input_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
-    pub struct MotionServiceClient<T> {
+    pub struct AudioInputServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl MotionServiceClient<tonic::transport::Channel> {
+    impl AudioInputServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -18,7 +18,7 @@ pub mod motion_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> MotionServiceClient<T>
+    impl<T> AudioInputServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -32,7 +32,7 @@ pub mod motion_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> MotionServiceClient<InterceptedService<T, F>>
+        ) -> AudioInputServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
@@ -45,7 +45,7 @@ pub mod motion_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            MotionServiceClient::new(InterceptedService::new(inner, interceptor))
+            AudioInputServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with `gzip`.
         ///
@@ -62,10 +62,13 @@ pub mod motion_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn r#move(
+        pub async fn chunks(
             &mut self,
-            request: impl tonic::IntoRequest<super::MoveRequest>,
-        ) -> Result<tonic::Response<super::MoveResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::ChunksRequest>,
+        ) -> Result<
+                tonic::Response<tonic::codec::Streaming<super::ChunksResponse>>,
+                tonic::Status,
+            > {
             self.inner
                 .ready()
                 .await
@@ -77,14 +80,38 @@ pub mod motion_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.service.motion.v1.MotionService/Move",
+                "/proto.api.component.audioinput.v1.AudioInputService/Chunks",
+            );
+            self.inner.server_streaming(request.into_request(), path, codec).await
+        }
+        pub async fn properties(
+            &mut self,
+            request: impl tonic::IntoRequest<super::PropertiesRequest>,
+        ) -> Result<tonic::Response<super::PropertiesResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.component.audioinput.v1.AudioInputService/Properties",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn move_single_component(
+        pub async fn record(
             &mut self,
-            request: impl tonic::IntoRequest<super::MoveSingleComponentRequest>,
-        ) -> Result<tonic::Response<super::MoveSingleComponentResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::RecordRequest>,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::super::super::google::api::HttpBody,
+                >,
+                tonic::Status,
+            > {
             self.inner
                 .ready()
                 .await
@@ -96,59 +123,51 @@ pub mod motion_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.service.motion.v1.MotionService/MoveSingleComponent",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn get_pose(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetPoseRequest>,
-        ) -> Result<tonic::Response<super::GetPoseResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.service.motion.v1.MotionService/GetPose",
+                "/proto.api.component.audioinput.v1.AudioInputService/Record",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod motion_service_server {
+pub mod audio_input_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with MotionServiceServer.
+    ///Generated trait containing gRPC methods that should be implemented for use with AudioInputServiceServer.
     #[async_trait]
-    pub trait MotionService: Send + Sync + 'static {
-        async fn r#move(
+    pub trait AudioInputService: Send + Sync + 'static {
+        ///Server streaming response type for the Chunks method.
+        type ChunksStream: futures_core::Stream<
+                Item = Result<super::ChunksResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn chunks(
             &self,
-            request: tonic::Request<super::MoveRequest>,
-        ) -> Result<tonic::Response<super::MoveResponse>, tonic::Status>;
-        async fn move_single_component(
+            request: tonic::Request<super::ChunksRequest>,
+        ) -> Result<tonic::Response<Self::ChunksStream>, tonic::Status>;
+        async fn properties(
             &self,
-            request: tonic::Request<super::MoveSingleComponentRequest>,
-        ) -> Result<tonic::Response<super::MoveSingleComponentResponse>, tonic::Status>;
-        async fn get_pose(
+            request: tonic::Request<super::PropertiesRequest>,
+        ) -> Result<tonic::Response<super::PropertiesResponse>, tonic::Status>;
+        async fn record(
             &self,
-            request: tonic::Request<super::GetPoseRequest>,
-        ) -> Result<tonic::Response<super::GetPoseResponse>, tonic::Status>;
+            request: tonic::Request<super::RecordRequest>,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::super::super::google::api::HttpBody,
+                >,
+                tonic::Status,
+            >;
     }
     #[derive(Debug)]
-    pub struct MotionServiceServer<T: MotionService> {
+    pub struct AudioInputServiceServer<T: AudioInputService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: MotionService> MotionServiceServer<T> {
+    impl<T: AudioInputService> AudioInputServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -182,9 +201,9 @@ pub mod motion_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for MotionServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for AudioInputServiceServer<T>
     where
-        T: MotionService,
+        T: AudioInputService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -200,23 +219,25 @@ pub mod motion_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/proto.api.service.motion.v1.MotionService/Move" => {
+                "/proto.api.component.audioinput.v1.AudioInputService/Chunks" => {
                     #[allow(non_camel_case_types)]
-                    struct MoveSvc<T: MotionService>(pub Arc<T>);
+                    struct ChunksSvc<T: AudioInputService>(pub Arc<T>);
                     impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::MoveRequest> for MoveSvc<T> {
-                        type Response = super::MoveResponse;
+                        T: AudioInputService,
+                    > tonic::server::ServerStreamingService<super::ChunksRequest>
+                    for ChunksSvc<T> {
+                        type Response = super::ChunksResponse;
+                        type ResponseStream = T::ChunksStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
+                            tonic::Response<Self::ResponseStream>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::MoveRequest>,
+                            request: tonic::Request<super::ChunksRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).r#move(request).await };
+                            let fut = async move { (*inner).chunks(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -225,7 +246,45 @@ pub mod motion_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = MoveSvc(inner);
+                        let method = ChunksSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.component.audioinput.v1.AudioInputService/Properties" => {
+                    #[allow(non_camel_case_types)]
+                    struct PropertiesSvc<T: AudioInputService>(pub Arc<T>);
+                    impl<
+                        T: AudioInputService,
+                    > tonic::server::UnaryService<super::PropertiesRequest>
+                    for PropertiesSvc<T> {
+                        type Response = super::PropertiesResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::PropertiesRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).properties(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = PropertiesSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -237,26 +296,24 @@ pub mod motion_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/proto.api.service.motion.v1.MotionService/MoveSingleComponent" => {
+                "/proto.api.component.audioinput.v1.AudioInputService/Record" => {
                     #[allow(non_camel_case_types)]
-                    struct MoveSingleComponentSvc<T: MotionService>(pub Arc<T>);
+                    struct RecordSvc<T: AudioInputService>(pub Arc<T>);
                     impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::MoveSingleComponentRequest>
-                    for MoveSingleComponentSvc<T> {
-                        type Response = super::MoveSingleComponentResponse;
+                        T: AudioInputService,
+                    > tonic::server::UnaryService<super::RecordRequest>
+                    for RecordSvc<T> {
+                        type Response = super::super::super::super::super::super::google::api::HttpBody;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::MoveSingleComponentRequest>,
+                            request: tonic::Request<super::RecordRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).move_single_component(request).await
-                            };
+                            let fut = async move { (*inner).record(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -265,45 +322,7 @@ pub mod motion_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = MoveSingleComponentSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/proto.api.service.motion.v1.MotionService/GetPose" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetPoseSvc<T: MotionService>(pub Arc<T>);
-                    impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::GetPoseRequest>
-                    for GetPoseSvc<T> {
-                        type Response = super::GetPoseResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetPoseRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).get_pose(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetPoseSvc(inner);
+                        let method = RecordSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -330,7 +349,7 @@ pub mod motion_service_server {
             }
         }
     }
-    impl<T: MotionService> Clone for MotionServiceServer<T> {
+    impl<T: AudioInputService> Clone for AudioInputServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -340,7 +359,7 @@ pub mod motion_service_server {
             }
         }
     }
-    impl<T: MotionService> Clone for _Inner<T> {
+    impl<T: AudioInputService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(self.0.clone())
         }
@@ -350,7 +369,8 @@ pub mod motion_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: MotionService> tonic::transport::NamedService for MotionServiceServer<T> {
-        const NAME: &'static str = "proto.api.service.motion.v1.MotionService";
+    impl<T: AudioInputService> tonic::transport::NamedService
+    for AudioInputServiceServer<T> {
+        const NAME: &'static str = "proto.api.component.audioinput.v1.AudioInputService";
     }
 }

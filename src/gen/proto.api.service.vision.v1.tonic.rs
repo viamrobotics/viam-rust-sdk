@@ -100,6 +100,25 @@ pub mod vision_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn remove_detector(
+            &mut self,
+            request: impl tonic::IntoRequest<super::RemoveDetectorRequest>,
+        ) -> Result<tonic::Response<super::RemoveDetectorResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.vision.v1.VisionService/RemoveDetector",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn get_detections_from_camera(
             &mut self,
             request: impl tonic::IntoRequest<super::GetDetectionsFromCameraRequest>,
@@ -138,6 +157,104 @@ pub mod vision_service_client {
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/proto.api.service.vision.v1.VisionService/GetDetections",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_classifier_names(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetClassifierNamesRequest>,
+        ) -> Result<tonic::Response<super::GetClassifierNamesResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.vision.v1.VisionService/GetClassifierNames",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn add_classifier(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AddClassifierRequest>,
+        ) -> Result<tonic::Response<super::AddClassifierResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.vision.v1.VisionService/AddClassifier",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn remove_classifier(
+            &mut self,
+            request: impl tonic::IntoRequest<super::RemoveClassifierRequest>,
+        ) -> Result<tonic::Response<super::RemoveClassifierResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.vision.v1.VisionService/RemoveClassifier",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_classifications_from_camera(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetClassificationsFromCameraRequest>,
+        ) -> Result<
+                tonic::Response<super::GetClassificationsFromCameraResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.vision.v1.VisionService/GetClassificationsFromCamera",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_classifications(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetClassificationsRequest>,
+        ) -> Result<tonic::Response<super::GetClassificationsResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.vision.v1.VisionService/GetClassifications",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -221,6 +338,10 @@ pub mod vision_service_server {
             &self,
             request: tonic::Request<super::AddDetectorRequest>,
         ) -> Result<tonic::Response<super::AddDetectorResponse>, tonic::Status>;
+        async fn remove_detector(
+            &self,
+            request: tonic::Request<super::RemoveDetectorRequest>,
+        ) -> Result<tonic::Response<super::RemoveDetectorResponse>, tonic::Status>;
         async fn get_detections_from_camera(
             &self,
             request: tonic::Request<super::GetDetectionsFromCameraRequest>,
@@ -232,6 +353,29 @@ pub mod vision_service_server {
             &self,
             request: tonic::Request<super::GetDetectionsRequest>,
         ) -> Result<tonic::Response<super::GetDetectionsResponse>, tonic::Status>;
+        async fn get_classifier_names(
+            &self,
+            request: tonic::Request<super::GetClassifierNamesRequest>,
+        ) -> Result<tonic::Response<super::GetClassifierNamesResponse>, tonic::Status>;
+        async fn add_classifier(
+            &self,
+            request: tonic::Request<super::AddClassifierRequest>,
+        ) -> Result<tonic::Response<super::AddClassifierResponse>, tonic::Status>;
+        async fn remove_classifier(
+            &self,
+            request: tonic::Request<super::RemoveClassifierRequest>,
+        ) -> Result<tonic::Response<super::RemoveClassifierResponse>, tonic::Status>;
+        async fn get_classifications_from_camera(
+            &self,
+            request: tonic::Request<super::GetClassificationsFromCameraRequest>,
+        ) -> Result<
+                tonic::Response<super::GetClassificationsFromCameraResponse>,
+                tonic::Status,
+            >;
+        async fn get_classifications(
+            &self,
+            request: tonic::Request<super::GetClassificationsRequest>,
+        ) -> Result<tonic::Response<super::GetClassificationsResponse>, tonic::Status>;
         async fn get_segmenter_names(
             &self,
             request: tonic::Request<super::GetSegmenterNamesRequest>,
@@ -387,6 +531,46 @@ pub mod vision_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/proto.api.service.vision.v1.VisionService/RemoveDetector" => {
+                    #[allow(non_camel_case_types)]
+                    struct RemoveDetectorSvc<T: VisionService>(pub Arc<T>);
+                    impl<
+                        T: VisionService,
+                    > tonic::server::UnaryService<super::RemoveDetectorRequest>
+                    for RemoveDetectorSvc<T> {
+                        type Response = super::RemoveDetectorResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::RemoveDetectorRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).remove_detector(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RemoveDetectorSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/proto.api.service.vision.v1.VisionService/GetDetectionsFromCamera" => {
                     #[allow(non_camel_case_types)]
                     struct GetDetectionsFromCameraSvc<T: VisionService>(pub Arc<T>);
@@ -458,6 +642,209 @@ pub mod vision_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetDetectionsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.service.vision.v1.VisionService/GetClassifierNames" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetClassifierNamesSvc<T: VisionService>(pub Arc<T>);
+                    impl<
+                        T: VisionService,
+                    > tonic::server::UnaryService<super::GetClassifierNamesRequest>
+                    for GetClassifierNamesSvc<T> {
+                        type Response = super::GetClassifierNamesResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetClassifierNamesRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_classifier_names(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetClassifierNamesSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.service.vision.v1.VisionService/AddClassifier" => {
+                    #[allow(non_camel_case_types)]
+                    struct AddClassifierSvc<T: VisionService>(pub Arc<T>);
+                    impl<
+                        T: VisionService,
+                    > tonic::server::UnaryService<super::AddClassifierRequest>
+                    for AddClassifierSvc<T> {
+                        type Response = super::AddClassifierResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AddClassifierRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).add_classifier(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AddClassifierSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.service.vision.v1.VisionService/RemoveClassifier" => {
+                    #[allow(non_camel_case_types)]
+                    struct RemoveClassifierSvc<T: VisionService>(pub Arc<T>);
+                    impl<
+                        T: VisionService,
+                    > tonic::server::UnaryService<super::RemoveClassifierRequest>
+                    for RemoveClassifierSvc<T> {
+                        type Response = super::RemoveClassifierResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::RemoveClassifierRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).remove_classifier(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RemoveClassifierSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.service.vision.v1.VisionService/GetClassificationsFromCamera" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetClassificationsFromCameraSvc<T: VisionService>(pub Arc<T>);
+                    impl<
+                        T: VisionService,
+                    > tonic::server::UnaryService<
+                        super::GetClassificationsFromCameraRequest,
+                    > for GetClassificationsFromCameraSvc<T> {
+                        type Response = super::GetClassificationsFromCameraResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::GetClassificationsFromCameraRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_classifications_from_camera(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetClassificationsFromCameraSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.service.vision.v1.VisionService/GetClassifications" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetClassificationsSvc<T: VisionService>(pub Arc<T>);
+                    impl<
+                        T: VisionService,
+                    > tonic::server::UnaryService<super::GetClassificationsRequest>
+                    for GetClassificationsSvc<T> {
+                        type Response = super::GetClassificationsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetClassificationsRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_classifications(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetClassificationsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
