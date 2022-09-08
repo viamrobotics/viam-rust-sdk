@@ -38,7 +38,7 @@
     :versions: []
     :when: 2022-09-08 15:39:55.751943000 Z
 - - :permit
-  - Apache 2.0, MIT
+  - " Apache 2.0, MIT "
   - :who:
     :why:
     :versions: []
