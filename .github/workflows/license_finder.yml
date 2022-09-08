@@ -3,9 +3,6 @@ name: License Finder
 on:
   workflow_dispatch:
   workflow_call:
-    secrets:
-      REPO_READ_TOKEN:
-        required: true
   pull_request:
     branches: ['main']
   push:
