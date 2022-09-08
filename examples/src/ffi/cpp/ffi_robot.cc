@@ -36,7 +36,7 @@ public:
     Status status =
         stub_->ResourceNames(&context, req, &resp);
 	if (!status.ok()) {
-		std::cout << "Rpc failed" << std::endl;
+		std::cout << "Rpc failed "<< status.error_code() << status.error_message() << std::endl;
 		return;
     }
 	for(auto i = 0; i < resp.resources_size(); i++){

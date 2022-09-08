@@ -8,7 +8,7 @@ use viam::rpc::dial;
 #[tokio::main]
 async fn main() -> Result<()> {
     let c = dial::DialOptions::builder()
-        .uri("localhost:50551")
+        .uri("localhost:61517")
         .without_credentials()
         .allow_downgrade()
         .connect()

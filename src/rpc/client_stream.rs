@@ -100,7 +100,7 @@ impl WebRTCClientStream {
 
             Some(Type::Trailers(trailers)) => {
                 self.process_trailers(trailers.to_owned());
-                Ok(self.message_sent.load(Ordering::Acquire))
+                Ok(true)
             }
             None => Ok(false),
         }
