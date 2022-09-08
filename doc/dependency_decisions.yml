@@ -6,28 +6,40 @@
   - :who:
     :why:
     :versions: []
-    :when: 2022-08-01 21:53:06.561636718 Z
+    :when: 2022-09-08 15:39:55.751943000 Z
 - - :permit
   - BSD-3-Clause
   - :who:
     :why:
     :versions: []
-    :when: 2022-08-15 13:09:14.673806968 Z
+    :when: 2022-09-08 15:39:55.751943000 Z
 - - :permit
   - Apache 2.0
   - :who:
     :why:
     :versions: []
-    :when: 2022-08-15 13:15:11.855751606 Z
+    :when: 2022-09-08 15:39:55.751943000 Z
 - - :permit
   - BSD-2-Clause
   - :who:
     :why:
     :versions: []
-    :when: 2022-08-15 13:17:08.745016552 Z
+    :when: 2022-09-08 15:39:55.751943000 Z
 - - :permit
   - ISC
   - :who:
     :why:
     :versions: []
-    :when: 2022-08-15 13:37:40.979906881 Z
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
+  - MPL-2.0
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :approve
+  - viam
+  - :who:
+    :why: 'this is our library'
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
