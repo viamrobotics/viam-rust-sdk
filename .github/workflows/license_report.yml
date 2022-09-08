@@ -29,8 +29,5 @@ jobs:
           default: true
           override: true
 
-      - name: Run license report help
-        run: license_finder help report
-
       - name: Run license report
-        run: license_finder report
+        run: license_finder report --write-headers --format=csv --columns="name version authors licenses license_links approved"
