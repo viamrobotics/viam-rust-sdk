@@ -30,4 +30,4 @@ jobs:
           override: true
 
       - name: Run license report
-        run: license_finder report --write-headers --format=csv --columns="name version authors licenses license_links approved"
+        run: license_finder report --write-headers --format=csv --columns=name version authors licenses license_links approved
