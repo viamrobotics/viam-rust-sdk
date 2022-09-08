@@ -1,0 +1,33 @@
+# This file is NOT optimized for human-readability - please use the
+# `license_finder` program to read and edit it: <TODO: add link to README instructions>
+---
+- - :permit
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-08-01 21:53:06.561636718 Z
+- - :permit
+  - BSD-3-Clause
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-08-15 13:09:14.673806968 Z
+- - :permit
+  - Apache 2.0
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-08-15 13:15:11.855751606 Z
+- - :permit
+  - BSD-2-Clause
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-08-15 13:17:08.745016552 Z
+- - :permit
+  - ISC
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-08-15 13:37:40.979906881 Z
