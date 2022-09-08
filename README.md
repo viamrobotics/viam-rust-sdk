@@ -170,3 +170,6 @@ Then run
 ``` shell
 make ffi_robot && ./ffi_robot
 ```
+
+## License 
+Apache 2.0 - see [LICENSE](https://github.com/viamrobotics/viam-rust-sdk/blob/main/LICENSE) file
