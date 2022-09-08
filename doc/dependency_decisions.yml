@@ -8,6 +8,12 @@
     :versions: []
     :when: 2022-09-08 15:39:55.751943000 Z
 - - :permit
+  - " MIT"
+  - :who:
+    :why: "TODO: whitespace detection issue - submit patch to license finder"
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
   - BSD-3-Clause
   - :who:
     :why:
@@ -17,6 +23,12 @@
   - Apache-2.0
   - :who:
     :why:
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
+  - " Apache-2.0"
+  - :who:
+    :why: "TODO: whitespace detection issue - submit patch to license finder"
     :versions: []
     :when: 2022-09-08 15:39:55.751943000 Z
 - - :permit
@@ -33,12 +45,6 @@
     :when: 2022-09-08 15:39:55.751943000 Z
 - - :permit
   - MPL-2.0
-  - :who:
-    :why:
-    :versions: []
-    :when: 2022-09-08 15:39:55.751943000 Z
-- - :permit
-  - " Apache-2.0, MIT "
   - :who:
     :why:
     :versions: []
