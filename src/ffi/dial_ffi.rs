@@ -5,7 +5,9 @@ use tokio::sync::oneshot;
 use tokio::task::JoinHandle;
 use tracing::Level;
 
-use crate::rpc::{self, dial::DialBuilder};
+use crate::rpc::dial::{
+    CredentialsExt, DialBuilder, DialOptions, WithCredentials, WithoutCredentials,
+};
 use libc::c_char;
 
 use crate::proxy;
@@ -64,10 +66,14 @@ pub extern "C" fn init_rust_runtime() -> Box<Ffi> {
 fn dial_without_cred(
     uri: String,
     allow_insec: bool,
-) -> Result<DialBuilder<rpc::dial::WithoutCredentials>> {
-    let c = rpc::dial::DialOptions::builder()
-        .uri(&uri)
-        .without_credentials();
+    disable_webrtc: bool,
+) -> Result<DialBuilder<WithoutCredentials>> {
+    let c = DialOptions::builder().uri(&uri).without_credentials();
+    let c = if disable_webrtc {
+        c.disable_webrtc()
+    } else {
+        c
+    };
     let c = if allow_insec { c.allow_downgrade() } else { c };
     Ok(c)
 }
@@ -76,14 +82,15 @@ fn dial_with_cred(
     uri: String,
     payload: &str,
     allow_insec: bool,
-) -> Result<DialBuilder<rpc::dial::WithCredentials>> {
-    let creds = rpc::dial::CredentialsExt::new(
-        String::from("robot-location-secret"),
-        String::from(payload),
-    );
-    let c = rpc::dial::DialOptions::builder()
-        .uri(&uri)
-        .with_credentials(creds);
+    disable_webrtc: bool,
+) -> Result<DialBuilder<WithCredentials>> {
+    let creds = CredentialsExt::new(String::from("robot-location-secret"), String::from(payload));
+    let c = DialOptions::builder().uri(&uri).with_credentials(creds);
+    let c = if disable_webrtc {
+        c.disable_webrtc()
+    } else {
+        c
+    };
     let c = if allow_insec { c.allow_downgrade() } else { c };
     Ok(c)
 }
@@ -96,15 +103,16 @@ fn dial_with_cred(
 /// * `c_payload` a C-style string that is the robot's secret, set to NULL if you don't need authentication
 /// * `c_allow_insecure` a bool, set to true when allowing insecure connection to your robot
 /// * `rt_ptr` a pointer to a rust runtime previously obtained with init_rust_runtime
+/// * `disable_webrtc` a bool, set to true to force only direct connection
 #[no_mangle]
-pub unsafe extern "C" fn dial_direct(
+pub unsafe extern "C" fn dial(
     c_uri: *const c_char,
     c_payload: *const c_char,
     c_allow_insec: bool,
     rt_ptr: Option<&mut Ffi>,
 ) -> *mut c_char {
     let uri = {
-        if let true = c_uri.is_null() {
+        if c_uri.is_null() {
             return ptr::null_mut();
         }
         let ur = match Uri::from_maybe_shared(CStr::from_ptr(c_uri).to_bytes()) {
@@ -147,15 +155,18 @@ pub unsafe extern "C" fn dial_direct(
         }
     };
     let (tx, rx) = oneshot::channel::<()>();
+    let uri_str = uri.to_string();
+    // if the uri is local then we can connect directly.
+    let disable_webrtc = uri_str.contains(".local");
     let server = match ctx.runtime.block_on(async move {
         let dial = match payload {
             Some(p) => tower::util::Either::A(
-                dial_with_cred(uri.clone().to_string(), p.to_str()?, allow_insec)?
+                dial_with_cred(uri_str, p.to_str()?, allow_insec, disable_webrtc)?
                     .connect()
                     .await?,
             ),
             None => {
-                let c = dial_without_cred(uri.clone().to_string(), allow_insec)?;
+                let c = dial_without_cred(uri_str, allow_insec, disable_webrtc)?;
                 tower::util::Either::B(c.connect().await?)
             }
         };
@@ -193,6 +204,7 @@ pub unsafe extern "C" fn dial_direct(
     ctx.push_handle(h);
     path.into_raw()
 }
+
 /// This function must be used to free the path returned by the dial_direct function
 /// # Safety
 ///

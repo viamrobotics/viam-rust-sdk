@@ -19,7 +19,7 @@ using proto::api::robot::v1::ResourceNamesResponse;
 extern "C" void *init_rust_runtime();
 extern "C" int free_rust_runtime(void *ptr);
 extern "C" void free_string(char* s);
-extern "C" char *dial_direct(const char *uri, const char *payload,
+extern "C" char *dial(const char *uri, const char *payload,
                              bool allow_insecure, void *ptr);
 
 class RobotServiceClient {
@@ -36,11 +36,11 @@ public:
     Status status =
         stub_->ResourceNames(&context, req, &resp);
 	if (!status.ok()) {
-		std::cout << "Rpc failed" << std::endl;
+		std::cout << "Rpc failed "<< status.error_code() << status.error_message() << std::endl;
 		return;
     }
 	for(auto i = 0; i < resp.resources_size(); i++){
-		std::cout << "Ressource " << i << " " << resp.resources(i).type() << std::endl;
+		std::cout << "Resource " << i << " " << resp.resources(i).type() << std::endl;
 			}
   }
 
@@ -51,9 +51,9 @@ private:
 int main(int argc, char *argv[]) {
 
   void *ptr = init_rust_runtime();
-  char *path = dial_direct("https://test-main.33vvxnbbw9.local.viam.cloud:8080",
-                           "9x375brdv1f7u2v6vi42a21cbzo0xuauov025wox5mg9grd5",
-                           false, ptr);
+  char *path = dial("https://test-main.33vvxnbbw9.local.viam.cloud:8080",
+					"9x375brdv1f7u2v6vi42a21cbzo0xuauov025wox5mg9grd5",
+					false, ptr);
   if(path == NULL){
 	  free_rust_runtime(ptr);
 	  return 1;
