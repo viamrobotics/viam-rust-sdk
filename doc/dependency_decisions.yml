@@ -1,0 +1,57 @@
+# This file is NOT optimized for human-readability - please use the
+# `license_finder` program to read and edit it: <TODO: add link to README instructions>
+---
+- - :permit
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
+  - " MIT"
+  - :who:
+    :why: "TODO: whitespace detection issue - submit patch to license finder"
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
+  - BSD-3-Clause
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
+  - Apache-2.0
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
+  - " Apache-2.0"
+  - :who:
+    :why: "TODO: whitespace detection issue - submit patch to license finder"
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
+  - BSD-2-Clause
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
+  - ISC
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :permit
+  - MPL-2.0
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z
+- - :approve
+  - viam
+  - :who:
+    :why: 'this is our library'
+    :versions: []
+    :when: 2022-09-08 15:39:55.751943000 Z

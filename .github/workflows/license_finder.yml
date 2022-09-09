@@ -1,0 +1,33 @@
+name: License Finder
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    branches: ['main']
+  push:
+
+jobs:
+  license_finder:
+    name: Audit 3rd-Party Licenses
+    runs-on: [x64, qemu-host]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64-cache
+      options: --platform linux/amd64
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Install latest rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+          override: true
+
+      - name: Run license finder
+        run: license_finder
