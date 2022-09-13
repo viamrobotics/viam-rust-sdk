@@ -62,10 +62,10 @@ pub mod camera_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn get_frame(
+        pub async fn get_image(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetFrameRequest>,
-        ) -> Result<tonic::Response<super::GetFrameResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::GetImageRequest>,
+        ) -> Result<tonic::Response<super::GetImageResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -77,7 +77,7 @@ pub mod camera_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.component.camera.v1.CameraService/GetFrame",
+                "/proto.api.component.camera.v1.CameraService/GetImage",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -152,10 +152,10 @@ pub mod camera_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with CameraServiceServer.
     #[async_trait]
     pub trait CameraService: Send + Sync + 'static {
-        async fn get_frame(
+        async fn get_image(
             &self,
-            request: tonic::Request<super::GetFrameRequest>,
-        ) -> Result<tonic::Response<super::GetFrameResponse>, tonic::Status>;
+            request: tonic::Request<super::GetImageRequest>,
+        ) -> Result<tonic::Response<super::GetImageResponse>, tonic::Status>;
         async fn render_frame(
             &self,
             request: tonic::Request<super::RenderFrameRequest>,
@@ -233,24 +233,24 @@ pub mod camera_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/proto.api.component.camera.v1.CameraService/GetFrame" => {
+                "/proto.api.component.camera.v1.CameraService/GetImage" => {
                     #[allow(non_camel_case_types)]
-                    struct GetFrameSvc<T: CameraService>(pub Arc<T>);
+                    struct GetImageSvc<T: CameraService>(pub Arc<T>);
                     impl<
                         T: CameraService,
-                    > tonic::server::UnaryService<super::GetFrameRequest>
-                    for GetFrameSvc<T> {
-                        type Response = super::GetFrameResponse;
+                    > tonic::server::UnaryService<super::GetImageRequest>
+                    for GetImageSvc<T> {
+                        type Response = super::GetImageResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetFrameRequest>,
+                            request: tonic::Request<super::GetImageRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).get_frame(request).await };
+                            let fut = async move { (*inner).get_image(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -259,7 +259,7 @@ pub mod camera_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetFrameSvc(inner);
+                        let method = GetImageSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

@@ -62,6 +62,28 @@ pub mod vision_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
+        pub async fn get_model_parameter_schema(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetModelParameterSchemaRequest>,
+        ) -> Result<
+                tonic::Response<super::GetModelParameterSchemaResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.vision.v1.VisionService/GetModelParameterSchema",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn get_detector_names(
             &mut self,
             request: impl tonic::IntoRequest<super::GetDetectorNamesRequest>,
@@ -277,13 +299,10 @@ pub mod vision_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn get_segmenter_parameters(
+        pub async fn add_segmenter(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetSegmenterParametersRequest>,
-        ) -> Result<
-                tonic::Response<super::GetSegmenterParametersResponse>,
-                tonic::Status,
-            > {
+            request: impl tonic::IntoRequest<super::AddSegmenterRequest>,
+        ) -> Result<tonic::Response<super::AddSegmenterResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -295,7 +314,26 @@ pub mod vision_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.service.vision.v1.VisionService/GetSegmenterParameters",
+                "/proto.api.service.vision.v1.VisionService/AddSegmenter",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn remove_segmenter(
+            &mut self,
+            request: impl tonic::IntoRequest<super::RemoveSegmenterRequest>,
+        ) -> Result<tonic::Response<super::RemoveSegmenterResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/proto.api.service.vision.v1.VisionService/RemoveSegmenter",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -330,6 +368,13 @@ pub mod vision_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with VisionServiceServer.
     #[async_trait]
     pub trait VisionService: Send + Sync + 'static {
+        async fn get_model_parameter_schema(
+            &self,
+            request: tonic::Request<super::GetModelParameterSchemaRequest>,
+        ) -> Result<
+                tonic::Response<super::GetModelParameterSchemaResponse>,
+                tonic::Status,
+            >;
         async fn get_detector_names(
             &self,
             request: tonic::Request<super::GetDetectorNamesRequest>,
@@ -380,13 +425,14 @@ pub mod vision_service_server {
             &self,
             request: tonic::Request<super::GetSegmenterNamesRequest>,
         ) -> Result<tonic::Response<super::GetSegmenterNamesResponse>, tonic::Status>;
-        async fn get_segmenter_parameters(
+        async fn add_segmenter(
             &self,
-            request: tonic::Request<super::GetSegmenterParametersRequest>,
-        ) -> Result<
-                tonic::Response<super::GetSegmenterParametersResponse>,
-                tonic::Status,
-            >;
+            request: tonic::Request<super::AddSegmenterRequest>,
+        ) -> Result<tonic::Response<super::AddSegmenterResponse>, tonic::Status>;
+        async fn remove_segmenter(
+            &self,
+            request: tonic::Request<super::RemoveSegmenterRequest>,
+        ) -> Result<tonic::Response<super::RemoveSegmenterResponse>, tonic::Status>;
         async fn get_object_point_clouds(
             &self,
             request: tonic::Request<super::GetObjectPointCloudsRequest>,
@@ -451,6 +497,48 @@ pub mod vision_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
+                "/proto.api.service.vision.v1.VisionService/GetModelParameterSchema" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetModelParameterSchemaSvc<T: VisionService>(pub Arc<T>);
+                    impl<
+                        T: VisionService,
+                    > tonic::server::UnaryService<super::GetModelParameterSchemaRequest>
+                    for GetModelParameterSchemaSvc<T> {
+                        type Response = super::GetModelParameterSchemaResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::GetModelParameterSchemaRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_model_parameter_schema(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetModelParameterSchemaSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/proto.api.service.vision.v1.VisionService/GetDetectorNames" => {
                     #[allow(non_camel_case_types)]
                     struct GetDetectorNamesSvc<T: VisionService>(pub Arc<T>);
@@ -896,25 +984,25 @@ pub mod vision_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/proto.api.service.vision.v1.VisionService/GetSegmenterParameters" => {
+                "/proto.api.service.vision.v1.VisionService/AddSegmenter" => {
                     #[allow(non_camel_case_types)]
-                    struct GetSegmenterParametersSvc<T: VisionService>(pub Arc<T>);
+                    struct AddSegmenterSvc<T: VisionService>(pub Arc<T>);
                     impl<
                         T: VisionService,
-                    > tonic::server::UnaryService<super::GetSegmenterParametersRequest>
-                    for GetSegmenterParametersSvc<T> {
-                        type Response = super::GetSegmenterParametersResponse;
+                    > tonic::server::UnaryService<super::AddSegmenterRequest>
+                    for AddSegmenterSvc<T> {
+                        type Response = super::AddSegmenterResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetSegmenterParametersRequest>,
+                            request: tonic::Request<super::AddSegmenterRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).get_segmenter_parameters(request).await
+                                (*inner).add_segmenter(request).await
                             };
                             Box::pin(fut)
                         }
@@ -924,7 +1012,47 @@ pub mod vision_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetSegmenterParametersSvc(inner);
+                        let method = AddSegmenterSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/proto.api.service.vision.v1.VisionService/RemoveSegmenter" => {
+                    #[allow(non_camel_case_types)]
+                    struct RemoveSegmenterSvc<T: VisionService>(pub Arc<T>);
+                    impl<
+                        T: VisionService,
+                    > tonic::server::UnaryService<super::RemoveSegmenterRequest>
+                    for RemoveSegmenterSvc<T> {
+                        type Response = super::RemoveSegmenterResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::RemoveSegmenterRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).remove_segmenter(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RemoveSegmenterSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
