@@ -18,7 +18,7 @@ use crate::{
     },
     rpc::webrtc::PollableAtomicBool,
 };
-use ::http::header::HeaderName;
+use ::http::header::{HeaderName, TRAILER};
 use ::http::{
     uri::{Authority, Parts, PathAndQuery, Scheme},
     HeaderValue, StatusCode, Version,
@@ -130,7 +130,11 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
 
                     let response = http::response::Response::builder()
                         .status(status_code)
-                        .header("content-type", "application/grpc+tonic")
+                        .header("content-type", "application/grpc")
+                        .header(TRAILER, "Grpc-Status")
+                        .header(TRAILER, "Grpc-Message")
+                        .header(TRAILER, "Grpc-Status-Details-Bin")
+                        .header("grpc-status", "0")
                         .version(Version::HTTP_2)
                         .body(Body::from(recv))
                         .unwrap();
