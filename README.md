@@ -132,7 +132,7 @@ For now we only support Unix-like systems. Before continuing make sure that GRPC
 Navigate to :
 
 ``` shell
-cd examples/ffi/cpp
+cd examples/src/ffi/cpp
 # Then
 make buf
 # Note that to build the robot API you will need a BUF_TOKEN, if you don't have one you can still run the echo example
@@ -145,11 +145,7 @@ The echo example communicate with the goutils sample server, navigate to your go
 ``` shell
 go run rpc/examples/echo/server/cmd/main.go
 ```
-Take note of the signaling port and replace the port value in ffi_echo.cc with yours like this :
 
-``` c++
-dial_direct("http://127.0.0.1:<your-port>", NULL, true, ptr);
-```
 Then run 
 
 ``` shell
@@ -158,10 +154,10 @@ make ffi_echo && ./ffi_echo
 
 ### Robot example
 The robot example communicate with a rdk server
-Update the dial_direct function with your address and secret in the file ffi_robot.cc
+Update the dial function with your address and secret in the file ffi_robot.cc
 
 ``` c++
-dial_direct("<robot-address>",
+dial("<robot-address>",
             "<robot-secret>",
             false, ptr);
 ```

@@ -19,7 +19,7 @@ using proto::rpc::examples::echo::v1::EchoService;
 extern "C" void *init_rust_runtime();
 extern "C" int free_rust_runtime(void *ptr);
 extern "C" void free_string(char* s);
-extern "C" char *dial_direct(const char *uri, const char *payload,
+extern "C" char *dial(const char *uri, const char *payload,
                              bool allow_insecure, void *ptr);
 
 class EchoServiceClient {
@@ -49,7 +49,7 @@ private:
 int main(int argc, char *argv[]) {
 
   void *ptr = init_rust_runtime();
-  char *path = dial_direct("http://127.0.0.1:55133", NULL, true, ptr);
+  char *path = dial("http://127.0.0.1:8080", NULL, true, ptr);
   if(path == NULL){
 	  free_rust_runtime(ptr);
 	  return 1;
