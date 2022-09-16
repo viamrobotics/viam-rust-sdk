@@ -114,29 +114,30 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
                         status_code = StatusCode::METHOD_NOT_ALLOWED;
                     };
 
-                    let recv_from_stream = channel.recv_from_stream(stream_id);
-                    let recv = match webrtc_action_with_timeout(recv_from_stream)
+                    let resp_body = channel.resp_body_from_stream(stream_id);
+                    let body = match webrtc_action_with_timeout(resp_body)
                         .await
-                        .and_then(|recv| recv)
+                        .and_then(|body| body)
                     {
-                        Ok(recv) => recv,
+                        Ok(body) => body,
                         Err(e) => {
                             log::error!("error receiving response from stream: {e}");
                             channel.close_stream_with_recv_error(stream_id, e);
                             status_code = StatusCode::SERVICE_UNAVAILABLE;
-                            Vec::new()
+                            Body::empty()
                         }
                     };
 
                     let response = http::response::Response::builder()
                         .status(status_code)
+                        // standardized gRPC headers. the gRPC status code is attached
+                        // separately when we process trailers
                         .header("content-type", "application/grpc")
                         .header(TRAILER, "Grpc-Status")
                         .header(TRAILER, "Grpc-Message")
                         .header(TRAILER, "Grpc-Status-Details-Bin")
-                        .header("grpc-status", "0")
                         .version(Version::HTTP_2)
-                        .body(Body::from(recv))
+                        .body(body)
                         .unwrap();
                     Ok(response)
                 };
