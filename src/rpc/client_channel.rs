@@ -207,9 +207,12 @@ impl WebRTCClientChannel {
                 r#type: Some(Type::Message(RequestMessage {
                     has_message,
                     eos: if remaining.len() > 0 {
-                        eos
+                        // stream definitely isn't done if there's more to send
+                        false
                     } else {
-                        it_was_all_a_stream
+                        // if we intentionally sent an eos or the http request was inferrably
+                        // a stream
+                        eos || it_was_all_a_stream
                     },
                     packet_message: Some(PacketMessage {
                         eom: to_send.len() == usize::try_from(next_message_length).unwrap()

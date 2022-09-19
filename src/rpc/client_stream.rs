@@ -73,14 +73,6 @@ impl WebRTCClientStream {
     }
 
     fn process_trailers(&mut self, trailers: ResponseTrailers) {
-        //let to_send_trailers = trailers_from_proto(trailers.clone());
-        //if let Err(e) = self
-        //.base_stream
-        //.message_sender
-        //.send_trailers(to_send_trailers)
-        //{
-        //log::error!("Error sending trailers to http response: {e}");
-        //}
         self.trailers_received.store(true, Ordering::Release);
 
         let err = match trailers.status {
