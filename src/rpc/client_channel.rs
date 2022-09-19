@@ -173,37 +173,33 @@ impl WebRTCClientChannel {
         // likely going to cause problems for us when we encounter a need for bidi streaming
         // in the real world. Look into how we can fix it, and hopefully get rid of this
         // header math in the process.
-        let mut length_of_first_message = 0usize;
+
+        let mut to_add_bytes = [0u8; 4];
         // 1-5 because those are the length header bytes for gRPC
-        for i in 1..5 {
-            let to_add = data.get(i).unwrap_or(&0).to_owned();
-            length_of_first_message += usize::from(to_add);
-        }
+        to_add_bytes.clone_from_slice(&data[1..5]);
+        let mut next_message_length = u32::from_be_bytes(to_add_bytes);
         // if this is all streaming calls we need to tell the server when we're done with
         // the stream, otherwise neither side will know we're done, trailers will never be
         // sent/processed, and we'll hang on the strream.
-        let it_was_all_a_stream = length_of_first_message + 5 < data.len();
+        let it_was_all_a_stream = usize::try_from(next_message_length).unwrap() + 5 < data.len();
 
         // always run the loop at least once, check at completion if we've sent all data and
         // break the loop accordingly
         loop {
-            if 0 < data.len() && data.len() < 5 {
+            if data.len() < 5 {
                 return Err(anyhow::anyhow!(
                     "Attempted to process message with irregular length"
                 ));
             }
 
-            let mut message_length = 0usize;
             // because we might have multiple requests contained within our data, we have
             // to do the manual work of breaking apart the body into separate requests.
-            for i in 1..5 {
-                let to_add = data.get(i).unwrap_or(&0).to_owned();
-                message_length += usize::from(to_add);
-            }
+            to_add_bytes.clone_from_slice(&data[1..5]);
+            next_message_length = u32::from_be_bytes(to_add_bytes);
             data = data.split_off(5);
             let split_at = MAX_REQUEST_MESSAGE_PACKET_DATA_SIZE
                 .min(data.len())
-                .min(message_length);
+                .min(usize::try_from(next_message_length).unwrap());
             let (to_send, remaining) = data.split_at(split_at);
             let stream = stream.clone();
             let request = Request {
@@ -216,7 +212,8 @@ impl WebRTCClientChannel {
                         it_was_all_a_stream
                     },
                     packet_message: Some(PacketMessage {
-                        eom: to_send.len() == message_length || remaining.len() == 0,
+                        eom: to_send.len() == usize::try_from(next_message_length).unwrap()
+                            || remaining.len() == 0,
                         data: to_send.to_vec(),
                     }),
                 })),

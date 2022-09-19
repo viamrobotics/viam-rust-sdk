@@ -135,6 +135,7 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
                     let response = http::response::Response::builder()
                         // standardized gRPC headers.
                         .header("content-type", "application/grpc")
+                        .header("te", "trailers")
                         .header(TRAILER, "Grpc-Status")
                         .header(TRAILER, "Grpc-Message")
                         .header(TRAILER, "Grpc-Status-Details-Bin")
