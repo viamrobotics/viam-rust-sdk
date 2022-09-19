@@ -1,14 +1,11 @@
-use super::{
-    base_channel::*, base_stream::*, client_stream::*, webrtc::webrtc_action_with_timeout,
-};
-use crate::{
-    gen::proto::rpc::webrtc::v1::{
-        request::Type, PacketMessage, Request, RequestHeaders, RequestMessage, Response, Stream,
-    },
-    rpc::webrtc::PollableAtomicBool,
+use super::{base_channel::*, base_stream::*, client_stream::*};
+use crate::gen::proto::rpc::webrtc::v1::{
+    request::Type, response::Type as RespType, PacketMessage, Request, RequestHeaders,
+    RequestMessage, Response, Stream,
 };
 use anyhow::Result;
-use byteorder::{BigEndian, WriteBytesExt};
+use chashmap::CHashMap;
+use hyper::Body;
 use prost::Message;
 use std::{
     collections::HashMap,
@@ -30,6 +27,7 @@ pub struct WebRTCClientChannel {
     stream_id_counter: AtomicU64,
     message_ready: Arc<AtomicBool>,
     pub streams: Mutex<HashMap<u64, ActiveWebRTCClientStream>>,
+    pub receiver_bodies: CHashMap<u64, hyper::Body>,
 }
 
 impl WebRTCClientChannel {
@@ -43,6 +41,7 @@ impl WebRTCClientChannel {
             message_ready: Arc::new(AtomicBool::new(false)),
             streams: Mutex::new(HashMap::new()),
             stream_id_counter: AtomicU64::new(0),
+            receiver_bodies: CHashMap::new(),
         };
 
         let channel = Arc::new(channel);
@@ -65,12 +64,11 @@ impl WebRTCClientChannel {
         let id = self.stream_id_counter.fetch_add(1, Ordering::AcqRel);
         let stream = Stream { id };
 
-        let (message_sender, message_receiver) = tokio::sync::mpsc::channel(1);
+        let (message_sender, receiver_body) = hyper::Body::channel();
 
         let base_stream = WebRTCBaseStream {
             stream,
             message_sender,
-            message_receiver,
             closed: AtomicBool::new(false),
             packet_buffer: Vec::new(),
             closed_reason: AtomicPtr::new(&mut None),
@@ -87,13 +85,18 @@ impl WebRTCClientChannel {
             client_stream: client_stream.clone(),
         };
         let _ = self.streams.lock().unwrap().insert(id, stream);
+        let _ = self.receiver_bodies.insert(id, receiver_body);
         client_stream
     }
 
     fn on_channel_message(&self, msg: DataChannelMessage) -> Result<()> {
         let streams = self.streams.lock().unwrap();
         let response = Response::decode(&*msg.data.to_vec())?;
-        let active_stream = match response.stream.as_ref() {
+        let should_drop_stream = match response.r#type {
+            Some(RespType::Trailers(_)) => true,
+            _ => false,
+        };
+        let (active_stream, stream_id) = match response.stream.as_ref() {
             None => {
                 log::error!(
                     "no stream associated with response {:?}: discarding response",
@@ -101,13 +104,17 @@ impl WebRTCClientChannel {
                 );
                 return Ok(());
             }
-            Some(stream) => streams.get(&stream.id).ok_or_else(|| {
-                anyhow::anyhow!(
-                    "No stream found for id {}: discarding response {:?}",
-                    &stream.id,
-                    response
-                )
-            }),
+            Some(stream) => {
+                let id: u64 = stream.id;
+                let stream = streams.get(&stream.id).ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "No stream found for id {}: discarding response {:?}",
+                        &stream.id,
+                        response
+                    )
+                });
+                (stream, id)
+            }
         };
 
         let message_sent = match active_stream {
@@ -122,39 +129,22 @@ impl WebRTCClientChannel {
             }
         }?;
         drop(streams);
+        if should_drop_stream {
+            self.streams.lock().unwrap().remove(&stream_id);
+        }
         self.message_ready.store(message_sent, Ordering::Release);
         Ok(())
     }
 
-    pub async fn recv_from_stream(&self, stream_id: u64) -> Result<Vec<u8>> {
-        let message_ready = PollableAtomicBool::new(self.message_ready.clone());
-        if webrtc_action_with_timeout(message_ready).await.is_err() {
-            return Err(anyhow::anyhow!(
-                "Timed out receiving message from base stream"
-            ));
-        }
-
-        let streams_lock = self.streams.lock().unwrap();
-
-        match (*streams_lock).get(&stream_id) {
-            Some(stream) => {
-                let mut msg = stream
-                    .client_stream
-                    .lock()
-                    .unwrap()
-                    .base_stream
-                    .message_receiver
-                    .try_recv()?;
-
-                let mut message_buf = vec![0u8];
-                let len: u32 = msg.len().try_into()?;
-                message_buf.write_u32::<BigEndian>(len)?;
-                message_buf.append(&mut msg);
-                self.message_ready.store(false, Ordering::Release);
-                Ok(message_buf)
-            }
-            None => Ok(Vec::new()),
-        }
+    pub async fn resp_body_from_stream(&self, stream_id: u64) -> Result<Body> {
+        let body = self
+            .receiver_bodies
+            .remove(&stream_id)
+            .ok_or(anyhow::anyhow!(
+                "Tried to receive stream {stream_id} but it didn't exist!"
+            ))?;
+        self.message_ready.store(false, Ordering::Release);
+        Ok(body)
     }
 
     pub async fn write_headers(&self, stream: &Stream, headers: RequestHeaders) -> Result<()> {
@@ -175,25 +165,58 @@ impl WebRTCClientChannel {
         // even if no meaningful data, any actual message will include at least frame header bytes
         let has_message = !data.is_empty();
 
-        data = if data.len() >= 5 {
-            data.split_off(5)
-        } else {
-            data
-        };
+        // rust libraries are munging streamed client requests into a single http request.
+        // we can look at the gRPC header bytes to determine the length of the first message
+        // and compare it to the length of the data to determine whether this http request
+        // is a single unary call, or a streaming call.
+        // TODO(RSDK-654) The munging of streaming requests into a single http request is
+        // likely going to cause problems for us when we encounter a need for bidi streaming
+        // in the real world. Look into how we can fix it, and hopefully get rid of this
+        // header math in the process.
+
+        let mut to_add_bytes = [0u8; 4];
+        // 1-5 because those are the length header bytes for gRPC
+        to_add_bytes.clone_from_slice(&data[1..5]);
+        let mut next_message_length = u32::from_be_bytes(to_add_bytes);
+        // if this is all streaming calls we need to tell the server when we're done with
+        // the stream, otherwise neither side will know we're done, trailers will never be
+        // sent/processed, and we'll hang on the strream.
+        let it_was_all_a_stream = usize::try_from(next_message_length).unwrap() + 5 < data.len();
 
         // always run the loop at least once, check at completion if we've sent all data and
         // break the loop accordingly
         loop {
-            let split_at = MAX_REQUEST_MESSAGE_PACKET_DATA_SIZE.min(data.len());
+            if data.len() < 5 {
+                return Err(anyhow::anyhow!(
+                    "Attempted to process message with irregular length"
+                ));
+            }
+
+            // because we might have multiple requests contained within our data, we have
+            // to do the manual work of breaking apart the body into separate requests.
+            to_add_bytes.clone_from_slice(&data[1..5]);
+            next_message_length = u32::from_be_bytes(to_add_bytes);
+            data = data.split_off(5);
+            let split_at = MAX_REQUEST_MESSAGE_PACKET_DATA_SIZE
+                .min(data.len())
+                .min(usize::try_from(next_message_length).unwrap());
             let (to_send, remaining) = data.split_at(split_at);
             let stream = stream.clone();
             let request = Request {
                 stream,
                 r#type: Some(Type::Message(RequestMessage {
                     has_message,
-                    eos,
+                    eos: if remaining.len() > 0 {
+                        // stream definitely isn't done if there's more to send
+                        false
+                    } else {
+                        // if we intentionally sent an eos or the http request was inferrably
+                        // a stream
+                        eos || it_was_all_a_stream
+                    },
                     packet_message: Some(PacketMessage {
-                        eom: remaining.is_empty(),
+                        eom: to_send.len() == usize::try_from(next_message_length).unwrap()
+                            || remaining.len() == 0,
                         data: to_send.to_vec(),
                     }),
                 })),

@@ -18,10 +18,10 @@ use crate::{
     },
     rpc::webrtc::PollableAtomicBool,
 };
-use ::http::header::HeaderName;
+use ::http::header::{HeaderName, TRAILER};
 use ::http::{
     uri::{Authority, Parts, PathAndQuery, Scheme},
-    HeaderValue, StatusCode, Version,
+    HeaderValue, Version,
 };
 use ::webrtc::ice_transport::ice_candidate::{RTCIceCandidate, RTCIceCandidateInit};
 use ::webrtc::peer_connection::sdp::session_description::RTCSessionDescription;
@@ -42,6 +42,10 @@ use tower::{Service, ServiceBuilder};
 use tower_http::auth::AddAuthorization;
 use tower_http::auth::AddAuthorizationLayer;
 use tower_http::set_header::{SetRequestHeader, SetRequestHeaderLayer};
+
+// gRPC status codes
+const STATUS_CODE_OK: i32 = 0;
+const STATUS_CODE_UNKNOWN: i32 = 2;
 
 type SecretType = String;
 
@@ -77,7 +81,7 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
         match self {
             Self::Direct(channel) => Box::pin(channel.call(request)),
             Self::WebRTC(channel) => {
-                let mut status_code = StatusCode::OK;
+                let mut status_code = STATUS_CODE_OK;
                 let channel = channel.clone();
                 let fut = async move {
                     let (parts, body) = request.into_parts();
@@ -104,35 +108,40 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
                     if let Err(e) = channel.write_headers(&stream, headers).await {
                         log::error!("error writing headers: {e}");
                         channel.close_stream_with_recv_error(stream_id, e);
-                        status_code = StatusCode::METHOD_NOT_ALLOWED;
+                        status_code = STATUS_CODE_UNKNOWN;
                     }
 
                     let data = hyper::body::to_bytes(body).await.unwrap().to_vec();
                     if let Err(e) = channel.write_message(false, Some(stream), data).await {
                         log::error!("error sending message: {e}");
                         channel.close_stream_with_recv_error(stream_id, e);
-                        status_code = StatusCode::METHOD_NOT_ALLOWED;
+                        status_code = STATUS_CODE_UNKNOWN;
                     };
 
-                    let recv_from_stream = channel.recv_from_stream(stream_id);
-                    let recv = match webrtc_action_with_timeout(recv_from_stream)
+                    let resp_body = channel.resp_body_from_stream(stream_id);
+                    let body = match webrtc_action_with_timeout(resp_body)
                         .await
-                        .and_then(|recv| recv)
+                        .and_then(|body| body)
                     {
-                        Ok(recv) => recv,
+                        Ok(body) => body,
                         Err(e) => {
                             log::error!("error receiving response from stream: {e}");
                             channel.close_stream_with_recv_error(stream_id, e);
-                            status_code = StatusCode::SERVICE_UNAVAILABLE;
-                            Vec::new()
+                            status_code = STATUS_CODE_UNKNOWN;
+                            Body::empty()
                         }
                     };
 
                     let response = http::response::Response::builder()
-                        .status(status_code)
-                        .header("content-type", "application/grpc+tonic")
+                        // standardized gRPC headers.
+                        .header("content-type", "application/grpc")
+                        .header("te", "trailers")
+                        .header(TRAILER, "Grpc-Status")
+                        .header(TRAILER, "Grpc-Message")
+                        .header(TRAILER, "Grpc-Status-Details-Bin")
+                        .header("grpc-status", &status_code.to_string())
                         .version(Version::HTTP_2)
-                        .body(Body::from(recv))
+                        .body(body)
                         .unwrap();
                     Ok(response)
                 };

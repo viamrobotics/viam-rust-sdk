@@ -103,7 +103,6 @@ fn dial_with_cred(
 /// * `c_payload` a C-style string that is the robot's secret, set to NULL if you don't need authentication
 /// * `c_allow_insecure` a bool, set to true when allowing insecure connection to your robot
 /// * `rt_ptr` a pointer to a rust runtime previously obtained with init_rust_runtime
-/// * `disable_webrtc` a bool, set to true to force only direct connection
 #[no_mangle]
 pub unsafe extern "C" fn dial(
     c_uri: *const c_char,

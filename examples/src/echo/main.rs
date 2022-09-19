@@ -7,9 +7,14 @@ use viam::rpc::dial;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let creds = dial::CredentialsExt::new(
+        "robot-location-secret".to_string(),
+        "ytexnwei4fu1xv9csoqxfv4ckl3htsb49mzzey5t15xo9swy".to_string(),
+    );
+
     let c = dial::DialOptions::builder()
-        .uri("localhost:61517")
-        .without_credentials()
+        .uri("webrtc-test-main.jkek76kqnh.viam.cloud")
+        .with_credentials(creds)
         .allow_downgrade()
         .connect()
         .await?;
