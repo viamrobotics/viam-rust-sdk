@@ -19,7 +19,7 @@ You can locally build the library documentation by running `cargo doc --open`, i
 Lastly you can run one of the examples by navigation to the examples folder and run `cargo run --bin test-dial`
 
 ## Usage
-Tu use the SDK and connect to an RDK server you will need to setup a couple of things.
+To use the SDK and connect to an RDK server you will need to setup a couple of things.
 
 ### Create a new project with Cargo
 Outside of the SDK repository simply run `cargo new my-robot` this will create a new project named my-robot as well as a couple of files
@@ -166,6 +166,11 @@ Then run
 ``` shell
 make ffi_robot && ./ffi_robot
 ```
+
+## Two Notes on Connectivity and webRTC Functionality
+First: the rust SDK attempts to dial over webRTC by default. You can override this by calling `disable_webrtc()` on the dial builder.
+
+Second: the rust webRTC implementation is still new, and liable to have bugs. At a minimum, we expect that calls to `ShellService::shell()` have a high likelihood of strange behavior. If you encounter any issues with streaming requests over webRTC, direct dial (by disabling webrtc as above) should resolve them. And please file a bug report! We will endeavor to be as responsive as possible, and resolve issues as quickly as possible.
 
 ## License 
 Copyright 2021-2022 Viam Inc.
