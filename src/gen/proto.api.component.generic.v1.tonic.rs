@@ -62,10 +62,10 @@ pub mod generic_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn r#do(
+        pub async fn do_command(
             &mut self,
-            request: impl tonic::IntoRequest<super::DoRequest>,
-        ) -> Result<tonic::Response<super::DoResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::DoCommandRequest>,
+        ) -> Result<tonic::Response<super::DoCommandResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -77,7 +77,7 @@ pub mod generic_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/proto.api.component.generic.v1.GenericService/Do",
+                "/proto.api.component.generic.v1.GenericService/DoCommand",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -90,10 +90,10 @@ pub mod generic_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with GenericServiceServer.
     #[async_trait]
     pub trait GenericService: Send + Sync + 'static {
-        async fn r#do(
+        async fn do_command(
             &self,
-            request: tonic::Request<super::DoRequest>,
-        ) -> Result<tonic::Response<super::DoResponse>, tonic::Status>;
+            request: tonic::Request<super::DoCommandRequest>,
+        ) -> Result<tonic::Response<super::DoCommandResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct GenericServiceServer<T: GenericService> {
@@ -154,22 +154,24 @@ pub mod generic_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/proto.api.component.generic.v1.GenericService/Do" => {
+                "/proto.api.component.generic.v1.GenericService/DoCommand" => {
                     #[allow(non_camel_case_types)]
-                    struct DoSvc<T: GenericService>(pub Arc<T>);
-                    impl<T: GenericService> tonic::server::UnaryService<super::DoRequest>
-                    for DoSvc<T> {
-                        type Response = super::DoResponse;
+                    struct DoCommandSvc<T: GenericService>(pub Arc<T>);
+                    impl<
+                        T: GenericService,
+                    > tonic::server::UnaryService<super::DoCommandRequest>
+                    for DoCommandSvc<T> {
+                        type Response = super::DoCommandResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::DoRequest>,
+                            request: tonic::Request<super::DoCommandRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).r#do(request).await };
+                            let fut = async move { (*inner).do_command(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -178,7 +180,7 @@ pub mod generic_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DoSvc(inner);
+                        let method = DoCommandSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
