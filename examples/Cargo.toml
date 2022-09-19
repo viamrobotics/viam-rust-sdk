@@ -20,8 +20,3 @@ tokio = { version = "1.19", features = [ "rt-multi-thread", "time", "fs", "macro
 tonic = {version = "0.7.2",features = ["tls", "compression", "tls-roots"]}
 tower = "0.4.0"
 env_logger = "0.9.0"
-
-[patch.crates-io]
-# TODO fix this path, let's at a minimum point to a real repo
-hyper = { path = "../../../rust/hyper" }
-

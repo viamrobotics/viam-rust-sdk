@@ -43,7 +43,3 @@ webrtc = "0.5.0"
 [build-dependencies]
 tonic-build = {version = "0.7.2",features = ["prost", "compression"]}
 
-[patch.crates-io]
-# TODO fix this path, let's at a minimum point to a real repo
-hyper = { path = "../../rust/hyper" }
-

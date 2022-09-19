@@ -1,13 +1,12 @@
-use crate::gen::proto::rpc::webrtc::v1::{IceServer, ResponseTrailers, WebRtcConfig};
+use crate::gen::proto::rpc::webrtc::v1::{IceServer, WebRtcConfig};
 use anyhow::Result;
 use bytes::Bytes;
 use core::fmt;
 use futures::Future;
-use http::{header::HeaderName, HeaderMap, HeaderValue, Uri};
+use http::Uri;
 use std::{
     hint,
     pin::Pin,
-    str::FromStr,
     sync::{atomic::AtomicBool, Arc},
     task::{Context, Poll},
     time::Duration,
@@ -303,50 +302,4 @@ pub async fn webrtc_action_with_timeout<T>(f: impl Future<Output = T>) -> Result
             }
         }
     }
-}
-
-pub fn trailers_from_proto(proto: ResponseTrailers) -> HeaderMap {
-    let mut trailers = HeaderMap::new();
-    if let Some(metadata) = proto.metadata {
-        let mut vals = metadata.md.iter();
-        while let Some((k, v)) = vals.next() {
-            let k = HeaderName::from_str(k);
-            let v = HeaderValue::from_str(&v.values.concat());
-            let (k, v) = match (k, v) {
-                (Ok(k), Ok(v)) => (k, v),
-                (Err(e), _) => {
-                    log::error!("Error converting proto trailer key: [{e}]");
-                    continue;
-                }
-                (_, Err(e)) => {
-                    log::error!("Error converting proto trailer value: [{e}]");
-                    continue;
-                }
-            };
-            trailers.insert(k, v);
-        }
-    };
-
-    let status_name = "grpc-status";
-    let status_code = match proto.status {
-        Some(ref status) => status.code.to_string(),
-        None => "0".to_string(),
-    };
-
-    let k = match HeaderName::from_str(status_name) {
-        Ok(k) => k,
-        Err(e) => {
-            log::error!("Error parsing HeaderName: {e}");
-            return trailers;
-        }
-    };
-    let v = match HeaderValue::from_str(&status_code) {
-        Ok(v) => v,
-        Err(e) => {
-            log::error!("Error parsing HeaderValue: {e}");
-            return trailers;
-        }
-    };
-    trailers.insert(k, v);
-    trailers
 }
