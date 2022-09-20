@@ -9,7 +9,7 @@ use hyper::Body;
 use prost::Message;
 use std::sync::{
     atomic::{AtomicBool, AtomicPtr, AtomicU64, Ordering},
-    Arc, Mutex,
+    Arc,
 };
 use webrtc::{
     data_channel::{data_channel_message::DataChannelMessage, RTCDataChannel},
@@ -23,7 +23,7 @@ pub struct WebRTCClientChannel {
     pub base_channel: Arc<WebRTCBaseChannel>,
     stream_id_counter: AtomicU64,
     message_ready: Arc<AtomicBool>,
-    pub streams: CHashMap<u64, ActiveWebRTCClientStream>,
+    pub streams: CHashMap<u64, WebRTCClientStream>,
     pub receiver_bodies: CHashMap<u64, hyper::Body>,
 }
 
@@ -48,7 +48,7 @@ impl WebRTCClientChannel {
             .on_message(Box::new(move |msg: DataChannelMessage| {
                 let channel = channel.clone();
                 Box::pin(async move {
-                    if let Err(e) = channel.on_channel_message(msg) {
+                    if let Err(e) = channel.on_channel_message(msg).await {
                         log::error!("error deserializing message: {e}");
                     }
                 })
@@ -57,36 +57,32 @@ impl WebRTCClientChannel {
         ret_channel
     }
 
-    pub fn new_stream(&self) -> Arc<Mutex<WebRTCClientStream>> {
+    pub fn new_stream(&self) -> Stream {
         let id = self.stream_id_counter.fetch_add(1, Ordering::AcqRel);
         let stream = Stream { id };
-
         let (message_sender, receiver_body) = hyper::Body::channel();
 
         let base_stream = WebRTCBaseStream {
-            stream,
+            stream: stream.clone(),
             message_sender,
             closed: AtomicBool::new(false),
             packet_buffer: Vec::new(),
             closed_reason: AtomicPtr::new(&mut None),
         };
 
-        let client_stream = Arc::new(Mutex::new(WebRTCClientStream {
+        let client_stream = WebRTCClientStream {
             base_stream,
             message_sent: AtomicBool::new(false),
             headers_received: AtomicBool::new(false),
             trailers_received: AtomicBool::new(false),
-        }));
-
-        let stream = ActiveWebRTCClientStream {
-            client_stream: client_stream.clone(),
         };
-        let _ = self.streams.insert(id, stream);
+
+        let _ = self.streams.insert(id, client_stream);
         let _ = self.receiver_bodies.insert(id, receiver_body);
-        client_stream
+        stream
     }
 
-    fn on_channel_message(&self, msg: DataChannelMessage) -> Result<()> {
+    async fn on_channel_message(&self, msg: DataChannelMessage) -> Result<()> {
         let response = Response::decode(&*msg.data.to_vec())?;
         let should_drop_stream = match response.r#type {
             Some(RespType::Trailers(_)) => true,
@@ -102,7 +98,7 @@ impl WebRTCClientChannel {
             }
             Some(stream) => {
                 let id: u64 = stream.id;
-                let stream = self.streams.get(&stream.id).ok_or_else(|| {
+                let stream = self.streams.get_mut(&stream.id).ok_or_else(|| {
                     anyhow::anyhow!(
                         "No stream found for id {}: discarding response {:?}",
                         &stream.id,
@@ -114,11 +110,7 @@ impl WebRTCClientChannel {
         };
 
         let message_sent = match active_stream {
-            Ok(active_stream) => active_stream
-                .client_stream
-                .lock()
-                .unwrap()
-                .on_response(response),
+            Ok(mut active_stream) => active_stream.on_response(response).await,
             Err(e) => {
                 log::error!("{e}");
                 return Ok(());
@@ -243,12 +235,7 @@ impl WebRTCClientChannel {
 
     pub fn close_stream_with_recv_error(&self, stream_id: u64, error: anyhow::Error) {
         match self.streams.remove(&stream_id) {
-            Some(stream) => stream
-                .client_stream
-                .lock()
-                .unwrap()
-                .base_stream
-                .close_with_recv_error(&mut Some(&error)),
+            Some(stream) => stream.base_stream.close_with_recv_error(&mut Some(&error)),
             None => {
                 log::error!("attempted to close stream with id {stream_id}, but it wasn't found!")
             }
