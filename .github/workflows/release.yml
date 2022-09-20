@@ -51,13 +51,13 @@ jobs:
           - os: self-hosted
             arch: x64
             target: aarch64-unknown-linux-gnu
-            platform: manylinux_aarch64
+            platform: linux_aarch64
             ext: so
             image: 'ghcr.io/viamrobotics/canon:arm64'
           - os: self-hosted
             arch: x64
             target: x86_64-unknown-linux-gnu
-            platform: manylinux_x86_64
+            platform: linux_x86_64
             ext: so
             image: 'ghcr.io/viamrobotics/canon:amd64'
     steps:
