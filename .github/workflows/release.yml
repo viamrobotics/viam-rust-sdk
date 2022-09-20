@@ -41,7 +41,7 @@ jobs:
           path: builds
 
   build_in_container:
-    runs-on: [x64, qemu-host]
+    runs-on: ${{ matrix.arch }}
     container:
       image: ${{ matrix.image }}
       options: ${{ matrix.opts }}
