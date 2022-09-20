@@ -7,12 +7,9 @@ use anyhow::Result;
 use chashmap::CHashMap;
 use hyper::Body;
 use prost::Message;
-use std::{
-    collections::HashMap,
-    sync::{
-        atomic::{AtomicBool, AtomicPtr, AtomicU64, Ordering},
-        Arc, Mutex,
-    },
+use std::sync::{
+    atomic::{AtomicBool, AtomicPtr, AtomicU64, Ordering},
+    Arc, Mutex,
 };
 use webrtc::{
     data_channel::{data_channel_message::DataChannelMessage, RTCDataChannel},
@@ -26,7 +23,7 @@ pub struct WebRTCClientChannel {
     pub base_channel: Arc<WebRTCBaseChannel>,
     stream_id_counter: AtomicU64,
     message_ready: Arc<AtomicBool>,
-    pub streams: Mutex<HashMap<u64, ActiveWebRTCClientStream>>,
+    pub streams: CHashMap<u64, ActiveWebRTCClientStream>,
     pub receiver_bodies: CHashMap<u64, hyper::Body>,
 }
 
@@ -39,7 +36,7 @@ impl WebRTCClientChannel {
         let channel = Self {
             base_channel,
             message_ready: Arc::new(AtomicBool::new(false)),
-            streams: Mutex::new(HashMap::new()),
+            streams: CHashMap::new(),
             stream_id_counter: AtomicU64::new(0),
             receiver_bodies: CHashMap::new(),
         };
@@ -84,13 +81,12 @@ impl WebRTCClientChannel {
         let stream = ActiveWebRTCClientStream {
             client_stream: client_stream.clone(),
         };
-        let _ = self.streams.lock().unwrap().insert(id, stream);
+        let _ = self.streams.insert(id, stream);
         let _ = self.receiver_bodies.insert(id, receiver_body);
         client_stream
     }
 
     fn on_channel_message(&self, msg: DataChannelMessage) -> Result<()> {
-        let streams = self.streams.lock().unwrap();
         let response = Response::decode(&*msg.data.to_vec())?;
         let should_drop_stream = match response.r#type {
             Some(RespType::Trailers(_)) => true,
@@ -106,7 +102,7 @@ impl WebRTCClientChannel {
             }
             Some(stream) => {
                 let id: u64 = stream.id;
-                let stream = streams.get(&stream.id).ok_or_else(|| {
+                let stream = self.streams.get(&stream.id).ok_or_else(|| {
                     anyhow::anyhow!(
                         "No stream found for id {}: discarding response {:?}",
                         &stream.id,
@@ -128,9 +124,8 @@ impl WebRTCClientChannel {
                 return Ok(());
             }
         }?;
-        drop(streams);
         if should_drop_stream {
-            self.streams.lock().unwrap().remove(&stream_id);
+            self.streams.remove(&stream_id);
         }
         self.message_ready.store(message_sent, Ordering::Release);
         Ok(())
@@ -247,8 +242,7 @@ impl WebRTCClientChannel {
     }
 
     pub fn close_stream_with_recv_error(&self, stream_id: u64, error: anyhow::Error) {
-        let mut stream_lock = self.streams.lock().unwrap();
-        match stream_lock.remove(&stream_id) {
+        match self.streams.remove(&stream_id) {
             Some(stream) => stream
                 .client_stream
                 .lock()
