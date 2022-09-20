@@ -86,13 +86,7 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
                 let fut = async move {
                     let (parts, body) = request.into_parts();
 
-                    let stream = channel
-                        .new_stream()
-                        .lock()
-                        .unwrap()
-                        .base_stream
-                        .stream
-                        .clone();
+                    let stream = channel.new_stream();
                     let stream_id = stream.id;
                     let metadata = Some(metadata_from_parts(&parts));
                     let headers = RequestHeaders {
