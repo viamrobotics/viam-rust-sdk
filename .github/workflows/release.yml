@@ -44,18 +44,23 @@ jobs:
     runs-on: [x64, qemu-host]
     container:
       image: ${{ matrix.image }}
+      options: ${{ matrix.opts }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - target: aarch64-unknown-linux-gnu
+          - arch: [arm64, qemu-host]
+            target: aarch64-unknown-linux-gnu
             platform: linux_aarch64
             ext: so
-            image: 'ghcr.io/viamrobotics/canon:arm64'
-          - target: x86_64-unknown-linux-gnu
+            image: 'ghcr.io/viamrobotics/canon:arm64-cache'
+            opts: '--platform linux/arm64'
+          - arch: [x64, qemu-host]
+            target: x86_64-unknown-linux-gnu
             platform: linux_x86_64
             ext: so
-            image: 'ghcr.io/viamrobotics/canon:amd64'
+            image: 'ghcr.io/viamrobotics/canon:amd64-cache'
+            opts: '--platform linux/amd64'
     steps:
       - uses: actions/checkout@v2
       - name: Setup rust toolchain
