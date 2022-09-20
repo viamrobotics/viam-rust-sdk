@@ -41,22 +41,18 @@ jobs:
           path: builds
 
   build_in_container:
-    runs-on: ${{ matrix.os }}
+    runs-on: [x64, qemu-host]
     container:
       image: ${{ matrix.image }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: self-hosted
-            arch: x64
-            target: aarch64-unknown-linux-gnu
+          - target: aarch64-unknown-linux-gnu
             platform: linux_aarch64
             ext: so
             image: 'ghcr.io/viamrobotics/canon:arm64'
-          - os: self-hosted
-            arch: x64
-            target: x86_64-unknown-linux-gnu
+          - target: x86_64-unknown-linux-gnu
             platform: linux_x86_64
             ext: so
             image: 'ghcr.io/viamrobotics/canon:amd64'
