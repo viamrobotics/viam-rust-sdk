@@ -65,12 +65,7 @@ pub mod data_service_client {
         pub async fn tabular_data_by_filter(
             &mut self,
             request: impl tonic::IntoRequest<super::TabularDataByFilterRequest>,
-        ) -> Result<
-                tonic::Response<
-                    tonic::codec::Streaming<super::TabularDataByFilterResponse>,
-                >,
-                tonic::Status,
-            > {
+        ) -> Result<tonic::Response<super::TabularDataByFilterResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -84,17 +79,12 @@ pub mod data_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.data.v1.DataService/TabularDataByFilter",
             );
-            self.inner.server_streaming(request.into_request(), path, codec).await
+            self.inner.unary(request.into_request(), path, codec).await
         }
         pub async fn binary_data_by_filter(
             &mut self,
             request: impl tonic::IntoRequest<super::BinaryDataByFilterRequest>,
-        ) -> Result<
-                tonic::Response<
-                    tonic::codec::Streaming<super::BinaryDataByFilterResponse>,
-                >,
-                tonic::Status,
-            > {
+        ) -> Result<tonic::Response<super::BinaryDataByFilterResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -108,15 +98,12 @@ pub mod data_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.data.v1.DataService/BinaryDataByFilter",
             );
-            self.inner.server_streaming(request.into_request(), path, codec).await
+            self.inner.unary(request.into_request(), path, codec).await
         }
         pub async fn binary_data_by_i_ds(
             &mut self,
             request: impl tonic::IntoRequest<super::BinaryDataByIDsRequest>,
-        ) -> Result<
-                tonic::Response<tonic::codec::Streaming<super::BinaryDataByIDsResponse>>,
-                tonic::Status,
-            > {
+        ) -> Result<tonic::Response<super::BinaryDataByIDsResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -130,7 +117,7 @@ pub mod data_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.data.v1.DataService/BinaryDataByIDs",
             );
-            self.inner.server_streaming(request.into_request(), path, codec).await
+            self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
@@ -141,36 +128,18 @@ pub mod data_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with DataServiceServer.
     #[async_trait]
     pub trait DataService: Send + Sync + 'static {
-        ///Server streaming response type for the TabularDataByFilter method.
-        type TabularDataByFilterStream: futures_core::Stream<
-                Item = Result<super::TabularDataByFilterResponse, tonic::Status>,
-            >
-            + Send
-            + 'static;
         async fn tabular_data_by_filter(
             &self,
             request: tonic::Request<super::TabularDataByFilterRequest>,
-        ) -> Result<tonic::Response<Self::TabularDataByFilterStream>, tonic::Status>;
-        ///Server streaming response type for the BinaryDataByFilter method.
-        type BinaryDataByFilterStream: futures_core::Stream<
-                Item = Result<super::BinaryDataByFilterResponse, tonic::Status>,
-            >
-            + Send
-            + 'static;
+        ) -> Result<tonic::Response<super::TabularDataByFilterResponse>, tonic::Status>;
         async fn binary_data_by_filter(
             &self,
             request: tonic::Request<super::BinaryDataByFilterRequest>,
-        ) -> Result<tonic::Response<Self::BinaryDataByFilterStream>, tonic::Status>;
-        ///Server streaming response type for the BinaryDataByIDs method.
-        type BinaryDataByIDsStream: futures_core::Stream<
-                Item = Result<super::BinaryDataByIDsResponse, tonic::Status>,
-            >
-            + Send
-            + 'static;
+        ) -> Result<tonic::Response<super::BinaryDataByFilterResponse>, tonic::Status>;
         async fn binary_data_by_i_ds(
             &self,
             request: tonic::Request<super::BinaryDataByIDsRequest>,
-        ) -> Result<tonic::Response<Self::BinaryDataByIDsStream>, tonic::Status>;
+        ) -> Result<tonic::Response<super::BinaryDataByIDsResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct DataServiceServer<T: DataService> {
@@ -236,13 +205,11 @@ pub mod data_service_server {
                     struct TabularDataByFilterSvc<T: DataService>(pub Arc<T>);
                     impl<
                         T: DataService,
-                    > tonic::server::ServerStreamingService<
-                        super::TabularDataByFilterRequest,
-                    > for TabularDataByFilterSvc<T> {
+                    > tonic::server::UnaryService<super::TabularDataByFilterRequest>
+                    for TabularDataByFilterSvc<T> {
                         type Response = super::TabularDataByFilterResponse;
-                        type ResponseStream = T::TabularDataByFilterStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
+                            tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
@@ -268,7 +235,7 @@ pub mod data_service_server {
                                 accept_compression_encodings,
                                 send_compression_encodings,
                             );
-                        let res = grpc.server_streaming(method, req).await;
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
@@ -278,13 +245,11 @@ pub mod data_service_server {
                     struct BinaryDataByFilterSvc<T: DataService>(pub Arc<T>);
                     impl<
                         T: DataService,
-                    > tonic::server::ServerStreamingService<
-                        super::BinaryDataByFilterRequest,
-                    > for BinaryDataByFilterSvc<T> {
+                    > tonic::server::UnaryService<super::BinaryDataByFilterRequest>
+                    for BinaryDataByFilterSvc<T> {
                         type Response = super::BinaryDataByFilterResponse;
-                        type ResponseStream = T::BinaryDataByFilterStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
+                            tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
@@ -310,7 +275,7 @@ pub mod data_service_server {
                                 accept_compression_encodings,
                                 send_compression_encodings,
                             );
-                        let res = grpc.server_streaming(method, req).await;
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
@@ -320,13 +285,11 @@ pub mod data_service_server {
                     struct BinaryDataByIDsSvc<T: DataService>(pub Arc<T>);
                     impl<
                         T: DataService,
-                    > tonic::server::ServerStreamingService<
-                        super::BinaryDataByIDsRequest,
-                    > for BinaryDataByIDsSvc<T> {
+                    > tonic::server::UnaryService<super::BinaryDataByIDsRequest>
+                    for BinaryDataByIDsSvc<T> {
                         type Response = super::BinaryDataByIDsResponse;
-                        type ResponseStream = T::BinaryDataByIDsStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
+                            tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
@@ -352,7 +315,7 @@ pub mod data_service_server {
                                 accept_compression_encodings,
                                 send_compression_encodings,
                             );
-                        let res = grpc.server_streaming(method, req).await;
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
