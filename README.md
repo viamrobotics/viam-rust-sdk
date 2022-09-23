@@ -135,8 +135,6 @@ Navigate to :
 cd examples/src/ffi/cpp
 # Then
 make buf
-# Note that to build the robot API you will need a BUF_TOKEN, if you don't have one you can still run the echo example
-export BUF_TOKEN=<your-token>; make buf
 ```
 
 ### Echo example
