@@ -4,16 +4,16 @@
 #include <string>
 #include <unistd.h>
 
-#include "gen/proto/api/robot/v1/robot.pb.h"
-#include "gen/proto/api/robot/v1/robot.grpc.pb.h"
+#include "gen/robot/v1/robot.pb.h"
+#include "gen/robot/v1/robot.grpc.pb.h"
 #include <grpcpp/grpcpp.h>
 
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
-using proto::api::robot::v1::ResourceNamesRequest;
-using proto::api::robot::v1::RobotService;
-using proto::api::robot::v1::ResourceNamesResponse;
+using viam::robot::v1::ResourceNamesRequest;
+using viam::robot::v1::RobotService;
+using viam::robot::v1::ResourceNamesResponse;
 
 
 extern "C" void *init_rust_runtime();
