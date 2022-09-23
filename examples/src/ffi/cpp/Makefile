@@ -10,7 +10,7 @@ all: buf ffi_echo
 ffi_echo: gen/google/api/http.pb.o gen/google/api/annotations.pb.o gen/proto/rpc/examples/echo/v1/echo.pb.o gen/proto/rpc/examples/echo/v1/echo.grpc.pb.o ffi_echo.o
 	$(CXX) $^ $(CXXFLAGS) $(LDFLAGS) -o $@
 
-ffi_robot: gen/google/api/http.pb.o gen/google/api/annotations.pb.o gen/proto/api/robot/v1/robot.pb.o gen/proto/api/robot/v1/robot.grpc.pb.o gen/proto/api/common/v1/common.pb.o gen/proto/api/common/v1/common.grpc.pb.o ffi_robot.o
+ffi_robot: gen/google/api/http.pb.o gen/google/api/annotations.pb.o gen/robot/v1/robot.pb.o gen/robot/v1/robot.grpc.pb.o gen/common/v1/common.pb.o gen/common/v1/common.grpc.pb.o ffi_robot.o
 	$(CXX) $^ $(CXXFLAGS) $(LDFLAGS) -o $@
 
 buf:
