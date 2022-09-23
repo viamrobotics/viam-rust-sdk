@@ -1,3 +1,5 @@
 gen
 ffi_echo
 ffi_echo.o
+ffi_robot
+ffi_robot.o
