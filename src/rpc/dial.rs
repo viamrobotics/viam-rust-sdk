@@ -50,6 +50,8 @@ const STATUS_CODE_UNKNOWN: i32 = 2;
 type SecretType = String;
 
 #[derive(Clone)]
+/// A communication channel to a given uri. The channel is either a direct tonic channel,
+/// or a webRTC channel.
 pub enum ViamChannel {
     Direct(Channel),
     WebRTC(Arc<WebRTCClientChannel>),
@@ -146,7 +148,7 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
 }
 
 #[derive(Debug)]
-pub struct DialOptions {
+pub(crate) struct DialOptions {
     credentials: Option<Credentials>,
     webrtc_options: Option<Options>,
     uri: Option<Parts>,
@@ -165,6 +167,7 @@ pub struct WithoutCredentials(());
 pub trait AuthMethod {}
 impl AuthMethod for WithCredentials {}
 impl AuthMethod for WithoutCredentials {}
+/// A DialBuilder allows us to set options before establishing a connection to a server
 #[allow(dead_code)]
 pub struct DialBuilder<T> {
     state: T,
@@ -181,6 +184,7 @@ impl<T> fmt::Debug for DialBuilder<T> {
 }
 
 impl DialOptions {
+    /// Creates a new DialBuilder
     pub fn builder() -> DialBuilder<WantsUri> {
         DialBuilder {
             state: WantsUri(()),
@@ -196,6 +200,7 @@ impl DialOptions {
 }
 
 impl DialBuilder<WantsUri> {
+    /// Sets the uri to connect to
     pub fn uri(self, uri: &str) -> DialBuilder<WantsCredentials> {
         let uri_parts = uri_parts_with_defaults(uri);
         DialBuilder {
@@ -211,6 +216,7 @@ impl DialBuilder<WantsUri> {
     }
 }
 impl DialBuilder<WantsCredentials> {
+    /// Tells connecting logic to not expect/require credentials
     pub fn without_credentials(self) -> DialBuilder<WithoutCredentials> {
         DialBuilder {
             state: WithoutCredentials(()),
@@ -223,6 +229,7 @@ impl DialBuilder<WantsCredentials> {
             },
         }
     }
+    /// Sets credentials to use when connecting
     pub fn with_credentials(self, creds: Credentials) -> DialBuilder<WithCredentials> {
         DialBuilder {
             state: WithCredentials(()),
@@ -238,15 +245,20 @@ impl DialBuilder<WantsCredentials> {
 }
 
 impl<T: AuthMethod> DialBuilder<T> {
+    /// Attempts to connect insecurely with scheme of HTTP as a default
     pub fn insecure(mut self) -> Self {
         self.config.insecure = true;
         self
     }
+    /// Allows for downgrading and attempting to connect via HTTP if HTTPS fails
     pub fn allow_downgrade(mut self) -> Self {
         self.config.allow_downgrade = true;
         self
     }
 
+    /// Overrides any default connection behavior, forcing direct connection. Note that
+    /// the connection itself will fail if it is between a client and server on separate
+    /// networks and not over webRTC
     pub fn disable_webrtc(mut self) -> Self {
         let webrtc_options = Options::default().disable_webrtc();
         self.config.webrtc_options = Some(webrtc_options);
@@ -255,6 +267,7 @@ impl<T: AuthMethod> DialBuilder<T> {
 }
 
 impl DialBuilder<WithoutCredentials> {
+    /// attempts to establish a connection without credentials to the DialBuilder's given uri
     pub async fn connect(self) -> Result<ViamChannel> {
         let webrtc_options = self.config.webrtc_options;
         let disable_webrtc = match &webrtc_options {
@@ -281,8 +294,7 @@ impl DialBuilder<WithoutCredentials> {
                     let mut uri_parts = uri.clone().into_parts();
                     uri_parts.scheme = Some(Scheme::HTTP);
                     let uri = Uri::from_parts(uri_parts)?;
-                    let c = Channel::builder(uri.clone()).connect().await?;
-                    c
+                    Channel::builder(uri.clone()).connect().await?
                 } else {
                     return Err(anyhow::anyhow!(e));
                 }
@@ -329,6 +341,7 @@ async fn get_auth_token(channel: &mut Channel, creds: Credentials, entity: &str)
 }
 
 impl DialBuilder<WithCredentials> {
+    /// attempts to establish a connection with credentials to the DialBuilder's given uri
     pub async fn connect(self) -> Result<AddAuthorization<ViamChannel>> {
         let webrtc_options = self.config.webrtc_options;
         let disable_webrtc = match &webrtc_options {
@@ -737,7 +750,7 @@ fn encode_sdp(sdp: RTCSessionDescription) -> Result<String> {
     Ok(base64::encode(sdp))
 }
 
-pub fn infer_remote_uri_from_authority(uri: Uri) -> Uri {
+fn infer_remote_uri_from_authority(uri: Uri) -> Uri {
     let is_local_connection = uri
         .authority()
         .map(Authority::as_str)

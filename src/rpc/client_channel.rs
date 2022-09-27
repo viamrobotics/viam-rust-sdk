@@ -19,23 +19,22 @@ use webrtc::{
 // see golang/client_stream.go
 const MAX_REQUEST_MESSAGE_PACKET_DATA_SIZE: usize = 16373;
 
+/// The client-side implementation of a webRTC connection channel.
 pub struct WebRTCClientChannel {
-    pub base_channel: Arc<WebRTCBaseChannel>,
+    pub(crate) base_channel: Arc<WebRTCBaseChannel>,
     stream_id_counter: AtomicU64,
-    message_ready: Arc<AtomicBool>,
-    pub streams: CHashMap<u64, WebRTCClientStream>,
-    pub receiver_bodies: CHashMap<u64, hyper::Body>,
+    pub(crate) streams: CHashMap<u64, WebRTCClientStream>,
+    pub(crate) receiver_bodies: CHashMap<u64, hyper::Body>,
 }
 
 impl WebRTCClientChannel {
-    pub async fn new(
+    pub(crate) async fn new(
         peer_connection: Arc<RTCPeerConnection>,
         data_channel: Arc<RTCDataChannel>,
     ) -> Arc<Self> {
         let base_channel = WebRTCBaseChannel::new(peer_connection, data_channel.clone()).await;
         let channel = Self {
             base_channel,
-            message_ready: Arc::new(AtomicBool::new(false)),
             streams: CHashMap::new(),
             stream_id_counter: AtomicU64::new(0),
             receiver_bodies: CHashMap::new(),
@@ -57,7 +56,7 @@ impl WebRTCClientChannel {
         ret_channel
     }
 
-    pub fn new_stream(&self) -> Stream {
+    pub(crate) fn new_stream(&self) -> Stream {
         let id = self.stream_id_counter.fetch_add(1, Ordering::AcqRel);
         let stream = Stream { id };
         let (message_sender, receiver_body) = hyper::Body::channel();
@@ -72,7 +71,6 @@ impl WebRTCClientChannel {
 
         let client_stream = WebRTCClientStream {
             base_stream,
-            message_sent: AtomicBool::new(false),
             headers_received: AtomicBool::new(false),
             trailers_received: AtomicBool::new(false),
         };
@@ -84,10 +82,7 @@ impl WebRTCClientChannel {
 
     async fn on_channel_message(&self, msg: DataChannelMessage) -> Result<()> {
         let response = Response::decode(&*msg.data.to_vec())?;
-        let should_drop_stream = match response.r#type {
-            Some(RespType::Trailers(_)) => true,
-            _ => false,
-        };
+        let should_drop_stream = matches!(response.r#type, Some(RespType::Trailers(_)));
         let (active_stream, stream_id) = match response.stream.as_ref() {
             None => {
                 log::error!(
@@ -109,32 +104,34 @@ impl WebRTCClientChannel {
             }
         };
 
-        let message_sent = match active_stream {
-            Ok(mut active_stream) => active_stream.on_response(response).await,
+        match active_stream {
+            Ok(mut active_stream) => active_stream.on_response(response).await?,
             Err(e) => {
-                log::error!("{e}");
+                log::error!("Error acquiring active stream: {e}");
                 return Ok(());
             }
-        }?;
+        };
         if should_drop_stream {
             self.streams.remove(&stream_id);
         }
-        self.message_ready.store(message_sent, Ordering::Release);
         Ok(())
     }
 
-    pub async fn resp_body_from_stream(&self, stream_id: u64) -> Result<Body> {
+    pub(crate) async fn resp_body_from_stream(&self, stream_id: u64) -> Result<Body> {
         let body = self
             .receiver_bodies
             .remove(&stream_id)
             .ok_or(anyhow::anyhow!(
                 "Tried to receive stream {stream_id} but it didn't exist!"
             ))?;
-        self.message_ready.store(false, Ordering::Release);
         Ok(body)
     }
 
-    pub async fn write_headers(&self, stream: &Stream, headers: RequestHeaders) -> Result<()> {
+    pub(crate) async fn write_headers(
+        &self,
+        stream: &Stream,
+        headers: RequestHeaders,
+    ) -> Result<()> {
         let headers = Request {
             stream: Some(stream.clone()),
             r#type: Some(Type::Headers(headers)),
@@ -143,7 +140,7 @@ impl WebRTCClientChannel {
         self.send(&header_vec).await
     }
 
-    pub async fn write_message(
+    pub(crate) async fn write_message(
         &self,
         eos: bool,
         stream: Option<Stream>,
@@ -233,7 +230,7 @@ impl WebRTCClientChannel {
             .map(|_: usize| ())
     }
 
-    pub fn close_stream_with_recv_error(&self, stream_id: u64, error: anyhow::Error) {
+    pub(crate) fn close_stream_with_recv_error(&self, stream_id: u64, error: anyhow::Error) {
         match self.streams.remove(&stream_id) {
             Some(stream) => stream.base_stream.close_with_recv_error(&mut Some(&error)),
             None => {

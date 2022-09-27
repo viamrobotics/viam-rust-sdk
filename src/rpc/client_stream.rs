@@ -7,11 +7,11 @@ use byteorder::{BigEndian, WriteBytesExt};
 use bytes::Bytes;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+/// The client-specific parts of a webRTC stream.
 pub struct WebRTCClientStream {
-    pub base_stream: WebRTCBaseStream,
-    pub headers_received: AtomicBool,
-    pub message_sent: AtomicBool,
-    pub trailers_received: AtomicBool,
+    pub(crate) base_stream: WebRTCBaseStream,
+    pub(crate) headers_received: AtomicBool,
+    pub(crate) trailers_received: AtomicBool,
 }
 
 impl WebRTCClientStream {
@@ -21,14 +21,12 @@ impl WebRTCClientStream {
 
     // processes a response message, returns true if and only if message was actually
     // processed
-    async fn process_message(&mut self, response: ResponseMessage) -> Result<bool> {
-        let mut message_processed = false;
+    async fn process_message(&mut self, response: ResponseMessage) -> Result<()> {
         if let Some(message) = response.packet_message {
             match self.base_stream.process_message(message) {
                 Ok(data) => {
                     if data.is_some() {
                         let mut data = data.unwrap();
-                        message_processed = true;
                         let mut message_buf = vec![0u8];
                         let len: u32 = data.len().try_into()?;
                         message_buf.write_u32::<BigEndian>(len)?;
@@ -45,7 +43,7 @@ impl WebRTCClientStream {
                 }
             }
         }
-        Ok(message_processed)
+        Ok(())
     }
 
     async fn process_trailers(&mut self, trailers: ResponseTrailers) {
@@ -76,9 +74,8 @@ impl WebRTCClientStream {
         self.base_stream.close_with_recv_error(&mut err.as_ref())
     }
 
-    // processes response. returns true if and only if a message was sent and we're done
-    // processing (i.e., trailers were processed)
-    pub async fn on_response(&mut self, response: Response) -> Result<bool> {
+    // processes response.
+    pub(crate) async fn on_response(&mut self, response: Response) -> Result<()> {
         match &response.r#type {
             Some(Type::Headers(headers)) => {
                 if self.headers_received.load(Ordering::Acquire) {
@@ -94,7 +91,7 @@ impl WebRTCClientStream {
                 }
 
                 self.process_headers(headers.to_owned());
-                Ok(false)
+                Ok(())
             }
             Some(Type::Message(message)) => {
                 if !self.headers_received.load(Ordering::Acquire) {
@@ -114,9 +111,9 @@ impl WebRTCClientStream {
 
             Some(Type::Trailers(trailers)) => {
                 self.process_trailers(trailers.to_owned()).await;
-                Ok(true)
+                Ok(())
             }
-            None => Ok(false),
+            None => Ok(()),
         }
     }
 }
