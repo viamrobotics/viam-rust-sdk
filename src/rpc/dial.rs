@@ -147,8 +147,9 @@ impl Service<http::Request<BoxBody>> for ViamChannel {
     }
 }
 
+/// Options for modifying the connection parameters
 #[derive(Debug)]
-pub(crate) struct DialOptions {
+pub struct DialOptions {
     credentials: Option<Credentials>,
     webrtc_options: Option<Options>,
     uri: Option<Parts>,
