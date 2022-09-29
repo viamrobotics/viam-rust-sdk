@@ -106,7 +106,7 @@ fn dial_with_cred(
 /// The function returns a path to a UDS as a [`c_char`], the string should be freed with free_string when not needed anymore.
 /// When falling to dial it will return a NULL pointer
 /// # Arguments
-/// * `c_uri` a C-style string representing the address of robot your want to connect to
+/// * `c_uri` a C-style string representing the address of robot you want to connect to
 /// * `c_payload` a C-style string that is the robot's secret, set to NULL if you don't need authentication
 /// * `c_allow_insecure` a bool, set to true when allowing insecure connection to your robot
 /// * `rt_ptr` a pointer to a rust runtime previously obtained with init_rust_runtime
