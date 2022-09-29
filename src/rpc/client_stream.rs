@@ -25,8 +25,9 @@ impl WebRTCClientStream {
         let mut message_processed = false;
         if let Some(message) = response.packet_message {
             match self.base_stream.process_message(message) {
-                Ok(mut data) => {
-                    if !data.is_empty() {
+                Ok(data) => {
+                    if data.is_some() {
+                        let mut data = data.unwrap();
                         message_processed = true;
                         let mut message_buf = vec![0u8];
                         let len: u32 = data.len().try_into()?;
@@ -39,7 +40,6 @@ impl WebRTCClientStream {
                             .await?;
                     }
                 }
-
                 Err(e) => {
                     log::error!("Error processing message: {e}");
                 }
