@@ -24,9 +24,9 @@ impl WebRTCBaseStream {
         self.closed_reason.store(&mut err, Ordering::Release);
     }
 
-    pub fn process_message(&mut self, message: PacketMessage) -> Result<Vec<u8>> {
+    pub fn process_message(&mut self, message: PacketMessage) -> Result<Option<Vec<u8>>> {
         if message.data.is_empty() && message.eom {
-            return Ok(Vec::new());
+            return Ok(Some(Vec::new()));
         }
         if message.data.len() + self.packet_buffer.len() > MAX_MESSAGE_SIZE {
             let e = Err(anyhow::anyhow!(
@@ -41,9 +41,9 @@ impl WebRTCBaseStream {
         if message.eom {
             let ret = self.packet_buffer.clone();
             self.reset_packet_buffer();
-            return Ok(ret);
+            return Ok(Some(ret));
         }
-        Ok(Vec::new())
+        Ok(None)
     }
 
     fn reset_packet_buffer(&mut self) {
