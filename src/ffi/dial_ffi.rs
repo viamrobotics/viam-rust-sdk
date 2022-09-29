@@ -166,7 +166,12 @@ pub unsafe extern "C" fn dial(
     let (tx, rx) = oneshot::channel::<()>();
     let uri_str = uri.to_string();
     // if the uri is local then we can connect directly.
-    let disable_webrtc = uri_str.contains(".local");
+    let disable_webrtc;
+    if let Some(host) = uri.host() {
+        disable_webrtc = host.contains(".local") || host.contains("localhost");
+    } else {
+        disable_webrtc = uri_str.contains(".local") || uri_str.contains("localhost");
+    }
     let server = match runtime.block_on(async move {
         let dial = match payload {
             Some(p) => tower::util::Either::A(
