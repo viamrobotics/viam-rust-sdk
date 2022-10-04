@@ -34,8 +34,8 @@ async fn dial_webrtc() -> Result<tonic::Response<ResourceNamesResponse>> {
         "ytexnwei4fu1xv9csoqxfv4ckl3htsb49mzzey5t15xo9swy".to_string(),
     );
 
-    // To test, replace this uri with that of the desired robot
     let c = dial::DialOptions::builder()
+        // To test, replace this uri with that of the desired robot
         .uri("webrtc-test-main.jkek76kqnh.viam.cloud")
         .with_credentials(creds)
         .connect()

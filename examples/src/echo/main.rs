@@ -6,6 +6,8 @@ use viam::gen::proto::rpc::examples::echo::v1::{
 use viam::rpc::dial;
 
 #[tokio::main]
+/// Tests unary, server, and bidi streaming with simple echo requests. To run, simply
+/// update the credentials and uri as necessary.
 async fn main() -> Result<()> {
     let creds = dial::CredentialsExt::new(
         "robot-location-secret".to_string(),
