@@ -34,13 +34,14 @@ use webrtc::{
 // set to 20sec to match _defaultOfferDeadline in goutils/rpc/wrtc_call_queue.go
 const WEBRTC_TIMEOUT: Duration = Duration::from_secs(20);
 
+/// Options for connecting via webRTC.
 #[derive(Default)]
-pub struct Options {
-    pub disable_webrtc: bool,
-    pub disable_trickle_ice: bool,
-    pub config: RTCConfiguration,
-    pub signaling_insecure: bool,
-    pub signaling_server_address: String,
+pub(crate) struct Options {
+    pub(crate) disable_webrtc: bool,
+    pub(crate) disable_trickle_ice: bool,
+    pub(crate) config: RTCConfiguration,
+    pub(crate) signaling_insecure: bool,
+    pub(crate) signaling_server_address: String,
 }
 
 // an Arc<AtomicBool> that is pollable as a future. Pending when false, Ready(()) when true
@@ -95,7 +96,7 @@ impl fmt::Debug for Options {
 }
 
 impl Options {
-    pub fn infer_signaling_server_address(uri: &Uri) -> Option<(String, bool)> {
+    pub(crate) fn infer_signaling_server_address(uri: &Uri) -> Option<(String, bool)> {
         // TODO(RSDK-235): remove hard coding of signaling server
         // address and prefer SRV lookup instead
         let path = uri.to_string();
@@ -108,7 +109,7 @@ impl Options {
         }
     }
 
-    pub fn infer_from_uri(uri: Uri) -> Self {
+    pub(crate) fn infer_from_uri(uri: Uri) -> Self {
         match Self::infer_signaling_server_address(&uri) {
             None => Options {
                 config: default_configuration(),
@@ -123,13 +124,14 @@ impl Options {
         }
     }
 
-    pub fn disable_webrtc(mut self) -> Self {
+    /// Disables connecting via webRTC, forcing a direct connect
+    pub(crate) fn disable_webrtc(mut self) -> Self {
         self.disable_webrtc = true;
         self
     }
 }
 
-pub fn default_configuration() -> RTCConfiguration {
+fn default_configuration() -> RTCConfiguration {
     let ice_server = RTCIceServer {
         urls: vec!["stun:global.stun.twilio.com:3478?transport=udp".to_string()],
         ..Default::default()
@@ -150,7 +152,7 @@ fn ice_server_from_proto(ice_server: IceServer) -> RTCIceServer {
     }
 }
 
-pub fn extend_webrtc_config(
+pub(crate) fn extend_webrtc_config(
     original: RTCConfiguration,
     optional: Option<WebRtcConfig>,
 ) -> RTCConfiguration {
@@ -192,7 +194,7 @@ fn create_invalid_sdp_err(err: serde_json::error::Error) -> webrtc::Error {
     webrtc::Error::Sdp(webrtc::sdp::Error::SdpInvalidValue(err.to_string()))
 }
 
-pub async fn new_peer_connection_for_client(
+pub(crate) async fn new_peer_connection_for_client(
     config: RTCConfiguration,
     disable_trickle_ice: bool,
 ) -> Result<(Arc<RTCPeerConnection>, Arc<RTCDataChannel>)> {
@@ -287,7 +289,7 @@ pub async fn new_peer_connection_for_client(
     Ok((peer_connection, data_channel))
 }
 
-pub async fn webrtc_action_with_timeout<T>(f: impl Future<Output = T>) -> Result<T> {
+pub(crate) async fn webrtc_action_with_timeout<T>(f: impl Future<Output = T>) -> Result<T> {
     tokio::pin! {
         let timeout = tokio::time::sleep(WEBRTC_TIMEOUT);
         let f = f;
@@ -305,11 +307,10 @@ pub async fn webrtc_action_with_timeout<T>(f: impl Future<Output = T>) -> Result
     }
 }
 
-pub fn trailers_from_proto(proto: ResponseTrailers) -> HeaderMap {
+pub(crate) fn trailers_from_proto(proto: ResponseTrailers) -> HeaderMap {
     let mut trailers = HeaderMap::new();
     if let Some(metadata) = proto.metadata {
-        let mut vals = metadata.md.iter();
-        while let Some((k, v)) = vals.next() {
+        for (k, v) in metadata.md.iter() {
             let k = HeaderName::from_str(k);
             let v = HeaderValue::from_str(&v.values.concat());
             let (k, v) = match (k, v) {

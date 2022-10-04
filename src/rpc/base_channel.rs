@@ -6,15 +6,16 @@ use std::sync::{
 use webrtc::{data_channel::RTCDataChannel, peer_connection::RTCPeerConnection};
 
 // see golang/client_stream.go
+/// The base components to a webRTC channel, used on both client and server sides.
 pub struct WebRTCBaseChannel {
-    pub peer_connection: Arc<RTCPeerConnection>,
-    pub data_channel: Arc<RTCDataChannel>,
+    pub(crate) peer_connection: Arc<RTCPeerConnection>,
+    pub(crate) data_channel: Arc<RTCDataChannel>,
     closed_reason: AtomicPtr<Option<anyhow::Error>>,
     closed: AtomicBool,
 }
 
 impl WebRTCBaseChannel {
-    pub async fn new(
+    pub(crate) async fn new(
         peer_connection: Arc<RTCPeerConnection>,
         data_channel: Arc<RTCDataChannel>,
     ) -> Arc<Self> {
@@ -53,14 +54,18 @@ impl WebRTCBaseChannel {
             .map_err(anyhow::Error::from)
     }
 
+    /// Closes the channel
+    #[allow(dead_code)]
     pub async fn close(&self) -> Result<()> {
         self.close_with_reason(None).await
     }
-
+    /// Returns whether or not the channel is closed
+    #[allow(dead_code)]
     pub fn is_closed(&self) -> bool {
         self.closed.load(Ordering::Acquire)
     }
-
+    /// Returns Some(reason) if the channel closed with error, otherwise None
+    #[allow(dead_code)]
     pub fn closed_reason(&self) -> *mut Option<anyhow::Error> {
         self.closed_reason.load(Ordering::Acquire)
     }

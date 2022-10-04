@@ -6,16 +6,18 @@ use std::sync::atomic::{AtomicBool, AtomicPtr, Ordering};
 
 const MAX_MESSAGE_SIZE: usize = 1 << 25;
 
+/// Base elements of a webRTC stream, used in both client and server implementations
+#[allow(dead_code)]
 pub struct WebRTCBaseStream {
-    pub stream: Stream,
-    pub message_sender: Sender,
-    pub closed: AtomicBool,
-    pub packet_buffer: Vec<u8>,
-    pub closed_reason: AtomicPtr<Option<anyhow::Error>>,
+    pub(crate) stream: Stream,
+    pub(crate) message_sender: Sender,
+    pub(crate) closed: AtomicBool,
+    pub(crate) packet_buffer: Vec<u8>,
+    pub(crate) closed_reason: AtomicPtr<Option<anyhow::Error>>,
 }
 
 impl WebRTCBaseStream {
-    pub fn close_with_recv_error(&self, err: &mut Option<&anyhow::Error>) {
+    pub(crate) fn close_with_recv_error(&self, err: &mut Option<&anyhow::Error>) {
         if self.closed.load(Ordering::Acquire) {
             return;
         }
@@ -24,7 +26,7 @@ impl WebRTCBaseStream {
         self.closed_reason.store(&mut err, Ordering::Release);
     }
 
-    pub fn process_message(&mut self, message: PacketMessage) -> Result<Option<Vec<u8>>> {
+    pub(crate) fn process_message(&mut self, message: PacketMessage) -> Result<Option<Vec<u8>>> {
         if message.data.is_empty() && message.eom {
             return Ok(Some(Vec::new()));
         }

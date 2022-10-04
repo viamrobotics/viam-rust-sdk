@@ -1,5 +1,5 @@
 use anyhow::Result;
-use viam::gen::proto::api::robot::v1::{
+use viam::gen::proto::robot::v1::{
     robot_service_client, ResourceNamesRequest, ResourceNamesResponse,
 };
 use viam::rpc::dial;
@@ -7,10 +7,12 @@ use viam::rpc::dial;
 async fn dial_direct() -> Result<tonic::Response<ResourceNamesResponse>> {
     let creds = dial::CredentialsExt::new(
         "robot-location-secret".to_string(),
+        // To test, replace this with the desired robot's location secret
         "ytexnwei4fu1xv9csoqxfv4ckl3htsb49mzzey5t15xo9swy".to_string(),
     );
 
     let c = dial::DialOptions::builder()
+        // To test, replace this uri with that of the desired robot
         .uri("webrtc-test-main.jkek76kqnh.local.viam.cloud:8080")
         .with_credentials(creds)
         .disable_webrtc()
@@ -28,10 +30,12 @@ async fn dial_direct() -> Result<tonic::Response<ResourceNamesResponse>> {
 async fn dial_webrtc() -> Result<tonic::Response<ResourceNamesResponse>> {
     let creds = dial::CredentialsExt::new(
         "robot-location-secret".to_string(),
+        // To test, replace this with the desired robot's location secret
         "ytexnwei4fu1xv9csoqxfv4ckl3htsb49mzzey5t15xo9swy".to_string(),
     );
 
     let c = dial::DialOptions::builder()
+        // To test, replace this uri with that of the desired robot
         .uri("webrtc-test-main.jkek76kqnh.viam.cloud")
         .with_credentials(creds)
         .connect()
