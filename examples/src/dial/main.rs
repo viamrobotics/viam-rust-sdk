@@ -1,5 +1,5 @@
 use anyhow::Result;
-use viam::gen::proto::api::robot::v1::{
+use viam::gen::proto::robot::v1::{
     robot_service_client, ResourceNamesRequest, ResourceNamesResponse,
 };
 use viam::rpc::dial;
