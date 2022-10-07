@@ -508,6 +508,8 @@ async fn maybe_connect_via_webrtc(
 
     let exchange_done = Arc::new(AtomicBool::new(false));
     let remote_description_set = Arc::new(AtomicBool::new(false));
+    let ice_done = Arc::new(AtomicBool::new(false));
+    let ice_done2 = ice_done.clone();
 
     if !webrtc_options.disable_trickle_ice {
         let offer = peer_connection.create_offer(None).await?;
@@ -515,7 +517,6 @@ async fn maybe_connect_via_webrtc(
         let uuid_lock2 = uuid_lock.clone();
         let sent_done_or_error2 = sent_done_or_error.clone();
 
-        let ice_done = Arc::new(AtomicBool::new(false));
         let exchange_done = exchange_done.clone();
         let remote_description_set = remote_description_set.clone();
         peer_connection
@@ -555,8 +556,11 @@ async fn maybe_connect_via_webrtc(
                                         uuid: uuid.clone(),
                                         update: Some(Update::Candidate(proto_candidate)),
                                     };
-                                    if let Err(e) =
-                                        signaling_client.call_update(update_request).await
+                                    if let Err(e) = webrtc_action_with_timeout(
+                                        signaling_client.call_update(update_request),
+                                    )
+                                    .await
+                                    .and_then(|resp| resp.map_err(anyhow::Error::from))
                                     {
                                         log::error!("Error sending ice candidate: {e}");
                                     }
@@ -597,10 +601,17 @@ async fn maybe_connect_via_webrtc(
         let sent_done = sent_done_or_error2;
 
         loop {
-            let response = match call_client.message().await {
+            let response = match webrtc_action_with_timeout(call_client.message())
+                .await
+                .and_then(|resp| resp.map_err(anyhow::Error::from))
+            {
                 Ok(cr) => match cr {
                     Some(cr) => cr,
                     None => {
+                        let ice_done = PollableAtomicBool::new(ice_done2);
+                        // want to delay sending done until we either are actually done, or
+                        // we hit a timeout
+                        let _ = webrtc_action_with_timeout(ice_done).await;
                         let uuid = uuid.read().unwrap().to_string();
                         send_done_once(sent_done.clone(), &uuid, channel2.clone()).await;
                         break;
@@ -608,7 +619,7 @@ async fn maybe_connect_via_webrtc(
                 },
                 Err(e) => {
                     log::error!("Error processing call response: {e}");
-                    continue;
+                    break;
                 }
             };
 

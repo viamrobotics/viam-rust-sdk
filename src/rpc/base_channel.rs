@@ -20,6 +20,23 @@ impl WebRTCBaseChannel {
         data_channel: Arc<RTCDataChannel>,
     ) -> Arc<Self> {
         let dc = data_channel.clone();
+        let pc = peer_connection.clone();
+        peer_connection
+            .on_ice_connection_state_change(Box::new(move |conn_state| {
+                let pc = pc.clone();
+                Box::pin(async move {
+                    let sctp = pc.sctp();
+                    let transport = sctp.transport();
+                    let transport = transport.ice_transport();
+                    let candidate_pair = transport.get_selected_candidate_pair().await;
+                    log::info!(
+                        "Selected candidate pair. Pair: {candidate_pair:?}. ID: {}. Current connection state: {conn_state}",
+                        pc.get_stats_id()
+                    );
+                })
+            }))
+            .await;
+
         let channel = Arc::new(Self {
             peer_connection,
             data_channel,
@@ -37,6 +54,7 @@ impl WebRTCBaseChannel {
             })
         }))
         .await;
+
         channel
     }
 
