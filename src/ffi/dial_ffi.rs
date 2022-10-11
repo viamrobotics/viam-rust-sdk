@@ -64,7 +64,7 @@ impl Ffi {
 /// Returns a pointer to a [`Ffi`]
 #[no_mangle]
 pub extern "C" fn init_rust_runtime() -> Box<Ffi> {
-    tracing_subscriber::fmt::init();
+    let _ = tracing_subscriber::fmt::try_init();
     Box::new(Ffi::new())
 }
 
