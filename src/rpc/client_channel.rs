@@ -181,38 +181,49 @@ impl WebRTCClientChannel {
             to_add_bytes.clone_from_slice(&data[1..5]);
             next_message_length = u32::from_be_bytes(to_add_bytes);
             data = data.split_off(5);
-            let split_at = MAX_REQUEST_MESSAGE_PACKET_DATA_SIZE
-                .min(data.len())
-                .min(usize::try_from(next_message_length).unwrap());
-            let (to_send, remaining) = data.split_at(split_at);
-            let stream = stream.clone();
-            let request = Request {
-                stream,
-                r#type: Some(Type::Message(RequestMessage {
-                    has_message,
-                    eos: if remaining.len() > 0 {
-                        // stream definitely isn't done if there's more to send
-                        false
-                    } else {
-                        // if we intentionally sent an eos or the http request was inferrably
-                        // a stream
-                        eos || it_was_all_a_stream
-                    },
-                    packet_message: Some(PacketMessage {
-                        eom: to_send.len() == usize::try_from(next_message_length).unwrap()
-                            || remaining.len() == 0,
-                        data: to_send.to_vec(),
-                    }),
-                })),
-            };
+            // we need an internal loop because a single message may be longer than the
+            // MAX_REQUEST_MESSAGE_PACKET_DATA_SIZE in which case we don't want to shave off
+            // a five byte header. but, a single call to write_message may contain multiple
+            // distinct messages within the data vec, so we want to be able to evaluate length
+            // multiple times if necessary. we use a loop with an exit check at the bottom
+            // because we always want to send a request at least once, even if the data is empty.
+            loop {
+                let split_at = MAX_REQUEST_MESSAGE_PACKET_DATA_SIZE
+                    .min(data.len())
+                    .min(usize::try_from(next_message_length).unwrap());
+                let (to_send, remaining) = data.split_at(split_at);
+                next_message_length -= u32::try_from(split_at).unwrap();
+                let stream = stream.clone();
+                let request = Request {
+                    stream,
+                    r#type: Some(Type::Message(RequestMessage {
+                        has_message,
+                        eos: if !remaining.is_empty() {
+                            // stream definitely isn't done if there's more to send
+                            false
+                        } else {
+                            // if we intentionally sent an eos or the http request was inferrably
+                            // a stream
+                            eos || it_was_all_a_stream
+                        },
+                        packet_message: Some(PacketMessage {
+                            eom: next_message_length == 0 || remaining.is_empty(),
+                            data: to_send.to_vec(),
+                        }),
+                    })),
+                };
 
-            let request = Message::encode_to_vec(&request);
-            if let Err(e) = self.send(&request).await {
-                log::error!("error sending message: {e}");
-                return Err(e);
+                let request = Message::encode_to_vec(&request);
+                if let Err(e) = self.send(&request).await {
+                    log::error!("error sending message: {e}");
+                    return Err(e);
+                }
+
+                data = remaining.to_vec();
+                if next_message_length == 0 {
+                    break;
+                }
             }
-
-            data = remaining.to_vec();
             if data.is_empty() {
                 break;
             }
