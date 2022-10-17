@@ -2,7 +2,7 @@ use anyhow::Result;
 use viam::gen::proto::robot::v1::{
     robot_service_client, ResourceNamesRequest, ResourceNamesResponse,
 };
-use viam::rpc::dial;
+use viam_rust_utils::rpc::dial;
 
 async fn dial_direct() -> Result<tonic::Response<ResourceNamesResponse>> {
     let creds = dial::CredentialsExt::new(

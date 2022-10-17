@@ -1,6 +1,0 @@
-version: v1
-plugins:
-  - name: cpp
-    out: gen/
-  - remote: buf.build/grpc/plugins/cpp:v1.45.2-1
-    out: gen/
