@@ -119,6 +119,50 @@ pub mod app_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn create_location_secret(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateLocationSecretRequest>,
+        ) -> Result<
+                tonic::Response<super::CreateLocationSecretResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateLocationSecret",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn delete_location_secret(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteLocationSecretRequest>,
+        ) -> Result<
+                tonic::Response<super::DeleteLocationSecretResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/DeleteLocationSecret",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn get_robot(
             &mut self,
             request: impl tonic::IntoRequest<super::GetRobotRequest>,
@@ -314,6 +358,50 @@ pub mod app_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn create_robot_part_secret(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateRobotPartSecretRequest>,
+        ) -> Result<
+                tonic::Response<super::CreateRobotPartSecretResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateRobotPartSecret",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn delete_robot_part_secret(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteRobotPartSecretRequest>,
+        ) -> Result<
+                tonic::Response<super::DeleteRobotPartSecretResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/DeleteRobotPartSecret",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn find_robots(
             &mut self,
             request: impl tonic::IntoRequest<super::FindRobotsRequest>,
@@ -411,6 +499,14 @@ pub mod app_service_server {
             &self,
             request: tonic::Request<super::LocationAuthRequest>,
         ) -> Result<tonic::Response<super::LocationAuthResponse>, tonic::Status>;
+        async fn create_location_secret(
+            &self,
+            request: tonic::Request<super::CreateLocationSecretRequest>,
+        ) -> Result<tonic::Response<super::CreateLocationSecretResponse>, tonic::Status>;
+        async fn delete_location_secret(
+            &self,
+            request: tonic::Request<super::DeleteLocationSecretRequest>,
+        ) -> Result<tonic::Response<super::DeleteLocationSecretResponse>, tonic::Status>;
         async fn get_robot(
             &self,
             request: tonic::Request<super::GetRobotRequest>,
@@ -457,6 +553,20 @@ pub mod app_service_server {
             &self,
             request: tonic::Request<super::MarkPartAsMainRequest>,
         ) -> Result<tonic::Response<super::MarkPartAsMainResponse>, tonic::Status>;
+        async fn create_robot_part_secret(
+            &self,
+            request: tonic::Request<super::CreateRobotPartSecretRequest>,
+        ) -> Result<
+                tonic::Response<super::CreateRobotPartSecretResponse>,
+                tonic::Status,
+            >;
+        async fn delete_robot_part_secret(
+            &self,
+            request: tonic::Request<super::DeleteRobotPartSecretRequest>,
+        ) -> Result<
+                tonic::Response<super::DeleteRobotPartSecretResponse>,
+                tonic::Status,
+            >;
         async fn find_robots(
             &self,
             request: tonic::Request<super::FindRobotsRequest>,
@@ -642,6 +752,86 @@ pub mod app_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = LocationAuthSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/CreateLocationSecret" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateLocationSecretSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CreateLocationSecretRequest>
+                    for CreateLocationSecretSvc<T> {
+                        type Response = super::CreateLocationSecretResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateLocationSecretRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).create_location_secret(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateLocationSecretSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/DeleteLocationSecret" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteLocationSecretSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::DeleteLocationSecretRequest>
+                    for DeleteLocationSecretSvc<T> {
+                        type Response = super::DeleteLocationSecretResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::DeleteLocationSecretRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).delete_location_secret(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteLocationSecretSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -1042,6 +1232,86 @@ pub mod app_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = MarkPartAsMainSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/CreateRobotPartSecret" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateRobotPartSecretSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CreateRobotPartSecretRequest>
+                    for CreateRobotPartSecretSvc<T> {
+                        type Response = super::CreateRobotPartSecretResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateRobotPartSecretRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).create_robot_part_secret(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateRobotPartSecretSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/DeleteRobotPartSecret" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteRobotPartSecretSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::DeleteRobotPartSecretRequest>
+                    for DeleteRobotPartSecretSvc<T> {
+                        type Response = super::DeleteRobotPartSecretResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::DeleteRobotPartSecretRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).delete_robot_part_secret(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteRobotPartSecretSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
