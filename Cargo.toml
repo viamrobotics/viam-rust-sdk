@@ -1,7 +1,10 @@
 [package]
 name = "viam"
-version = "0.0.1"
+version = "0.0.4"
 edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/viamrobotics/viam-rust-sdk"
+authors = ["Viam, inc. <contact@viam.com>"]
 
 [lib]
 crate-type = ["cdylib","lib"]
