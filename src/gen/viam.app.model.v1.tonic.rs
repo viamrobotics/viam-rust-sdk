@@ -121,6 +121,25 @@ pub mod model_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn info(
+            &mut self,
+            request: impl tonic::IntoRequest<super::InfoRequest>,
+        ) -> Result<tonic::Response<super::InfoResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.model.v1.ModelService/Info",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -142,6 +161,10 @@ pub mod model_service_server {
             &self,
             request: tonic::Request<super::DeployRequest>,
         ) -> Result<tonic::Response<super::DeployResponse>, tonic::Status>;
+        async fn info(
+            &self,
+            request: tonic::Request<super::InfoRequest>,
+        ) -> Result<tonic::Response<super::InfoResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct ModelServiceServer<T: ModelService> {
@@ -307,6 +330,42 @@ pub mod model_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = DeploySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.model.v1.ModelService/Info" => {
+                    #[allow(non_camel_case_types)]
+                    struct InfoSvc<T: ModelService>(pub Arc<T>);
+                    impl<T: ModelService> tonic::server::UnaryService<super::InfoRequest>
+                    for InfoSvc<T> {
+                        type Response = super::InfoResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::InfoRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).info(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = InfoSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
