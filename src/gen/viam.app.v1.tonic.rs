@@ -62,6 +62,25 @@ pub mod app_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
+        pub async fn create_location(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateLocationRequest>,
+        ) -> Result<tonic::Response<super::CreateLocationResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateLocation",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn list_organizations(
             &mut self,
             request: impl tonic::IntoRequest<super::ListOrganizationsRequest>,
@@ -487,6 +506,10 @@ pub mod app_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with AppServiceServer.
     #[async_trait]
     pub trait AppService: Send + Sync + 'static {
+        async fn create_location(
+            &self,
+            request: tonic::Request<super::CreateLocationRequest>,
+        ) -> Result<tonic::Response<super::CreateLocationResponse>, tonic::Status>;
         async fn list_organizations(
             &self,
             request: tonic::Request<super::ListOrganizationsRequest>,
@@ -643,6 +666,46 @@ pub mod app_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
+                "/viam.app.v1.AppService/CreateLocation" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateLocationSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CreateLocationRequest>
+                    for CreateLocationSvc<T> {
+                        type Response = super::CreateLocationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateLocationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).create_location(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateLocationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.app.v1.AppService/ListOrganizations" => {
                     #[allow(non_camel_case_types)]
                     struct ListOrganizationsSvc<T: AppService>(pub Arc<T>);
