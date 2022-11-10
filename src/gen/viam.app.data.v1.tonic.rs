@@ -185,6 +185,102 @@ pub mod data_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn add_annotations_to_binary_data_by_file_i_ds(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::AddAnnotationsToBinaryDataByFileIDsRequest,
+            >,
+        ) -> Result<
+                tonic::Response<super::AddAnnotationsToBinaryDataByFileIDsResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/AddAnnotationsToBinaryDataByFileIDs",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn add_annotations_to_binary_data_by_filter(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::AddAnnotationsToBinaryDataByFilterRequest,
+            >,
+        ) -> Result<
+                tonic::Response<super::AddAnnotationsToBinaryDataByFilterResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/AddAnnotationsToBinaryDataByFilter",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn remove_annotations_from_binary_data_by_file_i_ds(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::RemoveAnnotationsFromBinaryDataByFileIDsRequest,
+            >,
+        ) -> Result<
+                tonic::Response<super::RemoveAnnotationsFromBinaryDataByFileIDsResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/RemoveAnnotationsFromBinaryDataByFileIDs",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn remove_annotations_from_binary_data_by_filter(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::RemoveAnnotationsFromBinaryDataByFilterRequest,
+            >,
+        ) -> Result<
+                tonic::Response<super::RemoveAnnotationsFromBinaryDataByFilterResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/RemoveAnnotationsFromBinaryDataByFilter",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -225,6 +321,38 @@ pub mod data_service_server {
             request: tonic::Request<super::DeleteBinaryDataByIDsRequest>,
         ) -> Result<
                 tonic::Response<super::DeleteBinaryDataByIDsResponse>,
+                tonic::Status,
+            >;
+        async fn add_annotations_to_binary_data_by_file_i_ds(
+            &self,
+            request: tonic::Request<super::AddAnnotationsToBinaryDataByFileIDsRequest>,
+        ) -> Result<
+                tonic::Response<super::AddAnnotationsToBinaryDataByFileIDsResponse>,
+                tonic::Status,
+            >;
+        async fn add_annotations_to_binary_data_by_filter(
+            &self,
+            request: tonic::Request<super::AddAnnotationsToBinaryDataByFilterRequest>,
+        ) -> Result<
+                tonic::Response<super::AddAnnotationsToBinaryDataByFilterResponse>,
+                tonic::Status,
+            >;
+        async fn remove_annotations_from_binary_data_by_file_i_ds(
+            &self,
+            request: tonic::Request<
+                super::RemoveAnnotationsFromBinaryDataByFileIDsRequest,
+            >,
+        ) -> Result<
+                tonic::Response<super::RemoveAnnotationsFromBinaryDataByFileIDsResponse>,
+                tonic::Status,
+            >;
+        async fn remove_annotations_from_binary_data_by_filter(
+            &self,
+            request: tonic::Request<
+                super::RemoveAnnotationsFromBinaryDataByFilterRequest,
+            >,
+        ) -> Result<
+                tonic::Response<super::RemoveAnnotationsFromBinaryDataByFilterResponse>,
                 tonic::Status,
             >;
     }
@@ -521,6 +649,194 @@ pub mod data_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = DeleteBinaryDataByIDsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/AddAnnotationsToBinaryDataByFileIDs" => {
+                    #[allow(non_camel_case_types)]
+                    struct AddAnnotationsToBinaryDataByFileIDsSvc<T: DataService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<
+                        super::AddAnnotationsToBinaryDataByFileIDsRequest,
+                    > for AddAnnotationsToBinaryDataByFileIDsSvc<T> {
+                        type Response = super::AddAnnotationsToBinaryDataByFileIDsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::AddAnnotationsToBinaryDataByFileIDsRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner)
+                                    .add_annotations_to_binary_data_by_file_i_ds(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AddAnnotationsToBinaryDataByFileIDsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/AddAnnotationsToBinaryDataByFilter" => {
+                    #[allow(non_camel_case_types)]
+                    struct AddAnnotationsToBinaryDataByFilterSvc<T: DataService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<
+                        super::AddAnnotationsToBinaryDataByFilterRequest,
+                    > for AddAnnotationsToBinaryDataByFilterSvc<T> {
+                        type Response = super::AddAnnotationsToBinaryDataByFilterResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::AddAnnotationsToBinaryDataByFilterRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner)
+                                    .add_annotations_to_binary_data_by_filter(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AddAnnotationsToBinaryDataByFilterSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/RemoveAnnotationsFromBinaryDataByFileIDs" => {
+                    #[allow(non_camel_case_types)]
+                    struct RemoveAnnotationsFromBinaryDataByFileIDsSvc<T: DataService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<
+                        super::RemoveAnnotationsFromBinaryDataByFileIDsRequest,
+                    > for RemoveAnnotationsFromBinaryDataByFileIDsSvc<T> {
+                        type Response = super::RemoveAnnotationsFromBinaryDataByFileIDsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::RemoveAnnotationsFromBinaryDataByFileIDsRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner)
+                                    .remove_annotations_from_binary_data_by_file_i_ds(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RemoveAnnotationsFromBinaryDataByFileIDsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/RemoveAnnotationsFromBinaryDataByFilter" => {
+                    #[allow(non_camel_case_types)]
+                    struct RemoveAnnotationsFromBinaryDataByFilterSvc<T: DataService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<
+                        super::RemoveAnnotationsFromBinaryDataByFilterRequest,
+                    > for RemoveAnnotationsFromBinaryDataByFilterSvc<T> {
+                        type Response = super::RemoveAnnotationsFromBinaryDataByFilterResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::RemoveAnnotationsFromBinaryDataByFilterRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner)
+                                    .remove_annotations_from_binary_data_by_filter(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RemoveAnnotationsFromBinaryDataByFilterSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
