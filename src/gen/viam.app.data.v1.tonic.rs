@@ -185,13 +185,11 @@ pub mod data_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn add_annotations_to_binary_data_by_file_i_ds(
+        pub async fn add_tags_to_binary_data_by_file_i_ds(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::AddAnnotationsToBinaryDataByFileIDsRequest,
-            >,
+            request: impl tonic::IntoRequest<super::AddTagsToBinaryDataByFileIDsRequest>,
         ) -> Result<
-                tonic::Response<super::AddAnnotationsToBinaryDataByFileIDsResponse>,
+                tonic::Response<super::AddTagsToBinaryDataByFileIDsResponse>,
                 tonic::Status,
             > {
             self.inner
@@ -205,17 +203,15 @@ pub mod data_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.data.v1.DataService/AddAnnotationsToBinaryDataByFileIDs",
+                "/viam.app.data.v1.DataService/AddTagsToBinaryDataByFileIDs",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn add_annotations_to_binary_data_by_filter(
+        pub async fn add_tags_to_binary_data_by_filter(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::AddAnnotationsToBinaryDataByFilterRequest,
-            >,
+            request: impl tonic::IntoRequest<super::AddTagsToBinaryDataByFilterRequest>,
         ) -> Result<
-                tonic::Response<super::AddAnnotationsToBinaryDataByFilterResponse>,
+                tonic::Response<super::AddTagsToBinaryDataByFilterResponse>,
                 tonic::Status,
             > {
             self.inner
@@ -229,17 +225,17 @@ pub mod data_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.data.v1.DataService/AddAnnotationsToBinaryDataByFilter",
+                "/viam.app.data.v1.DataService/AddTagsToBinaryDataByFilter",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn remove_annotations_from_binary_data_by_file_i_ds(
+        pub async fn remove_tags_from_binary_data_by_file_i_ds(
             &mut self,
             request: impl tonic::IntoRequest<
-                super::RemoveAnnotationsFromBinaryDataByFileIDsRequest,
+                super::RemoveTagsFromBinaryDataByFileIDsRequest,
             >,
         ) -> Result<
-                tonic::Response<super::RemoveAnnotationsFromBinaryDataByFileIDsResponse>,
+                tonic::Response<super::RemoveTagsFromBinaryDataByFileIDsResponse>,
                 tonic::Status,
             > {
             self.inner
@@ -253,17 +249,17 @@ pub mod data_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.data.v1.DataService/RemoveAnnotationsFromBinaryDataByFileIDs",
+                "/viam.app.data.v1.DataService/RemoveTagsFromBinaryDataByFileIDs",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn remove_annotations_from_binary_data_by_filter(
+        pub async fn remove_tags_from_binary_data_by_filter(
             &mut self,
             request: impl tonic::IntoRequest<
-                super::RemoveAnnotationsFromBinaryDataByFilterRequest,
+                super::RemoveTagsFromBinaryDataByFilterRequest,
             >,
         ) -> Result<
-                tonic::Response<super::RemoveAnnotationsFromBinaryDataByFilterResponse>,
+                tonic::Response<super::RemoveTagsFromBinaryDataByFilterResponse>,
                 tonic::Status,
             > {
             self.inner
@@ -277,7 +273,7 @@ pub mod data_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.data.v1.DataService/RemoveAnnotationsFromBinaryDataByFilter",
+                "/viam.app.data.v1.DataService/RemoveTagsFromBinaryDataByFilter",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -323,36 +319,32 @@ pub mod data_service_server {
                 tonic::Response<super::DeleteBinaryDataByIDsResponse>,
                 tonic::Status,
             >;
-        async fn add_annotations_to_binary_data_by_file_i_ds(
+        async fn add_tags_to_binary_data_by_file_i_ds(
             &self,
-            request: tonic::Request<super::AddAnnotationsToBinaryDataByFileIDsRequest>,
+            request: tonic::Request<super::AddTagsToBinaryDataByFileIDsRequest>,
         ) -> Result<
-                tonic::Response<super::AddAnnotationsToBinaryDataByFileIDsResponse>,
+                tonic::Response<super::AddTagsToBinaryDataByFileIDsResponse>,
                 tonic::Status,
             >;
-        async fn add_annotations_to_binary_data_by_filter(
+        async fn add_tags_to_binary_data_by_filter(
             &self,
-            request: tonic::Request<super::AddAnnotationsToBinaryDataByFilterRequest>,
+            request: tonic::Request<super::AddTagsToBinaryDataByFilterRequest>,
         ) -> Result<
-                tonic::Response<super::AddAnnotationsToBinaryDataByFilterResponse>,
+                tonic::Response<super::AddTagsToBinaryDataByFilterResponse>,
                 tonic::Status,
             >;
-        async fn remove_annotations_from_binary_data_by_file_i_ds(
+        async fn remove_tags_from_binary_data_by_file_i_ds(
             &self,
-            request: tonic::Request<
-                super::RemoveAnnotationsFromBinaryDataByFileIDsRequest,
-            >,
+            request: tonic::Request<super::RemoveTagsFromBinaryDataByFileIDsRequest>,
         ) -> Result<
-                tonic::Response<super::RemoveAnnotationsFromBinaryDataByFileIDsResponse>,
+                tonic::Response<super::RemoveTagsFromBinaryDataByFileIDsResponse>,
                 tonic::Status,
             >;
-        async fn remove_annotations_from_binary_data_by_filter(
+        async fn remove_tags_from_binary_data_by_filter(
             &self,
-            request: tonic::Request<
-                super::RemoveAnnotationsFromBinaryDataByFilterRequest,
-            >,
+            request: tonic::Request<super::RemoveTagsFromBinaryDataByFilterRequest>,
         ) -> Result<
-                tonic::Response<super::RemoveAnnotationsFromBinaryDataByFilterResponse>,
+                tonic::Response<super::RemoveTagsFromBinaryDataByFilterResponse>,
                 tonic::Status,
             >;
     }
@@ -660,17 +652,15 @@ pub mod data_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.data.v1.DataService/AddAnnotationsToBinaryDataByFileIDs" => {
+                "/viam.app.data.v1.DataService/AddTagsToBinaryDataByFileIDs" => {
                     #[allow(non_camel_case_types)]
-                    struct AddAnnotationsToBinaryDataByFileIDsSvc<T: DataService>(
-                        pub Arc<T>,
-                    );
+                    struct AddTagsToBinaryDataByFileIDsSvc<T: DataService>(pub Arc<T>);
                     impl<
                         T: DataService,
                     > tonic::server::UnaryService<
-                        super::AddAnnotationsToBinaryDataByFileIDsRequest,
-                    > for AddAnnotationsToBinaryDataByFileIDsSvc<T> {
-                        type Response = super::AddAnnotationsToBinaryDataByFileIDsResponse;
+                        super::AddTagsToBinaryDataByFileIDsRequest,
+                    > for AddTagsToBinaryDataByFileIDsSvc<T> {
+                        type Response = super::AddTagsToBinaryDataByFileIDsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -678,14 +668,12 @@ pub mod data_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::AddAnnotationsToBinaryDataByFileIDsRequest,
+                                super::AddTagsToBinaryDataByFileIDsRequest,
                             >,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner)
-                                    .add_annotations_to_binary_data_by_file_i_ds(request)
-                                    .await
+                                (*inner).add_tags_to_binary_data_by_file_i_ds(request).await
                             };
                             Box::pin(fut)
                         }
@@ -695,7 +683,7 @@ pub mod data_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = AddAnnotationsToBinaryDataByFileIDsSvc(inner);
+                        let method = AddTagsToBinaryDataByFileIDsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -707,17 +695,15 @@ pub mod data_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.data.v1.DataService/AddAnnotationsToBinaryDataByFilter" => {
+                "/viam.app.data.v1.DataService/AddTagsToBinaryDataByFilter" => {
                     #[allow(non_camel_case_types)]
-                    struct AddAnnotationsToBinaryDataByFilterSvc<T: DataService>(
-                        pub Arc<T>,
-                    );
+                    struct AddTagsToBinaryDataByFilterSvc<T: DataService>(pub Arc<T>);
                     impl<
                         T: DataService,
                     > tonic::server::UnaryService<
-                        super::AddAnnotationsToBinaryDataByFilterRequest,
-                    > for AddAnnotationsToBinaryDataByFilterSvc<T> {
-                        type Response = super::AddAnnotationsToBinaryDataByFilterResponse;
+                        super::AddTagsToBinaryDataByFilterRequest,
+                    > for AddTagsToBinaryDataByFilterSvc<T> {
+                        type Response = super::AddTagsToBinaryDataByFilterResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -725,14 +711,12 @@ pub mod data_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::AddAnnotationsToBinaryDataByFilterRequest,
+                                super::AddTagsToBinaryDataByFilterRequest,
                             >,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner)
-                                    .add_annotations_to_binary_data_by_filter(request)
-                                    .await
+                                (*inner).add_tags_to_binary_data_by_filter(request).await
                             };
                             Box::pin(fut)
                         }
@@ -742,7 +726,7 @@ pub mod data_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = AddAnnotationsToBinaryDataByFilterSvc(inner);
+                        let method = AddTagsToBinaryDataByFilterSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -754,17 +738,17 @@ pub mod data_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.data.v1.DataService/RemoveAnnotationsFromBinaryDataByFileIDs" => {
+                "/viam.app.data.v1.DataService/RemoveTagsFromBinaryDataByFileIDs" => {
                     #[allow(non_camel_case_types)]
-                    struct RemoveAnnotationsFromBinaryDataByFileIDsSvc<T: DataService>(
+                    struct RemoveTagsFromBinaryDataByFileIDsSvc<T: DataService>(
                         pub Arc<T>,
                     );
                     impl<
                         T: DataService,
                     > tonic::server::UnaryService<
-                        super::RemoveAnnotationsFromBinaryDataByFileIDsRequest,
-                    > for RemoveAnnotationsFromBinaryDataByFileIDsSvc<T> {
-                        type Response = super::RemoveAnnotationsFromBinaryDataByFileIDsResponse;
+                        super::RemoveTagsFromBinaryDataByFileIDsRequest,
+                    > for RemoveTagsFromBinaryDataByFileIDsSvc<T> {
+                        type Response = super::RemoveTagsFromBinaryDataByFileIDsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -772,13 +756,13 @@ pub mod data_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::RemoveAnnotationsFromBinaryDataByFileIDsRequest,
+                                super::RemoveTagsFromBinaryDataByFileIDsRequest,
                             >,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
                                 (*inner)
-                                    .remove_annotations_from_binary_data_by_file_i_ds(request)
+                                    .remove_tags_from_binary_data_by_file_i_ds(request)
                                     .await
                             };
                             Box::pin(fut)
@@ -789,7 +773,7 @@ pub mod data_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = RemoveAnnotationsFromBinaryDataByFileIDsSvc(inner);
+                        let method = RemoveTagsFromBinaryDataByFileIDsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -801,17 +785,17 @@ pub mod data_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.data.v1.DataService/RemoveAnnotationsFromBinaryDataByFilter" => {
+                "/viam.app.data.v1.DataService/RemoveTagsFromBinaryDataByFilter" => {
                     #[allow(non_camel_case_types)]
-                    struct RemoveAnnotationsFromBinaryDataByFilterSvc<T: DataService>(
+                    struct RemoveTagsFromBinaryDataByFilterSvc<T: DataService>(
                         pub Arc<T>,
                     );
                     impl<
                         T: DataService,
                     > tonic::server::UnaryService<
-                        super::RemoveAnnotationsFromBinaryDataByFilterRequest,
-                    > for RemoveAnnotationsFromBinaryDataByFilterSvc<T> {
-                        type Response = super::RemoveAnnotationsFromBinaryDataByFilterResponse;
+                        super::RemoveTagsFromBinaryDataByFilterRequest,
+                    > for RemoveTagsFromBinaryDataByFilterSvc<T> {
+                        type Response = super::RemoveTagsFromBinaryDataByFilterResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -819,13 +803,13 @@ pub mod data_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::RemoveAnnotationsFromBinaryDataByFilterRequest,
+                                super::RemoveTagsFromBinaryDataByFilterRequest,
                             >,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
                                 (*inner)
-                                    .remove_annotations_from_binary_data_by_filter(request)
+                                    .remove_tags_from_binary_data_by_filter(request)
                                     .await
                             };
                             Box::pin(fut)
@@ -836,7 +820,7 @@ pub mod data_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = RemoveAnnotationsFromBinaryDataByFilterSvc(inner);
+                        let method = RemoveTagsFromBinaryDataByFilterSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
