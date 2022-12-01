@@ -81,6 +81,25 @@ pub mod robot_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn get_sessions(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetSessionsRequest>,
+        ) -> Result<tonic::Response<super::GetSessionsResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.robot.v1.RobotService/GetSessions",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn resource_names(
             &mut self,
             request: impl tonic::IntoRequest<super::ResourceNamesRequest>,
@@ -274,6 +293,47 @@ pub mod robot_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn start_session(
+            &mut self,
+            request: impl tonic::IntoRequest<super::StartSessionRequest>,
+        ) -> Result<tonic::Response<super::StartSessionResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.robot.v1.RobotService/StartSession",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn send_session_heartbeat(
+            &mut self,
+            request: impl tonic::IntoRequest<super::SendSessionHeartbeatRequest>,
+        ) -> Result<
+                tonic::Response<super::SendSessionHeartbeatResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.robot.v1.RobotService/SendSessionHeartbeat",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -287,6 +347,10 @@ pub mod robot_service_server {
             &self,
             request: tonic::Request<super::GetOperationsRequest>,
         ) -> Result<tonic::Response<super::GetOperationsResponse>, tonic::Status>;
+        async fn get_sessions(
+            &self,
+            request: tonic::Request<super::GetSessionsRequest>,
+        ) -> Result<tonic::Response<super::GetSessionsResponse>, tonic::Status>;
         async fn resource_names(
             &self,
             request: tonic::Request<super::ResourceNamesRequest>,
@@ -333,6 +397,14 @@ pub mod robot_service_server {
             &self,
             request: tonic::Request<super::StopAllRequest>,
         ) -> Result<tonic::Response<super::StopAllResponse>, tonic::Status>;
+        async fn start_session(
+            &self,
+            request: tonic::Request<super::StartSessionRequest>,
+        ) -> Result<tonic::Response<super::StartSessionResponse>, tonic::Status>;
+        async fn send_session_heartbeat(
+            &self,
+            request: tonic::Request<super::SendSessionHeartbeatRequest>,
+        ) -> Result<tonic::Response<super::SendSessionHeartbeatResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct RobotServiceServer<T: RobotService> {
@@ -422,6 +494,46 @@ pub mod robot_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetOperationsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.robot.v1.RobotService/GetSessions" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetSessionsSvc<T: RobotService>(pub Arc<T>);
+                    impl<
+                        T: RobotService,
+                    > tonic::server::UnaryService<super::GetSessionsRequest>
+                    for GetSessionsSvc<T> {
+                        type Response = super::GetSessionsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetSessionsRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_sessions(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetSessionsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -819,6 +931,86 @@ pub mod robot_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = StopAllSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.robot.v1.RobotService/StartSession" => {
+                    #[allow(non_camel_case_types)]
+                    struct StartSessionSvc<T: RobotService>(pub Arc<T>);
+                    impl<
+                        T: RobotService,
+                    > tonic::server::UnaryService<super::StartSessionRequest>
+                    for StartSessionSvc<T> {
+                        type Response = super::StartSessionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::StartSessionRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).start_session(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = StartSessionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.robot.v1.RobotService/SendSessionHeartbeat" => {
+                    #[allow(non_camel_case_types)]
+                    struct SendSessionHeartbeatSvc<T: RobotService>(pub Arc<T>);
+                    impl<
+                        T: RobotService,
+                    > tonic::server::UnaryService<super::SendSessionHeartbeatRequest>
+                    for SendSessionHeartbeatSvc<T> {
+                        type Response = super::SendSessionHeartbeatResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::SendSessionHeartbeatRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).send_session_heartbeat(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = SendSessionHeartbeatSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
