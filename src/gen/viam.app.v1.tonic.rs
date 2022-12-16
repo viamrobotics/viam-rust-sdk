@@ -119,6 +119,44 @@ pub mod app_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn share_location(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ShareLocationRequest>,
+        ) -> Result<tonic::Response<super::ShareLocationResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ShareLocation",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn unshare_location(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UnshareLocationRequest>,
+        ) -> Result<tonic::Response<super::UnshareLocationResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/UnshareLocation",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn location_auth(
             &mut self,
             request: impl tonic::IntoRequest<super::LocationAuthRequest>,
@@ -518,6 +556,14 @@ pub mod app_service_server {
             &self,
             request: tonic::Request<super::ListLocationsRequest>,
         ) -> Result<tonic::Response<super::ListLocationsResponse>, tonic::Status>;
+        async fn share_location(
+            &self,
+            request: tonic::Request<super::ShareLocationRequest>,
+        ) -> Result<tonic::Response<super::ShareLocationResponse>, tonic::Status>;
+        async fn unshare_location(
+            &self,
+            request: tonic::Request<super::UnshareLocationRequest>,
+        ) -> Result<tonic::Response<super::UnshareLocationResponse>, tonic::Status>;
         async fn location_auth(
             &self,
             request: tonic::Request<super::LocationAuthRequest>,
@@ -775,6 +821,86 @@ pub mod app_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = ListLocationsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ShareLocation" => {
+                    #[allow(non_camel_case_types)]
+                    struct ShareLocationSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ShareLocationRequest>
+                    for ShareLocationSvc<T> {
+                        type Response = super::ShareLocationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ShareLocationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).share_location(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ShareLocationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/UnshareLocation" => {
+                    #[allow(non_camel_case_types)]
+                    struct UnshareLocationSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::UnshareLocationRequest>
+                    for UnshareLocationSvc<T> {
+                        type Response = super::UnshareLocationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::UnshareLocationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).unshare_location(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UnshareLocationSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
