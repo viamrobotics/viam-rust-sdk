@@ -277,6 +277,25 @@ pub mod data_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn tags_by_filter(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TagsByFilterRequest>,
+        ) -> Result<tonic::Response<super::TagsByFilterResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/TagsByFilter",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -347,6 +366,10 @@ pub mod data_service_server {
                 tonic::Response<super::RemoveTagsFromBinaryDataByFilterResponse>,
                 tonic::Status,
             >;
+        async fn tags_by_filter(
+            &self,
+            request: tonic::Request<super::TagsByFilterRequest>,
+        ) -> Result<tonic::Response<super::TagsByFilterResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct DataServiceServer<T: DataService> {
@@ -821,6 +844,46 @@ pub mod data_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = RemoveTagsFromBinaryDataByFilterSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/TagsByFilter" => {
+                    #[allow(non_camel_case_types)]
+                    struct TagsByFilterSvc<T: DataService>(pub Arc<T>);
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<super::TagsByFilterRequest>
+                    for TagsByFilterSvc<T> {
+                        type Response = super::TagsByFilterResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TagsByFilterRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).tags_by_filter(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = TagsByFilterSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

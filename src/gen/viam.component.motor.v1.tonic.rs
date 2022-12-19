@@ -214,6 +214,25 @@ pub mod motor_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn is_moving(
+            &mut self,
+            request: impl tonic::IntoRequest<super::IsMovingRequest>,
+        ) -> Result<tonic::Response<super::IsMovingResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.motor.v1.MotorService/IsMoving",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -255,6 +274,10 @@ pub mod motor_service_server {
             &self,
             request: tonic::Request<super::IsPoweredRequest>,
         ) -> Result<tonic::Response<super::IsPoweredResponse>, tonic::Status>;
+        async fn is_moving(
+            &self,
+            request: tonic::Request<super::IsMovingRequest>,
+        ) -> Result<tonic::Response<super::IsMovingResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct MotorServiceServer<T: MotorService> {
@@ -609,6 +632,44 @@ pub mod motor_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = IsPoweredSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.motor.v1.MotorService/IsMoving" => {
+                    #[allow(non_camel_case_types)]
+                    struct IsMovingSvc<T: MotorService>(pub Arc<T>);
+                    impl<
+                        T: MotorService,
+                    > tonic::server::UnaryService<super::IsMovingRequest>
+                    for IsMovingSvc<T> {
+                        type Response = super::IsMovingResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::IsMovingRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).is_moving(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = IsMovingSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

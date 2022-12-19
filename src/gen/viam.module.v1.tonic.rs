@@ -1,13 +1,13 @@
 // @generated
 /// Generated client implementations.
-pub mod base_service_client {
+pub mod module_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
-    pub struct BaseServiceClient<T> {
+    pub struct ModuleServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl BaseServiceClient<tonic::transport::Channel> {
+    impl ModuleServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -18,7 +18,7 @@ pub mod base_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> BaseServiceClient<T>
+    impl<T> ModuleServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -32,7 +32,7 @@ pub mod base_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> BaseServiceClient<InterceptedService<T, F>>
+        ) -> ModuleServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
@@ -45,7 +45,7 @@ pub mod base_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            BaseServiceClient::new(InterceptedService::new(inner, interceptor))
+            ModuleServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with `gzip`.
         ///
@@ -62,10 +62,10 @@ pub mod base_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn move_straight(
+        pub async fn add_resource(
             &mut self,
-            request: impl tonic::IntoRequest<super::MoveStraightRequest>,
-        ) -> Result<tonic::Response<super::MoveStraightResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::AddResourceRequest>,
+        ) -> Result<tonic::Response<super::AddResourceResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -77,14 +77,14 @@ pub mod base_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.base.v1.BaseService/MoveStraight",
+                "/viam.module.v1.ModuleService/AddResource",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn spin(
+        pub async fn reconfigure_resource(
             &mut self,
-            request: impl tonic::IntoRequest<super::SpinRequest>,
-        ) -> Result<tonic::Response<super::SpinResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::ReconfigureResourceRequest>,
+        ) -> Result<tonic::Response<super::ReconfigureResourceResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -96,14 +96,14 @@ pub mod base_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.base.v1.BaseService/Spin",
+                "/viam.module.v1.ModuleService/ReconfigureResource",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn set_power(
+        pub async fn remove_resource(
             &mut self,
-            request: impl tonic::IntoRequest<super::SetPowerRequest>,
-        ) -> Result<tonic::Response<super::SetPowerResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::RemoveResourceRequest>,
+        ) -> Result<tonic::Response<super::RemoveResourceResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -115,14 +115,14 @@ pub mod base_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.base.v1.BaseService/SetPower",
+                "/viam.module.v1.ModuleService/RemoveResource",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn set_velocity(
+        pub async fn ready(
             &mut self,
-            request: impl tonic::IntoRequest<super::SetVelocityRequest>,
-        ) -> Result<tonic::Response<super::SetVelocityResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::ReadyRequest>,
+        ) -> Result<tonic::Response<super::ReadyResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -134,90 +134,44 @@ pub mod base_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.base.v1.BaseService/SetVelocity",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn stop(
-            &mut self,
-            request: impl tonic::IntoRequest<super::StopRequest>,
-        ) -> Result<tonic::Response<super::StopResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.base.v1.BaseService/Stop",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn is_moving(
-            &mut self,
-            request: impl tonic::IntoRequest<super::IsMovingRequest>,
-        ) -> Result<tonic::Response<super::IsMovingResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.base.v1.BaseService/IsMoving",
+                "/viam.module.v1.ModuleService/Ready",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod base_service_server {
+pub mod module_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with BaseServiceServer.
+    ///Generated trait containing gRPC methods that should be implemented for use with ModuleServiceServer.
     #[async_trait]
-    pub trait BaseService: Send + Sync + 'static {
-        async fn move_straight(
+    pub trait ModuleService: Send + Sync + 'static {
+        async fn add_resource(
             &self,
-            request: tonic::Request<super::MoveStraightRequest>,
-        ) -> Result<tonic::Response<super::MoveStraightResponse>, tonic::Status>;
-        async fn spin(
+            request: tonic::Request<super::AddResourceRequest>,
+        ) -> Result<tonic::Response<super::AddResourceResponse>, tonic::Status>;
+        async fn reconfigure_resource(
             &self,
-            request: tonic::Request<super::SpinRequest>,
-        ) -> Result<tonic::Response<super::SpinResponse>, tonic::Status>;
-        async fn set_power(
+            request: tonic::Request<super::ReconfigureResourceRequest>,
+        ) -> Result<tonic::Response<super::ReconfigureResourceResponse>, tonic::Status>;
+        async fn remove_resource(
             &self,
-            request: tonic::Request<super::SetPowerRequest>,
-        ) -> Result<tonic::Response<super::SetPowerResponse>, tonic::Status>;
-        async fn set_velocity(
+            request: tonic::Request<super::RemoveResourceRequest>,
+        ) -> Result<tonic::Response<super::RemoveResourceResponse>, tonic::Status>;
+        async fn ready(
             &self,
-            request: tonic::Request<super::SetVelocityRequest>,
-        ) -> Result<tonic::Response<super::SetVelocityResponse>, tonic::Status>;
-        async fn stop(
-            &self,
-            request: tonic::Request<super::StopRequest>,
-        ) -> Result<tonic::Response<super::StopResponse>, tonic::Status>;
-        async fn is_moving(
-            &self,
-            request: tonic::Request<super::IsMovingRequest>,
-        ) -> Result<tonic::Response<super::IsMovingResponse>, tonic::Status>;
+            request: tonic::Request<super::ReadyRequest>,
+        ) -> Result<tonic::Response<super::ReadyResponse>, tonic::Status>;
     }
     #[derive(Debug)]
-    pub struct BaseServiceServer<T: BaseService> {
+    pub struct ModuleServiceServer<T: ModuleService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: BaseService> BaseServiceServer<T> {
+    impl<T: ModuleService> ModuleServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -251,9 +205,9 @@ pub mod base_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for BaseServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for ModuleServiceServer<T>
     where
-        T: BaseService,
+        T: ModuleService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -269,25 +223,25 @@ pub mod base_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.component.base.v1.BaseService/MoveStraight" => {
+                "/viam.module.v1.ModuleService/AddResource" => {
                     #[allow(non_camel_case_types)]
-                    struct MoveStraightSvc<T: BaseService>(pub Arc<T>);
+                    struct AddResourceSvc<T: ModuleService>(pub Arc<T>);
                     impl<
-                        T: BaseService,
-                    > tonic::server::UnaryService<super::MoveStraightRequest>
-                    for MoveStraightSvc<T> {
-                        type Response = super::MoveStraightResponse;
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::AddResourceRequest>
+                    for AddResourceSvc<T> {
+                        type Response = super::AddResourceResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::MoveStraightRequest>,
+                            request: tonic::Request<super::AddResourceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).move_straight(request).await
+                                (*inner).add_resource(request).await
                             };
                             Box::pin(fut)
                         }
@@ -297,7 +251,7 @@ pub mod base_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = MoveStraightSvc(inner);
+                        let method = AddResourceSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -309,99 +263,25 @@ pub mod base_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.component.base.v1.BaseService/Spin" => {
+                "/viam.module.v1.ModuleService/ReconfigureResource" => {
                     #[allow(non_camel_case_types)]
-                    struct SpinSvc<T: BaseService>(pub Arc<T>);
-                    impl<T: BaseService> tonic::server::UnaryService<super::SpinRequest>
-                    for SpinSvc<T> {
-                        type Response = super::SpinResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::SpinRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).spin(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = SpinSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.component.base.v1.BaseService/SetPower" => {
-                    #[allow(non_camel_case_types)]
-                    struct SetPowerSvc<T: BaseService>(pub Arc<T>);
+                    struct ReconfigureResourceSvc<T: ModuleService>(pub Arc<T>);
                     impl<
-                        T: BaseService,
-                    > tonic::server::UnaryService<super::SetPowerRequest>
-                    for SetPowerSvc<T> {
-                        type Response = super::SetPowerResponse;
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::ReconfigureResourceRequest>
+                    for ReconfigureResourceSvc<T> {
+                        type Response = super::ReconfigureResourceResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::SetPowerRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).set_power(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = SetPowerSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.component.base.v1.BaseService/SetVelocity" => {
-                    #[allow(non_camel_case_types)]
-                    struct SetVelocitySvc<T: BaseService>(pub Arc<T>);
-                    impl<
-                        T: BaseService,
-                    > tonic::server::UnaryService<super::SetVelocityRequest>
-                    for SetVelocitySvc<T> {
-                        type Response = super::SetVelocityResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::SetVelocityRequest>,
+                            request: tonic::Request<super::ReconfigureResourceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).set_velocity(request).await
+                                (*inner).reconfigure_resource(request).await
                             };
                             Box::pin(fut)
                         }
@@ -411,7 +291,7 @@ pub mod base_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = SetVelocitySvc(inner);
+                        let method = ReconfigureResourceSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -423,60 +303,26 @@ pub mod base_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.component.base.v1.BaseService/Stop" => {
+                "/viam.module.v1.ModuleService/RemoveResource" => {
                     #[allow(non_camel_case_types)]
-                    struct StopSvc<T: BaseService>(pub Arc<T>);
-                    impl<T: BaseService> tonic::server::UnaryService<super::StopRequest>
-                    for StopSvc<T> {
-                        type Response = super::StopResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::StopRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).stop(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = StopSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.component.base.v1.BaseService/IsMoving" => {
-                    #[allow(non_camel_case_types)]
-                    struct IsMovingSvc<T: BaseService>(pub Arc<T>);
+                    struct RemoveResourceSvc<T: ModuleService>(pub Arc<T>);
                     impl<
-                        T: BaseService,
-                    > tonic::server::UnaryService<super::IsMovingRequest>
-                    for IsMovingSvc<T> {
-                        type Response = super::IsMovingResponse;
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::RemoveResourceRequest>
+                    for RemoveResourceSvc<T> {
+                        type Response = super::RemoveResourceResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::IsMovingRequest>,
+                            request: tonic::Request<super::RemoveResourceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).is_moving(request).await };
+                            let fut = async move {
+                                (*inner).remove_resource(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -485,7 +331,44 @@ pub mod base_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = IsMovingSvc(inner);
+                        let method = RemoveResourceSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.module.v1.ModuleService/Ready" => {
+                    #[allow(non_camel_case_types)]
+                    struct ReadySvc<T: ModuleService>(pub Arc<T>);
+                    impl<
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::ReadyRequest> for ReadySvc<T> {
+                        type Response = super::ReadyResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ReadyRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).ready(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ReadySvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -512,7 +395,7 @@ pub mod base_service_server {
             }
         }
     }
-    impl<T: BaseService> Clone for BaseServiceServer<T> {
+    impl<T: ModuleService> Clone for ModuleServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -522,7 +405,7 @@ pub mod base_service_server {
             }
         }
     }
-    impl<T: BaseService> Clone for _Inner<T> {
+    impl<T: ModuleService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(self.0.clone())
         }
@@ -532,7 +415,7 @@ pub mod base_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: BaseService> tonic::transport::NamedService for BaseServiceServer<T> {
-        const NAME: &'static str = "viam.component.base.v1.BaseService";
+    impl<T: ModuleService> tonic::transport::NamedService for ModuleServiceServer<T> {
+        const NAME: &'static str = "viam.module.v1.ModuleService";
     }
 }
