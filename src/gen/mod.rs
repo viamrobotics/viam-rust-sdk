@@ -33,6 +33,13 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.app.model.v1)
             }
         }
+        pub mod package {
+            // @@protoc_insertion_point(attribute:viam.app.package.v1)
+            pub mod v1 {
+                include!("viam.app.package.v1.rs");
+                // @@protoc_insertion_point(viam.app.package.v1)
+            }
+        }
     }
     pub mod component {
         pub mod arm {
@@ -132,6 +139,13 @@ pub mod proto {
                 include!("viam.component.servo.v1.rs");
                 // @@protoc_insertion_point(viam.component.servo.v1)
             }
+        }
+    }
+    pub mod module {
+        // @@protoc_insertion_point(attribute:viam.module.v1)
+        pub mod v1 {
+            include!("viam.module.v1.rs");
+            // @@protoc_insertion_point(viam.module.v1)
         }
     }
     pub mod robot {
