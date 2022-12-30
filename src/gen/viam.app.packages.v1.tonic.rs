@@ -79,7 +79,7 @@ pub mod package_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.package.v1.PackageService/CreatePackage",
+                "/viam.app.packages.v1.PackageService/CreatePackage",
             );
             self.inner
                 .client_streaming(request.into_streaming_request(), path, codec)
@@ -100,7 +100,7 @@ pub mod package_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.package.v1.PackageService/DeletePackage",
+                "/viam.app.packages.v1.PackageService/DeletePackage",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -119,7 +119,7 @@ pub mod package_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.package.v1.PackageService/GetPackage",
+                "/viam.app.packages.v1.PackageService/GetPackage",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -138,7 +138,7 @@ pub mod package_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.package.v1.PackageService/ListPackages",
+                "/viam.app.packages.v1.PackageService/ListPackages",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -227,7 +227,7 @@ pub mod package_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.app.package.v1.PackageService/CreatePackage" => {
+                "/viam.app.packages.v1.PackageService/CreatePackage" => {
                     #[allow(non_camel_case_types)]
                     struct CreatePackageSvc<T: PackageService>(pub Arc<T>);
                     impl<
@@ -269,7 +269,7 @@ pub mod package_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.package.v1.PackageService/DeletePackage" => {
+                "/viam.app.packages.v1.PackageService/DeletePackage" => {
                     #[allow(non_camel_case_types)]
                     struct DeletePackageSvc<T: PackageService>(pub Arc<T>);
                     impl<
@@ -309,7 +309,7 @@ pub mod package_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.package.v1.PackageService/GetPackage" => {
+                "/viam.app.packages.v1.PackageService/GetPackage" => {
                     #[allow(non_camel_case_types)]
                     struct GetPackageSvc<T: PackageService>(pub Arc<T>);
                     impl<
@@ -347,7 +347,7 @@ pub mod package_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.package.v1.PackageService/ListPackages" => {
+                "/viam.app.packages.v1.PackageService/ListPackages" => {
                     #[allow(non_camel_case_types)]
                     struct ListPackagesSvc<T: PackageService>(pub Arc<T>);
                     impl<
@@ -423,6 +423,6 @@ pub mod package_service_server {
         }
     }
     impl<T: PackageService> tonic::transport::NamedService for PackageServiceServer<T> {
-        const NAME: &'static str = "viam.app.package.v1.PackageService";
+        const NAME: &'static str = "viam.app.packages.v1.PackageService";
     }
 }
