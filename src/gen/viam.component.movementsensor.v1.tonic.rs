@@ -195,6 +195,28 @@ pub mod movement_sensor_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn get_linear_acceleration(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetLinearAccelerationRequest>,
+        ) -> Result<
+                tonic::Response<super::GetLinearAccelerationResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.movementsensor.v1.MovementSensorService/GetLinearAcceleration",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -232,6 +254,13 @@ pub mod movement_sensor_service_server {
             &self,
             request: tonic::Request<super::GetAccuracyRequest>,
         ) -> Result<tonic::Response<super::GetAccuracyResponse>, tonic::Status>;
+        async fn get_linear_acceleration(
+            &self,
+            request: tonic::Request<super::GetLinearAccelerationRequest>,
+        ) -> Result<
+                tonic::Response<super::GetLinearAccelerationResponse>,
+                tonic::Status,
+            >;
     }
     #[derive(Debug)]
     pub struct MovementSensorServiceServer<T: MovementSensorService> {
@@ -562,6 +591,48 @@ pub mod movement_sensor_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetAccuracySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.movementsensor.v1.MovementSensorService/GetLinearAcceleration" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetLinearAccelerationSvc<T: MovementSensorService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: MovementSensorService,
+                    > tonic::server::UnaryService<super::GetLinearAccelerationRequest>
+                    for GetLinearAccelerationSvc<T> {
+                        type Response = super::GetLinearAccelerationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetLinearAccelerationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_linear_acceleration(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetLinearAccelerationSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

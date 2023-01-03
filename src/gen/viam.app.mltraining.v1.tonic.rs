@@ -1,13 +1,13 @@
 // @generated
 /// Generated client implementations.
-pub mod data_sync_service_client {
+pub mod ml_training_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
-    pub struct DataSyncServiceClient<T> {
+    pub struct MlTrainingServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl DataSyncServiceClient<tonic::transport::Channel> {
+    impl MlTrainingServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -18,7 +18,7 @@ pub mod data_sync_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> DataSyncServiceClient<T>
+    impl<T> MlTrainingServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -32,7 +32,7 @@ pub mod data_sync_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> DataSyncServiceClient<InterceptedService<T, F>>
+        ) -> MlTrainingServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
@@ -45,7 +45,7 @@ pub mod data_sync_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            DataSyncServiceClient::new(InterceptedService::new(inner, interceptor))
+            MlTrainingServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with `gzip`.
         ///
@@ -62,10 +62,10 @@ pub mod data_sync_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn data_capture_upload(
+        pub async fn submit_training_job(
             &mut self,
-            request: impl tonic::IntoRequest<super::DataCaptureUploadRequest>,
-        ) -> Result<tonic::Response<super::DataCaptureUploadResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::SubmitTrainingJobRequest>,
+        ) -> Result<tonic::Response<super::SubmitTrainingJobResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -77,14 +77,14 @@ pub mod data_sync_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.datasync.v1.DataSyncService/DataCaptureUpload",
+                "/viam.app.mltraining.v1.MLTrainingService/SubmitTrainingJob",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn file_upload(
+        pub async fn get_training_job(
             &mut self,
-            request: impl tonic::IntoStreamingRequest<Message = super::FileUploadRequest>,
-        ) -> Result<tonic::Response<super::FileUploadResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::GetTrainingJobRequest>,
+        ) -> Result<tonic::Response<super::GetTrainingJobResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -96,38 +96,36 @@ pub mod data_sync_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.datasync.v1.DataSyncService/FileUpload",
+                "/viam.app.mltraining.v1.MLTrainingService/GetTrainingJob",
             );
-            self.inner
-                .client_streaming(request.into_streaming_request(), path, codec)
-                .await
+            self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod data_sync_service_server {
+pub mod ml_training_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with DataSyncServiceServer.
+    ///Generated trait containing gRPC methods that should be implemented for use with MlTrainingServiceServer.
     #[async_trait]
-    pub trait DataSyncService: Send + Sync + 'static {
-        async fn data_capture_upload(
+    pub trait MlTrainingService: Send + Sync + 'static {
+        async fn submit_training_job(
             &self,
-            request: tonic::Request<super::DataCaptureUploadRequest>,
-        ) -> Result<tonic::Response<super::DataCaptureUploadResponse>, tonic::Status>;
-        async fn file_upload(
+            request: tonic::Request<super::SubmitTrainingJobRequest>,
+        ) -> Result<tonic::Response<super::SubmitTrainingJobResponse>, tonic::Status>;
+        async fn get_training_job(
             &self,
-            request: tonic::Request<tonic::Streaming<super::FileUploadRequest>>,
-        ) -> Result<tonic::Response<super::FileUploadResponse>, tonic::Status>;
+            request: tonic::Request<super::GetTrainingJobRequest>,
+        ) -> Result<tonic::Response<super::GetTrainingJobResponse>, tonic::Status>;
     }
     #[derive(Debug)]
-    pub struct DataSyncServiceServer<T: DataSyncService> {
+    pub struct MlTrainingServiceServer<T: MlTrainingService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: DataSyncService> DataSyncServiceServer<T> {
+    impl<T: MlTrainingService> MlTrainingServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -161,9 +159,9 @@ pub mod data_sync_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for DataSyncServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for MlTrainingServiceServer<T>
     where
-        T: DataSyncService,
+        T: MlTrainingService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -179,25 +177,25 @@ pub mod data_sync_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.app.datasync.v1.DataSyncService/DataCaptureUpload" => {
+                "/viam.app.mltraining.v1.MLTrainingService/SubmitTrainingJob" => {
                     #[allow(non_camel_case_types)]
-                    struct DataCaptureUploadSvc<T: DataSyncService>(pub Arc<T>);
+                    struct SubmitTrainingJobSvc<T: MlTrainingService>(pub Arc<T>);
                     impl<
-                        T: DataSyncService,
-                    > tonic::server::UnaryService<super::DataCaptureUploadRequest>
-                    for DataCaptureUploadSvc<T> {
-                        type Response = super::DataCaptureUploadResponse;
+                        T: MlTrainingService,
+                    > tonic::server::UnaryService<super::SubmitTrainingJobRequest>
+                    for SubmitTrainingJobSvc<T> {
+                        type Response = super::SubmitTrainingJobResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::DataCaptureUploadRequest>,
+                            request: tonic::Request<super::SubmitTrainingJobRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).data_capture_upload(request).await
+                                (*inner).submit_training_job(request).await
                             };
                             Box::pin(fut)
                         }
@@ -207,7 +205,7 @@ pub mod data_sync_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DataCaptureUploadSvc(inner);
+                        let method = SubmitTrainingJobSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -219,26 +217,26 @@ pub mod data_sync_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.datasync.v1.DataSyncService/FileUpload" => {
+                "/viam.app.mltraining.v1.MLTrainingService/GetTrainingJob" => {
                     #[allow(non_camel_case_types)]
-                    struct FileUploadSvc<T: DataSyncService>(pub Arc<T>);
+                    struct GetTrainingJobSvc<T: MlTrainingService>(pub Arc<T>);
                     impl<
-                        T: DataSyncService,
-                    > tonic::server::ClientStreamingService<super::FileUploadRequest>
-                    for FileUploadSvc<T> {
-                        type Response = super::FileUploadResponse;
+                        T: MlTrainingService,
+                    > tonic::server::UnaryService<super::GetTrainingJobRequest>
+                    for GetTrainingJobSvc<T> {
+                        type Response = super::GetTrainingJobResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                tonic::Streaming<super::FileUploadRequest>,
-                            >,
+                            request: tonic::Request<super::GetTrainingJobRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).file_upload(request).await };
+                            let fut = async move {
+                                (*inner).get_training_job(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -247,14 +245,14 @@ pub mod data_sync_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = FileUploadSvc(inner);
+                        let method = GetTrainingJobSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
                             );
-                        let res = grpc.client_streaming(method, req).await;
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
@@ -274,7 +272,7 @@ pub mod data_sync_service_server {
             }
         }
     }
-    impl<T: DataSyncService> Clone for DataSyncServiceServer<T> {
+    impl<T: MlTrainingService> Clone for MlTrainingServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -284,7 +282,7 @@ pub mod data_sync_service_server {
             }
         }
     }
-    impl<T: DataSyncService> Clone for _Inner<T> {
+    impl<T: MlTrainingService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(self.0.clone())
         }
@@ -294,8 +292,8 @@ pub mod data_sync_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: DataSyncService> tonic::transport::NamedService
-    for DataSyncServiceServer<T> {
-        const NAME: &'static str = "viam.app.datasync.v1.DataSyncService";
+    impl<T: MlTrainingService> tonic::transport::NamedService
+    for MlTrainingServiceServer<T> {
+        const NAME: &'static str = "viam.app.mltraining.v1.MLTrainingService";
     }
 }
