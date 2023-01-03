@@ -26,6 +26,13 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.app.data.v1)
             }
         }
+        pub mod mltraining {
+            // @@protoc_insertion_point(attribute:viam.app.mltraining.v1)
+            pub mod v1 {
+                include!("viam.app.mltraining.v1.rs");
+                // @@protoc_insertion_point(viam.app.mltraining.v1)
+            }
+        }
         pub mod model {
             // @@protoc_insertion_point(attribute:viam.app.model.v1)
             pub mod v1 {
@@ -33,11 +40,11 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.app.model.v1)
             }
         }
-        pub mod package {
-            // @@protoc_insertion_point(attribute:viam.app.package.v1)
+        pub mod packages {
+            // @@protoc_insertion_point(attribute:viam.app.packages.v1)
             pub mod v1 {
-                include!("viam.app.package.v1.rs");
-                // @@protoc_insertion_point(viam.app.package.v1)
+                include!("viam.app.packages.v1.rs");
+                // @@protoc_insertion_point(viam.app.packages.v1)
             }
         }
     }
