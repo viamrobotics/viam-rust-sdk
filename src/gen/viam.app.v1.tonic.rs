@@ -62,6 +62,25 @@ pub mod app_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
+        pub async fn list_organizations(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListOrganizationsRequest>,
+        ) -> Result<tonic::Response<super::ListOrganizationsResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ListOrganizations",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn create_location(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateLocationRequest>,
@@ -81,10 +100,10 @@ pub mod app_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn list_organizations(
+        pub async fn get_location(
             &mut self,
-            request: impl tonic::IntoRequest<super::ListOrganizationsRequest>,
-        ) -> Result<tonic::Response<super::ListOrganizationsResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::GetLocationRequest>,
+        ) -> Result<tonic::Response<super::GetLocationResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -96,7 +115,45 @@ pub mod app_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.v1.AppService/ListOrganizations",
+                "/viam.app.v1.AppService/GetLocation",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn update_location(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpdateLocationRequest>,
+        ) -> Result<tonic::Response<super::UpdateLocationResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/UpdateLocation",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn delete_location(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteLocationRequest>,
+        ) -> Result<tonic::Response<super::DeleteLocationResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/DeleteLocation",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -459,6 +516,25 @@ pub mod app_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn list_robots(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListRobotsRequest>,
+        ) -> Result<tonic::Response<super::ListRobotsResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ListRobots",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn find_robots(
             &mut self,
             request: impl tonic::IntoRequest<super::FindRobotsRequest>,
@@ -544,14 +620,26 @@ pub mod app_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with AppServiceServer.
     #[async_trait]
     pub trait AppService: Send + Sync + 'static {
-        async fn create_location(
-            &self,
-            request: tonic::Request<super::CreateLocationRequest>,
-        ) -> Result<tonic::Response<super::CreateLocationResponse>, tonic::Status>;
         async fn list_organizations(
             &self,
             request: tonic::Request<super::ListOrganizationsRequest>,
         ) -> Result<tonic::Response<super::ListOrganizationsResponse>, tonic::Status>;
+        async fn create_location(
+            &self,
+            request: tonic::Request<super::CreateLocationRequest>,
+        ) -> Result<tonic::Response<super::CreateLocationResponse>, tonic::Status>;
+        async fn get_location(
+            &self,
+            request: tonic::Request<super::GetLocationRequest>,
+        ) -> Result<tonic::Response<super::GetLocationResponse>, tonic::Status>;
+        async fn update_location(
+            &self,
+            request: tonic::Request<super::UpdateLocationRequest>,
+        ) -> Result<tonic::Response<super::UpdateLocationResponse>, tonic::Status>;
+        async fn delete_location(
+            &self,
+            request: tonic::Request<super::DeleteLocationRequest>,
+        ) -> Result<tonic::Response<super::DeleteLocationResponse>, tonic::Status>;
         async fn list_locations(
             &self,
             request: tonic::Request<super::ListLocationsRequest>,
@@ -636,6 +724,10 @@ pub mod app_service_server {
                 tonic::Response<super::DeleteRobotPartSecretResponse>,
                 tonic::Status,
             >;
+        async fn list_robots(
+            &self,
+            request: tonic::Request<super::ListRobotsRequest>,
+        ) -> Result<tonic::Response<super::ListRobotsResponse>, tonic::Status>;
         async fn find_robots(
             &self,
             request: tonic::Request<super::FindRobotsRequest>,
@@ -712,6 +804,46 @@ pub mod app_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
+                "/viam.app.v1.AppService/ListOrganizations" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListOrganizationsSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ListOrganizationsRequest>
+                    for ListOrganizationsSvc<T> {
+                        type Response = super::ListOrganizationsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListOrganizationsRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).list_organizations(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListOrganizationsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.app.v1.AppService/CreateLocation" => {
                     #[allow(non_camel_case_types)]
                     struct CreateLocationSvc<T: AppService>(pub Arc<T>);
@@ -752,25 +884,25 @@ pub mod app_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.v1.AppService/ListOrganizations" => {
+                "/viam.app.v1.AppService/GetLocation" => {
                     #[allow(non_camel_case_types)]
-                    struct ListOrganizationsSvc<T: AppService>(pub Arc<T>);
+                    struct GetLocationSvc<T: AppService>(pub Arc<T>);
                     impl<
                         T: AppService,
-                    > tonic::server::UnaryService<super::ListOrganizationsRequest>
-                    for ListOrganizationsSvc<T> {
-                        type Response = super::ListOrganizationsResponse;
+                    > tonic::server::UnaryService<super::GetLocationRequest>
+                    for GetLocationSvc<T> {
+                        type Response = super::GetLocationResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::ListOrganizationsRequest>,
+                            request: tonic::Request<super::GetLocationRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).list_organizations(request).await
+                                (*inner).get_location(request).await
                             };
                             Box::pin(fut)
                         }
@@ -780,7 +912,87 @@ pub mod app_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = ListOrganizationsSvc(inner);
+                        let method = GetLocationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/UpdateLocation" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateLocationSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::UpdateLocationRequest>
+                    for UpdateLocationSvc<T> {
+                        type Response = super::UpdateLocationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::UpdateLocationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).update_location(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateLocationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/DeleteLocation" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteLocationSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::DeleteLocationRequest>
+                    for DeleteLocationSvc<T> {
+                        type Response = super::DeleteLocationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::DeleteLocationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).delete_location(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteLocationSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -1501,6 +1713,44 @@ pub mod app_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = DeleteRobotPartSecretSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ListRobots" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListRobotsSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ListRobotsRequest>
+                    for ListRobotsSvc<T> {
+                        type Response = super::ListRobotsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListRobotsRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).list_robots(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListRobotsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
