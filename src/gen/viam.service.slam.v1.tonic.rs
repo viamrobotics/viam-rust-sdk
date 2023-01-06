@@ -100,6 +100,63 @@ pub mod slam_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn get_position_new(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetPositionNewRequest>,
+        ) -> Result<tonic::Response<super::GetPositionNewResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.slam.v1.SLAMService/GetPositionNew",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_point_cloud_map(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetPointCloudMapRequest>,
+        ) -> Result<tonic::Response<super::GetPointCloudMapResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.slam.v1.SLAMService/GetPointCloudMap",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_internal_state(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetInternalStateRequest>,
+        ) -> Result<tonic::Response<super::GetInternalStateResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.slam.v1.SLAMService/GetInternalState",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -117,6 +174,18 @@ pub mod slam_service_server {
             &self,
             request: tonic::Request<super::GetMapRequest>,
         ) -> Result<tonic::Response<super::GetMapResponse>, tonic::Status>;
+        async fn get_position_new(
+            &self,
+            request: tonic::Request<super::GetPositionNewRequest>,
+        ) -> Result<tonic::Response<super::GetPositionNewResponse>, tonic::Status>;
+        async fn get_point_cloud_map(
+            &self,
+            request: tonic::Request<super::GetPointCloudMapRequest>,
+        ) -> Result<tonic::Response<super::GetPointCloudMapResponse>, tonic::Status>;
+        async fn get_internal_state(
+            &self,
+            request: tonic::Request<super::GetInternalStateRequest>,
+        ) -> Result<tonic::Response<super::GetInternalStateResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct SlamServiceServer<T: SlamService> {
@@ -244,6 +313,126 @@ pub mod slam_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetMapSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.service.slam.v1.SLAMService/GetPositionNew" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetPositionNewSvc<T: SlamService>(pub Arc<T>);
+                    impl<
+                        T: SlamService,
+                    > tonic::server::UnaryService<super::GetPositionNewRequest>
+                    for GetPositionNewSvc<T> {
+                        type Response = super::GetPositionNewResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetPositionNewRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_position_new(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetPositionNewSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.service.slam.v1.SLAMService/GetPointCloudMap" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetPointCloudMapSvc<T: SlamService>(pub Arc<T>);
+                    impl<
+                        T: SlamService,
+                    > tonic::server::UnaryService<super::GetPointCloudMapRequest>
+                    for GetPointCloudMapSvc<T> {
+                        type Response = super::GetPointCloudMapResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetPointCloudMapRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_point_cloud_map(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetPointCloudMapSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.service.slam.v1.SLAMService/GetInternalState" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetInternalStateSvc<T: SlamService>(pub Arc<T>);
+                    impl<
+                        T: SlamService,
+                    > tonic::server::UnaryService<super::GetInternalStateRequest>
+                    for GetInternalStateSvc<T> {
+                        type Response = super::GetInternalStateResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetInternalStateRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_internal_state(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetInternalStateSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
