@@ -62,6 +62,25 @@ pub mod app_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
+        pub async fn create_organization(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateOrganizationRequest>,
+        ) -> Result<tonic::Response<super::CreateOrganizationResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateOrganization",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn list_organizations(
             &mut self,
             request: impl tonic::IntoRequest<super::ListOrganizationsRequest>,
@@ -78,6 +97,173 @@ pub mod app_service_client {
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/ListOrganizations",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_organization(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetOrganizationRequest>,
+        ) -> Result<tonic::Response<super::GetOrganizationResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/GetOrganization",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn update_organization(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpdateOrganizationRequest>,
+        ) -> Result<tonic::Response<super::UpdateOrganizationResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/UpdateOrganization",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn delete_organization(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteOrganizationRequest>,
+        ) -> Result<tonic::Response<super::DeleteOrganizationResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/DeleteOrganization",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn list_organization_members(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListOrganizationMembersRequest>,
+        ) -> Result<
+                tonic::Response<super::ListOrganizationMembersResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ListOrganizationMembers",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn create_organization_invite(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateOrganizationInviteRequest>,
+        ) -> Result<
+                tonic::Response<super::CreateOrganizationInviteResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateOrganizationInvite",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn delete_organization_member(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteOrganizationMemberRequest>,
+        ) -> Result<
+                tonic::Response<super::DeleteOrganizationMemberResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/DeleteOrganizationMember",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn delete_organization_invite(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteOrganizationInviteRequest>,
+        ) -> Result<
+                tonic::Response<super::DeleteOrganizationInviteResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/DeleteOrganizationInvite",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn resend_organization_invite(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ResendOrganizationInviteRequest>,
+        ) -> Result<
+                tonic::Response<super::ResendOrganizationInviteResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ResendOrganizationInvite",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -620,10 +806,61 @@ pub mod app_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with AppServiceServer.
     #[async_trait]
     pub trait AppService: Send + Sync + 'static {
+        async fn create_organization(
+            &self,
+            request: tonic::Request<super::CreateOrganizationRequest>,
+        ) -> Result<tonic::Response<super::CreateOrganizationResponse>, tonic::Status>;
         async fn list_organizations(
             &self,
             request: tonic::Request<super::ListOrganizationsRequest>,
         ) -> Result<tonic::Response<super::ListOrganizationsResponse>, tonic::Status>;
+        async fn get_organization(
+            &self,
+            request: tonic::Request<super::GetOrganizationRequest>,
+        ) -> Result<tonic::Response<super::GetOrganizationResponse>, tonic::Status>;
+        async fn update_organization(
+            &self,
+            request: tonic::Request<super::UpdateOrganizationRequest>,
+        ) -> Result<tonic::Response<super::UpdateOrganizationResponse>, tonic::Status>;
+        async fn delete_organization(
+            &self,
+            request: tonic::Request<super::DeleteOrganizationRequest>,
+        ) -> Result<tonic::Response<super::DeleteOrganizationResponse>, tonic::Status>;
+        async fn list_organization_members(
+            &self,
+            request: tonic::Request<super::ListOrganizationMembersRequest>,
+        ) -> Result<
+                tonic::Response<super::ListOrganizationMembersResponse>,
+                tonic::Status,
+            >;
+        async fn create_organization_invite(
+            &self,
+            request: tonic::Request<super::CreateOrganizationInviteRequest>,
+        ) -> Result<
+                tonic::Response<super::CreateOrganizationInviteResponse>,
+                tonic::Status,
+            >;
+        async fn delete_organization_member(
+            &self,
+            request: tonic::Request<super::DeleteOrganizationMemberRequest>,
+        ) -> Result<
+                tonic::Response<super::DeleteOrganizationMemberResponse>,
+                tonic::Status,
+            >;
+        async fn delete_organization_invite(
+            &self,
+            request: tonic::Request<super::DeleteOrganizationInviteRequest>,
+        ) -> Result<
+                tonic::Response<super::DeleteOrganizationInviteResponse>,
+                tonic::Status,
+            >;
+        async fn resend_organization_invite(
+            &self,
+            request: tonic::Request<super::ResendOrganizationInviteRequest>,
+        ) -> Result<
+                tonic::Response<super::ResendOrganizationInviteResponse>,
+                tonic::Status,
+            >;
         async fn create_location(
             &self,
             request: tonic::Request<super::CreateLocationRequest>,
@@ -804,6 +1041,46 @@ pub mod app_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
+                "/viam.app.v1.AppService/CreateOrganization" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateOrganizationSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CreateOrganizationRequest>
+                    for CreateOrganizationSvc<T> {
+                        type Response = super::CreateOrganizationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateOrganizationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).create_organization(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateOrganizationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.app.v1.AppService/ListOrganizations" => {
                     #[allow(non_camel_case_types)]
                     struct ListOrganizationsSvc<T: AppService>(pub Arc<T>);
@@ -833,6 +1110,336 @@ pub mod app_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = ListOrganizationsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/GetOrganization" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetOrganizationSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::GetOrganizationRequest>
+                    for GetOrganizationSvc<T> {
+                        type Response = super::GetOrganizationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetOrganizationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_organization(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetOrganizationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/UpdateOrganization" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateOrganizationSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::UpdateOrganizationRequest>
+                    for UpdateOrganizationSvc<T> {
+                        type Response = super::UpdateOrganizationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::UpdateOrganizationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).update_organization(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateOrganizationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/DeleteOrganization" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteOrganizationSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::DeleteOrganizationRequest>
+                    for DeleteOrganizationSvc<T> {
+                        type Response = super::DeleteOrganizationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::DeleteOrganizationRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).delete_organization(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteOrganizationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ListOrganizationMembers" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListOrganizationMembersSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ListOrganizationMembersRequest>
+                    for ListOrganizationMembersSvc<T> {
+                        type Response = super::ListOrganizationMembersResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::ListOrganizationMembersRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).list_organization_members(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListOrganizationMembersSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/CreateOrganizationInvite" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateOrganizationInviteSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CreateOrganizationInviteRequest>
+                    for CreateOrganizationInviteSvc<T> {
+                        type Response = super::CreateOrganizationInviteResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::CreateOrganizationInviteRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).create_organization_invite(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateOrganizationInviteSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/DeleteOrganizationMember" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteOrganizationMemberSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::DeleteOrganizationMemberRequest>
+                    for DeleteOrganizationMemberSvc<T> {
+                        type Response = super::DeleteOrganizationMemberResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::DeleteOrganizationMemberRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).delete_organization_member(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteOrganizationMemberSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/DeleteOrganizationInvite" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteOrganizationInviteSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::DeleteOrganizationInviteRequest>
+                    for DeleteOrganizationInviteSvc<T> {
+                        type Response = super::DeleteOrganizationInviteResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::DeleteOrganizationInviteRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).delete_organization_invite(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteOrganizationInviteSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ResendOrganizationInvite" => {
+                    #[allow(non_camel_case_types)]
+                    struct ResendOrganizationInviteSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ResendOrganizationInviteRequest>
+                    for ResendOrganizationInviteSvc<T> {
+                        type Response = super::ResendOrganizationInviteResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::ResendOrganizationInviteRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).resend_organization_invite(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ResendOrganizationInviteSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
