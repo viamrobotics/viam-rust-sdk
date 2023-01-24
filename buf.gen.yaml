@@ -4,3 +4,4 @@ plugins:
     out: src/gen/
   - remote: buf.build/prost/plugins/tonic:v0.1.0-2
     out: src/gen/
+a
