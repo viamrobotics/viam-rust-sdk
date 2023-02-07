@@ -658,6 +658,25 @@ pub mod app_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn mark_part_for_restart(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MarkPartForRestartRequest>,
+        ) -> Result<tonic::Response<super::MarkPartForRestartResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/MarkPartForRestart",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn create_robot_part_secret(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateRobotPartSecretRequest>,
@@ -775,6 +794,101 @@ pub mod app_service_client {
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteRobot",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn list_fragments(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListFragmentsRequest>,
+        ) -> Result<tonic::Response<super::ListFragmentsResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ListFragments",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_fragment(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetFragmentRequest>,
+        ) -> Result<tonic::Response<super::GetFragmentResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/GetFragment",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn create_fragment(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateFragmentRequest>,
+        ) -> Result<tonic::Response<super::CreateFragmentResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateFragment",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn update_fragment(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpdateFragmentRequest>,
+        ) -> Result<tonic::Response<super::UpdateFragmentResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/UpdateFragment",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn delete_fragment(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteFragmentRequest>,
+        ) -> Result<tonic::Response<super::DeleteFragmentResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/DeleteFragment",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -928,6 +1042,10 @@ pub mod app_service_server {
             &self,
             request: tonic::Request<super::MarkPartAsMainRequest>,
         ) -> Result<tonic::Response<super::MarkPartAsMainResponse>, tonic::Status>;
+        async fn mark_part_for_restart(
+            &self,
+            request: tonic::Request<super::MarkPartForRestartRequest>,
+        ) -> Result<tonic::Response<super::MarkPartForRestartResponse>, tonic::Status>;
         async fn create_robot_part_secret(
             &self,
             request: tonic::Request<super::CreateRobotPartSecretRequest>,
@@ -958,6 +1076,26 @@ pub mod app_service_server {
             &self,
             request: tonic::Request<super::DeleteRobotRequest>,
         ) -> Result<tonic::Response<super::DeleteRobotResponse>, tonic::Status>;
+        async fn list_fragments(
+            &self,
+            request: tonic::Request<super::ListFragmentsRequest>,
+        ) -> Result<tonic::Response<super::ListFragmentsResponse>, tonic::Status>;
+        async fn get_fragment(
+            &self,
+            request: tonic::Request<super::GetFragmentRequest>,
+        ) -> Result<tonic::Response<super::GetFragmentResponse>, tonic::Status>;
+        async fn create_fragment(
+            &self,
+            request: tonic::Request<super::CreateFragmentRequest>,
+        ) -> Result<tonic::Response<super::CreateFragmentResponse>, tonic::Status>;
+        async fn update_fragment(
+            &self,
+            request: tonic::Request<super::UpdateFragmentRequest>,
+        ) -> Result<tonic::Response<super::UpdateFragmentResponse>, tonic::Status>;
+        async fn delete_fragment(
+            &self,
+            request: tonic::Request<super::DeleteFragmentRequest>,
+        ) -> Result<tonic::Response<super::DeleteFragmentResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct AppServiceServer<T: AppService> {
@@ -2228,6 +2366,46 @@ pub mod app_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/viam.app.v1.AppService/MarkPartForRestart" => {
+                    #[allow(non_camel_case_types)]
+                    struct MarkPartForRestartSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::MarkPartForRestartRequest>
+                    for MarkPartForRestartSvc<T> {
+                        type Response = super::MarkPartForRestartResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::MarkPartForRestartRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).mark_part_for_restart(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = MarkPartForRestartSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.app.v1.AppService/CreateRobotPartSecret" => {
                     #[allow(non_camel_case_types)]
                     struct CreateRobotPartSecretSvc<T: AppService>(pub Arc<T>);
@@ -2453,6 +2631,206 @@ pub mod app_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = DeleteRobotSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ListFragments" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListFragmentsSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ListFragmentsRequest>
+                    for ListFragmentsSvc<T> {
+                        type Response = super::ListFragmentsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListFragmentsRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).list_fragments(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListFragmentsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/GetFragment" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetFragmentSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::GetFragmentRequest>
+                    for GetFragmentSvc<T> {
+                        type Response = super::GetFragmentResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetFragmentRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_fragment(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetFragmentSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/CreateFragment" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateFragmentSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CreateFragmentRequest>
+                    for CreateFragmentSvc<T> {
+                        type Response = super::CreateFragmentResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateFragmentRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).create_fragment(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateFragmentSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/UpdateFragment" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateFragmentSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::UpdateFragmentRequest>
+                    for UpdateFragmentSvc<T> {
+                        type Response = super::UpdateFragmentResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::UpdateFragmentRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).update_fragment(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateFragmentSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/DeleteFragment" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteFragmentSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::DeleteFragmentRequest>
+                    for DeleteFragmentSvc<T> {
+                        type Response = super::DeleteFragmentResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::DeleteFragmentRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).delete_fragment(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteFragmentSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
