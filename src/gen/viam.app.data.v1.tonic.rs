@@ -296,44 +296,6 @@ pub mod data_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn submit_training_job(
-            &mut self,
-            request: impl tonic::IntoRequest<super::SubmitTrainingJobRequest>,
-        ) -> Result<tonic::Response<super::SubmitTrainingJobResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.data.v1.DataService/SubmitTrainingJob",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn get_training_job(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetTrainingJobRequest>,
-        ) -> Result<tonic::Response<super::GetTrainingJobResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.data.v1.DataService/GetTrainingJob",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
     }
 }
 /// Generated server implementations.
@@ -408,14 +370,6 @@ pub mod data_service_server {
             &self,
             request: tonic::Request<super::TagsByFilterRequest>,
         ) -> Result<tonic::Response<super::TagsByFilterResponse>, tonic::Status>;
-        async fn submit_training_job(
-            &self,
-            request: tonic::Request<super::SubmitTrainingJobRequest>,
-        ) -> Result<tonic::Response<super::SubmitTrainingJobResponse>, tonic::Status>;
-        async fn get_training_job(
-            &self,
-            request: tonic::Request<super::GetTrainingJobRequest>,
-        ) -> Result<tonic::Response<super::GetTrainingJobResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct DataServiceServer<T: DataService> {
@@ -930,86 +884,6 @@ pub mod data_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = TagsByFilterSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.app.data.v1.DataService/SubmitTrainingJob" => {
-                    #[allow(non_camel_case_types)]
-                    struct SubmitTrainingJobSvc<T: DataService>(pub Arc<T>);
-                    impl<
-                        T: DataService,
-                    > tonic::server::UnaryService<super::SubmitTrainingJobRequest>
-                    for SubmitTrainingJobSvc<T> {
-                        type Response = super::SubmitTrainingJobResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::SubmitTrainingJobRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).submit_training_job(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = SubmitTrainingJobSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.app.data.v1.DataService/GetTrainingJob" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetTrainingJobSvc<T: DataService>(pub Arc<T>);
-                    impl<
-                        T: DataService,
-                    > tonic::server::UnaryService<super::GetTrainingJobRequest>
-                    for GetTrainingJobSvc<T> {
-                        type Response = super::GetTrainingJobResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetTrainingJobRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).get_training_job(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetTrainingJobSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
