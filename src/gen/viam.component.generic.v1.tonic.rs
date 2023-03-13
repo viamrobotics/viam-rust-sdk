@@ -64,8 +64,15 @@ pub mod generic_service_client {
         }
         pub async fn do_command(
             &mut self,
-            request: impl tonic::IntoRequest<super::DoCommandRequest>,
-        ) -> Result<tonic::Response<super::DoCommandResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<
+                super::super::super::super::common::v1::DoCommandRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::DoCommandResponse,
+                >,
+                tonic::Status,
+            > {
             self.inner
                 .ready()
                 .await
@@ -92,8 +99,15 @@ pub mod generic_service_server {
     pub trait GenericService: Send + Sync + 'static {
         async fn do_command(
             &self,
-            request: tonic::Request<super::DoCommandRequest>,
-        ) -> Result<tonic::Response<super::DoCommandResponse>, tonic::Status>;
+            request: tonic::Request<
+                super::super::super::super::common::v1::DoCommandRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::DoCommandResponse,
+                >,
+                tonic::Status,
+            >;
     }
     #[derive(Debug)]
     pub struct GenericServiceServer<T: GenericService> {
@@ -159,16 +173,19 @@ pub mod generic_service_server {
                     struct DoCommandSvc<T: GenericService>(pub Arc<T>);
                     impl<
                         T: GenericService,
-                    > tonic::server::UnaryService<super::DoCommandRequest>
-                    for DoCommandSvc<T> {
-                        type Response = super::DoCommandResponse;
+                    > tonic::server::UnaryService<
+                        super::super::super::super::common::v1::DoCommandRequest,
+                    > for DoCommandSvc<T> {
+                        type Response = super::super::super::super::common::v1::DoCommandResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::DoCommandRequest>,
+                            request: tonic::Request<
+                                super::super::super::super::common::v1::DoCommandRequest,
+                            >,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move { (*inner).do_command(request).await };
