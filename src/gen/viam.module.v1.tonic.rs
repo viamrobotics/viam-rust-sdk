@@ -138,6 +138,25 @@ pub mod module_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn validate_config(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ValidateConfigRequest>,
+        ) -> Result<tonic::Response<super::ValidateConfigResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.module.v1.ModuleService/ValidateConfig",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -163,6 +182,10 @@ pub mod module_service_server {
             &self,
             request: tonic::Request<super::ReadyRequest>,
         ) -> Result<tonic::Response<super::ReadyResponse>, tonic::Status>;
+        async fn validate_config(
+            &self,
+            request: tonic::Request<super::ValidateConfigRequest>,
+        ) -> Result<tonic::Response<super::ValidateConfigResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct ModuleServiceServer<T: ModuleService> {
@@ -369,6 +392,46 @@ pub mod module_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = ReadySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.module.v1.ModuleService/ValidateConfig" => {
+                    #[allow(non_camel_case_types)]
+                    struct ValidateConfigSvc<T: ModuleService>(pub Arc<T>);
+                    impl<
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::ValidateConfigRequest>
+                    for ValidateConfigSvc<T> {
+                        type Response = super::ValidateConfigResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ValidateConfigRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).validate_config(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ValidateConfigSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
