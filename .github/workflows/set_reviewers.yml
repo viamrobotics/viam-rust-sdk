@@ -7,16 +7,17 @@ on:
       - main
 
 jobs:
-  if: github.repository_owner == 'viamrobotics'
-  runs-on: [self-hosted, x64]
-  container:
-    image: ghcr.io/viamrobotics/canon:amd64
-  steps:
-    - uses: actions/checkout@v3
-    - uses: https://github.com/pleo-io/assign-random-codeowners
-      with:
-        reviewers-to-assign: 2
-        assign-individuals-from-teams: true
+  set-reviewers:
+    if: github.repository_owner == 'viamrobotics'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+    steps:
+      - uses: actions/checkout@v3
+      - uses: https://github.com/pleo-io/assign-random-codeowners
+        with:
+          reviewers-to-assign: 2
+          assign-individuals-from-teams: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
