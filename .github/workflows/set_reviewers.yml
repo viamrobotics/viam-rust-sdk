@@ -14,7 +14,7 @@ jobs:
       image: ghcr.io/viamrobotics/canon:amd64
     steps:
       - uses: actions/checkout@v3
-      - uses: https://github.com/pleo-io/assign-random-codeowners@v0.2.8
+      - uses: pleo-io/assign-random-codeowners@v0.2.8
         with:
           reviewers-to-assign: 2
           assign-individuals-from-teams: true
