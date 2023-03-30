@@ -81,10 +81,15 @@ pub mod slam_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn get_map(
+        pub async fn get_point_cloud_map(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetMapRequest>,
-        ) -> Result<tonic::Response<super::GetMapResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::GetPointCloudMapRequest>,
+        ) -> Result<
+                tonic::Response<
+                    tonic::codec::Streaming<super::GetPointCloudMapResponse>,
+                >,
+                tonic::Status,
+            > {
             self.inner
                 .ready()
                 .await
@@ -96,9 +101,33 @@ pub mod slam_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.slam.v1.SLAMService/GetMap",
+                "/viam.service.slam.v1.SLAMService/GetPointCloudMap",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            self.inner.server_streaming(request.into_request(), path, codec).await
+        }
+        pub async fn get_internal_state(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetInternalStateRequest>,
+        ) -> Result<
+                tonic::Response<
+                    tonic::codec::Streaming<super::GetInternalStateResponse>,
+                >,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.slam.v1.SLAMService/GetInternalState",
+            );
+            self.inner.server_streaming(request.into_request(), path, codec).await
         }
         pub async fn get_position_new(
             &mut self,
@@ -116,44 +145,6 @@ pub mod slam_service_client {
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.service.slam.v1.SLAMService/GetPositionNew",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn get_point_cloud_map(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetPointCloudMapRequest>,
-        ) -> Result<tonic::Response<super::GetPointCloudMapResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.slam.v1.SLAMService/GetPointCloudMap",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn get_internal_state(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetInternalStateRequest>,
-        ) -> Result<tonic::Response<super::GetInternalStateResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.slam.v1.SLAMService/GetInternalState",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -244,22 +235,30 @@ pub mod slam_service_server {
             &self,
             request: tonic::Request<super::GetPositionRequest>,
         ) -> Result<tonic::Response<super::GetPositionResponse>, tonic::Status>;
-        async fn get_map(
+        ///Server streaming response type for the GetPointCloudMap method.
+        type GetPointCloudMapStream: futures_core::Stream<
+                Item = Result<super::GetPointCloudMapResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn get_point_cloud_map(
             &self,
-            request: tonic::Request<super::GetMapRequest>,
-        ) -> Result<tonic::Response<super::GetMapResponse>, tonic::Status>;
+            request: tonic::Request<super::GetPointCloudMapRequest>,
+        ) -> Result<tonic::Response<Self::GetPointCloudMapStream>, tonic::Status>;
+        ///Server streaming response type for the GetInternalState method.
+        type GetInternalStateStream: futures_core::Stream<
+                Item = Result<super::GetInternalStateResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn get_internal_state(
+            &self,
+            request: tonic::Request<super::GetInternalStateRequest>,
+        ) -> Result<tonic::Response<Self::GetInternalStateStream>, tonic::Status>;
         async fn get_position_new(
             &self,
             request: tonic::Request<super::GetPositionNewRequest>,
         ) -> Result<tonic::Response<super::GetPositionNewResponse>, tonic::Status>;
-        async fn get_point_cloud_map(
-            &self,
-            request: tonic::Request<super::GetPointCloudMapRequest>,
-        ) -> Result<tonic::Response<super::GetPointCloudMapResponse>, tonic::Status>;
-        async fn get_internal_state(
-            &self,
-            request: tonic::Request<super::GetInternalStateRequest>,
-        ) -> Result<tonic::Response<super::GetInternalStateResponse>, tonic::Status>;
         ///Server streaming response type for the GetPointCloudMapStream method.
         type GetPointCloudMapStreamStream: futures_core::Stream<
                 Item = Result<super::GetPointCloudMapStreamResponse, tonic::Status>,
@@ -391,24 +390,28 @@ pub mod slam_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.slam.v1.SLAMService/GetMap" => {
+                "/viam.service.slam.v1.SLAMService/GetPointCloudMap" => {
                     #[allow(non_camel_case_types)]
-                    struct GetMapSvc<T: SlamService>(pub Arc<T>);
+                    struct GetPointCloudMapSvc<T: SlamService>(pub Arc<T>);
                     impl<
                         T: SlamService,
-                    > tonic::server::UnaryService<super::GetMapRequest>
-                    for GetMapSvc<T> {
-                        type Response = super::GetMapResponse;
+                    > tonic::server::ServerStreamingService<
+                        super::GetPointCloudMapRequest,
+                    > for GetPointCloudMapSvc<T> {
+                        type Response = super::GetPointCloudMapResponse;
+                        type ResponseStream = T::GetPointCloudMapStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
+                            tonic::Response<Self::ResponseStream>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetMapRequest>,
+                            request: tonic::Request<super::GetPointCloudMapRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).get_map(request).await };
+                            let fut = async move {
+                                (*inner).get_point_cloud_map(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -417,14 +420,56 @@ pub mod slam_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetMapSvc(inner);
+                        let method = GetPointCloudMapSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
                             );
-                        let res = grpc.unary(method, req).await;
+                        let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.service.slam.v1.SLAMService/GetInternalState" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetInternalStateSvc<T: SlamService>(pub Arc<T>);
+                    impl<
+                        T: SlamService,
+                    > tonic::server::ServerStreamingService<
+                        super::GetInternalStateRequest,
+                    > for GetInternalStateSvc<T> {
+                        type Response = super::GetInternalStateResponse;
+                        type ResponseStream = T::GetInternalStateStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetInternalStateRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_internal_state(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetInternalStateSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
@@ -458,86 +503,6 @@ pub mod slam_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetPositionNewSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.slam.v1.SLAMService/GetPointCloudMap" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetPointCloudMapSvc<T: SlamService>(pub Arc<T>);
-                    impl<
-                        T: SlamService,
-                    > tonic::server::UnaryService<super::GetPointCloudMapRequest>
-                    for GetPointCloudMapSvc<T> {
-                        type Response = super::GetPointCloudMapResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetPointCloudMapRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).get_point_cloud_map(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetPointCloudMapSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.slam.v1.SLAMService/GetInternalState" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetInternalStateSvc<T: SlamService>(pub Arc<T>);
-                    impl<
-                        T: SlamService,
-                    > tonic::server::UnaryService<super::GetInternalStateRequest>
-                    for GetInternalStateSvc<T> {
-                        type Response = super::GetInternalStateResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetInternalStateRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).get_internal_state(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetInternalStateSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
