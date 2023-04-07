@@ -914,6 +914,82 @@ pub mod app_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn add_role(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AddRoleRequest>,
+        ) -> Result<tonic::Response<super::AddRoleResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/AddRole",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn remove_role(
+            &mut self,
+            request: impl tonic::IntoRequest<super::RemoveRoleRequest>,
+        ) -> Result<tonic::Response<super::RemoveRoleResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/RemoveRole",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn list_authorizations(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListAuthorizationsRequest>,
+        ) -> Result<tonic::Response<super::ListAuthorizationsResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ListAuthorizations",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn check_permissions(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CheckPermissionsRequest>,
+        ) -> Result<tonic::Response<super::CheckPermissionsResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CheckPermissions",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -1122,6 +1198,22 @@ pub mod app_service_server {
             &self,
             request: tonic::Request<super::DeleteFragmentRequest>,
         ) -> Result<tonic::Response<super::DeleteFragmentResponse>, tonic::Status>;
+        async fn add_role(
+            &self,
+            request: tonic::Request<super::AddRoleRequest>,
+        ) -> Result<tonic::Response<super::AddRoleResponse>, tonic::Status>;
+        async fn remove_role(
+            &self,
+            request: tonic::Request<super::RemoveRoleRequest>,
+        ) -> Result<tonic::Response<super::RemoveRoleResponse>, tonic::Status>;
+        async fn list_authorizations(
+            &self,
+            request: tonic::Request<super::ListAuthorizationsRequest>,
+        ) -> Result<tonic::Response<super::ListAuthorizationsResponse>, tonic::Status>;
+        async fn check_permissions(
+            &self,
+            request: tonic::Request<super::CheckPermissionsRequest>,
+        ) -> Result<tonic::Response<super::CheckPermissionsResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct AppServiceServer<T: AppService> {
@@ -2908,6 +3000,162 @@ pub mod app_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/viam.app.v1.AppService/AddRole" => {
+                    #[allow(non_camel_case_types)]
+                    struct AddRoleSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::AddRoleRequest>
+                    for AddRoleSvc<T> {
+                        type Response = super::AddRoleResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AddRoleRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).add_role(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AddRoleSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/RemoveRole" => {
+                    #[allow(non_camel_case_types)]
+                    struct RemoveRoleSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::RemoveRoleRequest>
+                    for RemoveRoleSvc<T> {
+                        type Response = super::RemoveRoleResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::RemoveRoleRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).remove_role(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RemoveRoleSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ListAuthorizations" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListAuthorizationsSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ListAuthorizationsRequest>
+                    for ListAuthorizationsSvc<T> {
+                        type Response = super::ListAuthorizationsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListAuthorizationsRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).list_authorizations(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListAuthorizationsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/CheckPermissions" => {
+                    #[allow(non_camel_case_types)]
+                    struct CheckPermissionsSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CheckPermissionsRequest>
+                    for CheckPermissionsSvc<T> {
+                        type Response = super::CheckPermissionsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CheckPermissionsRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).check_permissions(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CheckPermissionsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 _ => {
                     Box::pin(async move {
                         Ok(
@@ -2945,6 +3193,501 @@ pub mod app_service_server {
     }
     impl<T: AppService> tonic::transport::NamedService for AppServiceServer<T> {
         const NAME: &'static str = "viam.app.v1.AppService";
+    }
+}
+/// Generated client implementations.
+pub mod billing_service_client {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    #[derive(Debug, Clone)]
+    pub struct BillingServiceClient<T> {
+        inner: tonic::client::Grpc<T>,
+    }
+    impl BillingServiceClient<tonic::transport::Channel> {
+        /// Attempt to create a new client by connecting to a given endpoint.
+        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
+        where
+            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D::Error: Into<StdError>,
+        {
+            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
+            Ok(Self::new(conn))
+        }
+    }
+    impl<T> BillingServiceClient<T>
+    where
+        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::Error: Into<StdError>,
+        T::ResponseBody: Default + Body<Data = Bytes> + Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    {
+        pub fn new(inner: T) -> Self {
+            let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> BillingServiceClient<InterceptedService<T, F>>
+        where
+            F: tonic::service::Interceptor,
+            T: tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                >,
+            >,
+            <T as tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+            >>::Error: Into<StdError> + Send + Sync,
+        {
+            BillingServiceClient::new(InterceptedService::new(inner, interceptor))
+        }
+        /// Compress requests with `gzip`.
+        ///
+        /// This requires the server to support it otherwise it might respond with an
+        /// error.
+        #[must_use]
+        pub fn send_gzip(mut self) -> Self {
+            self.inner = self.inner.send_gzip();
+            self
+        }
+        /// Enable decompressing responses with `gzip`.
+        #[must_use]
+        pub fn accept_gzip(mut self) -> Self {
+            self.inner = self.inner.accept_gzip();
+            self
+        }
+        pub async fn get_current_month_usage_summary(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetCurrentMonthUsageSummaryRequest>,
+        ) -> Result<
+                tonic::Response<super::GetCurrentMonthUsageSummaryResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.BillingService/GetCurrentMonthUsageSummary",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_unpaid_balance(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetUnpaidBalanceRequest>,
+        ) -> Result<tonic::Response<super::GetUnpaidBalanceResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.BillingService/GetUnpaidBalance",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_invoice_history(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetInvoiceHistoryRequest>,
+        ) -> Result<tonic::Response<super::GetInvoiceHistoryResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.BillingService/GetInvoiceHistory",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_itemized_invoice(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetItemizedInvoiceRequest>,
+        ) -> Result<tonic::Response<super::GetItemizedInvoiceResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.BillingService/GetItemizedInvoice",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_billing_summary(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetBillingSummaryRequest>,
+        ) -> Result<tonic::Response<super::GetBillingSummaryResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.BillingService/GetBillingSummary",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+    }
+}
+/// Generated server implementations.
+pub mod billing_service_server {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    ///Generated trait containing gRPC methods that should be implemented for use with BillingServiceServer.
+    #[async_trait]
+    pub trait BillingService: Send + Sync + 'static {
+        async fn get_current_month_usage_summary(
+            &self,
+            request: tonic::Request<super::GetCurrentMonthUsageSummaryRequest>,
+        ) -> Result<
+                tonic::Response<super::GetCurrentMonthUsageSummaryResponse>,
+                tonic::Status,
+            >;
+        async fn get_unpaid_balance(
+            &self,
+            request: tonic::Request<super::GetUnpaidBalanceRequest>,
+        ) -> Result<tonic::Response<super::GetUnpaidBalanceResponse>, tonic::Status>;
+        async fn get_invoice_history(
+            &self,
+            request: tonic::Request<super::GetInvoiceHistoryRequest>,
+        ) -> Result<tonic::Response<super::GetInvoiceHistoryResponse>, tonic::Status>;
+        async fn get_itemized_invoice(
+            &self,
+            request: tonic::Request<super::GetItemizedInvoiceRequest>,
+        ) -> Result<tonic::Response<super::GetItemizedInvoiceResponse>, tonic::Status>;
+        async fn get_billing_summary(
+            &self,
+            request: tonic::Request<super::GetBillingSummaryRequest>,
+        ) -> Result<tonic::Response<super::GetBillingSummaryResponse>, tonic::Status>;
+    }
+    #[derive(Debug)]
+    pub struct BillingServiceServer<T: BillingService> {
+        inner: _Inner<T>,
+        accept_compression_encodings: EnabledCompressionEncodings,
+        send_compression_encodings: EnabledCompressionEncodings,
+    }
+    struct _Inner<T>(Arc<T>);
+    impl<T: BillingService> BillingServiceServer<T> {
+        pub fn new(inner: T) -> Self {
+            Self::from_arc(Arc::new(inner))
+        }
+        pub fn from_arc(inner: Arc<T>) -> Self {
+            let inner = _Inner(inner);
+            Self {
+                inner,
+                accept_compression_encodings: Default::default(),
+                send_compression_encodings: Default::default(),
+            }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> InterceptedService<Self, F>
+        where
+            F: tonic::service::Interceptor,
+        {
+            InterceptedService::new(Self::new(inner), interceptor)
+        }
+        /// Enable decompressing requests with `gzip`.
+        #[must_use]
+        pub fn accept_gzip(mut self) -> Self {
+            self.accept_compression_encodings.enable_gzip();
+            self
+        }
+        /// Compress responses with `gzip`, if the client supports it.
+        #[must_use]
+        pub fn send_gzip(mut self) -> Self {
+            self.send_compression_encodings.enable_gzip();
+            self
+        }
+    }
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for BillingServiceServer<T>
+    where
+        T: BillingService,
+        B: Body + Send + 'static,
+        B::Error: Into<StdError> + Send + 'static,
+    {
+        type Response = http::Response<tonic::body::BoxBody>;
+        type Error = std::convert::Infallible;
+        type Future = BoxFuture<Self::Response, Self::Error>;
+        fn poll_ready(
+            &mut self,
+            _cx: &mut Context<'_>,
+        ) -> Poll<Result<(), Self::Error>> {
+            Poll::Ready(Ok(()))
+        }
+        fn call(&mut self, req: http::Request<B>) -> Self::Future {
+            let inner = self.inner.clone();
+            match req.uri().path() {
+                "/viam.app.v1.BillingService/GetCurrentMonthUsageSummary" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetCurrentMonthUsageSummarySvc<T: BillingService>(pub Arc<T>);
+                    impl<
+                        T: BillingService,
+                    > tonic::server::UnaryService<
+                        super::GetCurrentMonthUsageSummaryRequest,
+                    > for GetCurrentMonthUsageSummarySvc<T> {
+                        type Response = super::GetCurrentMonthUsageSummaryResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::GetCurrentMonthUsageSummaryRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_current_month_usage_summary(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetCurrentMonthUsageSummarySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.BillingService/GetUnpaidBalance" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetUnpaidBalanceSvc<T: BillingService>(pub Arc<T>);
+                    impl<
+                        T: BillingService,
+                    > tonic::server::UnaryService<super::GetUnpaidBalanceRequest>
+                    for GetUnpaidBalanceSvc<T> {
+                        type Response = super::GetUnpaidBalanceResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetUnpaidBalanceRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_unpaid_balance(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetUnpaidBalanceSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.BillingService/GetInvoiceHistory" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetInvoiceHistorySvc<T: BillingService>(pub Arc<T>);
+                    impl<
+                        T: BillingService,
+                    > tonic::server::UnaryService<super::GetInvoiceHistoryRequest>
+                    for GetInvoiceHistorySvc<T> {
+                        type Response = super::GetInvoiceHistoryResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetInvoiceHistoryRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_invoice_history(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetInvoiceHistorySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.BillingService/GetItemizedInvoice" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetItemizedInvoiceSvc<T: BillingService>(pub Arc<T>);
+                    impl<
+                        T: BillingService,
+                    > tonic::server::UnaryService<super::GetItemizedInvoiceRequest>
+                    for GetItemizedInvoiceSvc<T> {
+                        type Response = super::GetItemizedInvoiceResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetItemizedInvoiceRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_itemized_invoice(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetItemizedInvoiceSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.BillingService/GetBillingSummary" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetBillingSummarySvc<T: BillingService>(pub Arc<T>);
+                    impl<
+                        T: BillingService,
+                    > tonic::server::UnaryService<super::GetBillingSummaryRequest>
+                    for GetBillingSummarySvc<T> {
+                        type Response = super::GetBillingSummaryResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetBillingSummaryRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_billing_summary(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetBillingSummarySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                _ => {
+                    Box::pin(async move {
+                        Ok(
+                            http::Response::builder()
+                                .status(200)
+                                .header("grpc-status", "12")
+                                .header("content-type", "application/grpc")
+                                .body(empty_body())
+                                .unwrap(),
+                        )
+                    })
+                }
+            }
+        }
+    }
+    impl<T: BillingService> Clone for BillingServiceServer<T> {
+        fn clone(&self) -> Self {
+            let inner = self.inner.clone();
+            Self {
+                inner,
+                accept_compression_encodings: self.accept_compression_encodings,
+                send_compression_encodings: self.send_compression_encodings,
+            }
+        }
+    }
+    impl<T: BillingService> Clone for _Inner<T> {
+        fn clone(&self) -> Self {
+            Self(self.0.clone())
+        }
+    }
+    impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "{:?}", self.0)
+        }
+    }
+    impl<T: BillingService> tonic::transport::NamedService for BillingServiceServer<T> {
+        const NAME: &'static str = "viam.app.v1.BillingService";
     }
 }
 /// Generated client implementations.
