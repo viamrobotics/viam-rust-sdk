@@ -84,6 +84,13 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.component.camera.v1)
             }
         }
+        pub mod encoder {
+            // @@protoc_insertion_point(attribute:viam.component.encoder.v1)
+            pub mod v1 {
+                include!("viam.component.encoder.v1.rs");
+                // @@protoc_insertion_point(viam.component.encoder.v1)
+            }
+        }
         pub mod generic {
             // @@protoc_insertion_point(attribute:viam.component.generic.v1)
             pub mod v1 {
@@ -170,18 +177,11 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.service.datamanager.v1)
             }
         }
-        pub mod shell {
-            // @@protoc_insertion_point(attribute:viam.service.shell.v1)
+        pub mod mlmodel {
+            // @@protoc_insertion_point(attribute:viam.service.mlmodel.v1)
             pub mod v1 {
-                include!("viam.service.shell.v1.rs");
-                // @@protoc_insertion_point(viam.service.shell.v1)
-            }
-        }
-        pub mod slam {
-            // @@protoc_insertion_point(attribute:viam.service.slam.v1)
-            pub mod v1 {
-                include!("viam.service.slam.v1.rs");
-                // @@protoc_insertion_point(viam.service.slam.v1)
+                include!("viam.service.mlmodel.v1.rs");
+                // @@protoc_insertion_point(viam.service.mlmodel.v1)
             }
         }
         pub mod motion {
@@ -203,6 +203,20 @@ pub mod proto {
             pub mod v1 {
                 include!("viam.service.sensors.v1.rs");
                 // @@protoc_insertion_point(viam.service.sensors.v1)
+            }
+        }
+        pub mod shell {
+            // @@protoc_insertion_point(attribute:viam.service.shell.v1)
+            pub mod v1 {
+                include!("viam.service.shell.v1.rs");
+                // @@protoc_insertion_point(viam.service.shell.v1)
+            }
+        }
+        pub mod slam {
+            // @@protoc_insertion_point(attribute:viam.service.slam.v1)
+            pub mod v1 {
+                include!("viam.service.slam.v1.rs");
+                // @@protoc_insertion_point(viam.service.slam.v1)
             }
         }
         pub mod vision {
