@@ -1,13 +1,13 @@
 // @generated
 /// Generated client implementations.
-pub mod sensors_service_client {
+pub mod module_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
-    pub struct SensorsServiceClient<T> {
+    pub struct ModuleServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl SensorsServiceClient<tonic::transport::Channel> {
+    impl ModuleServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -18,7 +18,7 @@ pub mod sensors_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> SensorsServiceClient<T>
+    impl<T> ModuleServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -32,7 +32,7 @@ pub mod sensors_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> SensorsServiceClient<InterceptedService<T, F>>
+        ) -> ModuleServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
@@ -45,7 +45,7 @@ pub mod sensors_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            SensorsServiceClient::new(InterceptedService::new(inner, interceptor))
+            ModuleServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with `gzip`.
         ///
@@ -62,10 +62,10 @@ pub mod sensors_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn get_sensors(
+        pub async fn add_resource(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetSensorsRequest>,
-        ) -> Result<tonic::Response<super::GetSensorsResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::AddResourceRequest>,
+        ) -> Result<tonic::Response<super::AddResourceResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -77,14 +77,14 @@ pub mod sensors_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.sensors.v1.SensorsService/GetSensors",
+                "/viam.module.v1.ModuleService/AddResource",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn get_readings(
+        pub async fn reconfigure_resource(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetReadingsRequest>,
-        ) -> Result<tonic::Response<super::GetReadingsResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::ReconfigureResourceRequest>,
+        ) -> Result<tonic::Response<super::ReconfigureResourceResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -96,21 +96,14 @@ pub mod sensors_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.sensors.v1.SensorsService/GetReadings",
+                "/viam.module.v1.ModuleService/ReconfigureResource",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn do_command(
+        pub async fn remove_resource(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::super::super::common::v1::DoCommandRequest,
-            >,
-        ) -> Result<
-                tonic::Response<
-                    super::super::super::super::common::v1::DoCommandResponse,
-                >,
-                tonic::Status,
-            > {
+            request: impl tonic::IntoRequest<super::RemoveResourceRequest>,
+        ) -> Result<tonic::Response<super::RemoveResourceResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -122,47 +115,86 @@ pub mod sensors_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.sensors.v1.SensorsService/DoCommand",
+                "/viam.module.v1.ModuleService/RemoveResource",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn ready(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ReadyRequest>,
+        ) -> Result<tonic::Response<super::ReadyResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.module.v1.ModuleService/Ready",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn validate_config(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ValidateConfigRequest>,
+        ) -> Result<tonic::Response<super::ValidateConfigResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.module.v1.ModuleService/ValidateConfig",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod sensors_service_server {
+pub mod module_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with SensorsServiceServer.
+    ///Generated trait containing gRPC methods that should be implemented for use with ModuleServiceServer.
     #[async_trait]
-    pub trait SensorsService: Send + Sync + 'static {
-        async fn get_sensors(
+    pub trait ModuleService: Send + Sync + 'static {
+        async fn add_resource(
             &self,
-            request: tonic::Request<super::GetSensorsRequest>,
-        ) -> Result<tonic::Response<super::GetSensorsResponse>, tonic::Status>;
-        async fn get_readings(
+            request: tonic::Request<super::AddResourceRequest>,
+        ) -> Result<tonic::Response<super::AddResourceResponse>, tonic::Status>;
+        async fn reconfigure_resource(
             &self,
-            request: tonic::Request<super::GetReadingsRequest>,
-        ) -> Result<tonic::Response<super::GetReadingsResponse>, tonic::Status>;
-        async fn do_command(
+            request: tonic::Request<super::ReconfigureResourceRequest>,
+        ) -> Result<tonic::Response<super::ReconfigureResourceResponse>, tonic::Status>;
+        async fn remove_resource(
             &self,
-            request: tonic::Request<
-                super::super::super::super::common::v1::DoCommandRequest,
-            >,
-        ) -> Result<
-                tonic::Response<
-                    super::super::super::super::common::v1::DoCommandResponse,
-                >,
-                tonic::Status,
-            >;
+            request: tonic::Request<super::RemoveResourceRequest>,
+        ) -> Result<tonic::Response<super::RemoveResourceResponse>, tonic::Status>;
+        async fn ready(
+            &self,
+            request: tonic::Request<super::ReadyRequest>,
+        ) -> Result<tonic::Response<super::ReadyResponse>, tonic::Status>;
+        async fn validate_config(
+            &self,
+            request: tonic::Request<super::ValidateConfigRequest>,
+        ) -> Result<tonic::Response<super::ValidateConfigResponse>, tonic::Status>;
     }
     #[derive(Debug)]
-    pub struct SensorsServiceServer<T: SensorsService> {
+    pub struct ModuleServiceServer<T: ModuleService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: SensorsService> SensorsServiceServer<T> {
+    impl<T: ModuleService> ModuleServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -196,9 +228,9 @@ pub mod sensors_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for SensorsServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for ModuleServiceServer<T>
     where
-        T: SensorsService,
+        T: ModuleService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -214,63 +246,25 @@ pub mod sensors_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.service.sensors.v1.SensorsService/GetSensors" => {
+                "/viam.module.v1.ModuleService/AddResource" => {
                     #[allow(non_camel_case_types)]
-                    struct GetSensorsSvc<T: SensorsService>(pub Arc<T>);
+                    struct AddResourceSvc<T: ModuleService>(pub Arc<T>);
                     impl<
-                        T: SensorsService,
-                    > tonic::server::UnaryService<super::GetSensorsRequest>
-                    for GetSensorsSvc<T> {
-                        type Response = super::GetSensorsResponse;
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::AddResourceRequest>
+                    for AddResourceSvc<T> {
+                        type Response = super::AddResourceResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetSensorsRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).get_sensors(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetSensorsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.sensors.v1.SensorsService/GetReadings" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetReadingsSvc<T: SensorsService>(pub Arc<T>);
-                    impl<
-                        T: SensorsService,
-                    > tonic::server::UnaryService<super::GetReadingsRequest>
-                    for GetReadingsSvc<T> {
-                        type Response = super::GetReadingsResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetReadingsRequest>,
+                            request: tonic::Request<super::AddResourceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).get_readings(request).await
+                                (*inner).add_resource(request).await
                             };
                             Box::pin(fut)
                         }
@@ -280,7 +274,7 @@ pub mod sensors_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetReadingsSvc(inner);
+                        let method = AddResourceSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -292,27 +286,26 @@ pub mod sensors_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.sensors.v1.SensorsService/DoCommand" => {
+                "/viam.module.v1.ModuleService/ReconfigureResource" => {
                     #[allow(non_camel_case_types)]
-                    struct DoCommandSvc<T: SensorsService>(pub Arc<T>);
+                    struct ReconfigureResourceSvc<T: ModuleService>(pub Arc<T>);
                     impl<
-                        T: SensorsService,
-                    > tonic::server::UnaryService<
-                        super::super::super::super::common::v1::DoCommandRequest,
-                    > for DoCommandSvc<T> {
-                        type Response = super::super::super::super::common::v1::DoCommandResponse;
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::ReconfigureResourceRequest>
+                    for ReconfigureResourceSvc<T> {
+                        type Response = super::ReconfigureResourceResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::super::super::common::v1::DoCommandRequest,
-                            >,
+                            request: tonic::Request<super::ReconfigureResourceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).do_command(request).await };
+                            let fut = async move {
+                                (*inner).reconfigure_resource(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -321,7 +314,124 @@ pub mod sensors_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DoCommandSvc(inner);
+                        let method = ReconfigureResourceSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.module.v1.ModuleService/RemoveResource" => {
+                    #[allow(non_camel_case_types)]
+                    struct RemoveResourceSvc<T: ModuleService>(pub Arc<T>);
+                    impl<
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::RemoveResourceRequest>
+                    for RemoveResourceSvc<T> {
+                        type Response = super::RemoveResourceResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::RemoveResourceRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).remove_resource(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RemoveResourceSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.module.v1.ModuleService/Ready" => {
+                    #[allow(non_camel_case_types)]
+                    struct ReadySvc<T: ModuleService>(pub Arc<T>);
+                    impl<
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::ReadyRequest> for ReadySvc<T> {
+                        type Response = super::ReadyResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ReadyRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).ready(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ReadySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.module.v1.ModuleService/ValidateConfig" => {
+                    #[allow(non_camel_case_types)]
+                    struct ValidateConfigSvc<T: ModuleService>(pub Arc<T>);
+                    impl<
+                        T: ModuleService,
+                    > tonic::server::UnaryService<super::ValidateConfigRequest>
+                    for ValidateConfigSvc<T> {
+                        type Response = super::ValidateConfigResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ValidateConfigRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).validate_config(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ValidateConfigSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -348,7 +458,7 @@ pub mod sensors_service_server {
             }
         }
     }
-    impl<T: SensorsService> Clone for SensorsServiceServer<T> {
+    impl<T: ModuleService> Clone for ModuleServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -358,7 +468,7 @@ pub mod sensors_service_server {
             }
         }
     }
-    impl<T: SensorsService> Clone for _Inner<T> {
+    impl<T: ModuleService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(self.0.clone())
         }
@@ -368,7 +478,7 @@ pub mod sensors_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: SensorsService> tonic::transport::NamedService for SensorsServiceServer<T> {
-        const NAME: &'static str = "viam.service.sensors.v1.SensorsService";
+    impl<T: ModuleService> tonic::transport::NamedService for ModuleServiceServer<T> {
+        const NAME: &'static str = "viam.module.v1.ModuleService";
     }
 }

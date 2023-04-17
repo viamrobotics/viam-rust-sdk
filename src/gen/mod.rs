@@ -26,11 +26,25 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.app.data.v1)
             }
         }
+        pub mod mltraining {
+            // @@protoc_insertion_point(attribute:viam.app.mltraining.v1)
+            pub mod v1 {
+                include!("viam.app.mltraining.v1.rs");
+                // @@protoc_insertion_point(viam.app.mltraining.v1)
+            }
+        }
         pub mod model {
             // @@protoc_insertion_point(attribute:viam.app.model.v1)
             pub mod v1 {
                 include!("viam.app.model.v1.rs");
                 // @@protoc_insertion_point(viam.app.model.v1)
+            }
+        }
+        pub mod packages {
+            // @@protoc_insertion_point(attribute:viam.app.packages.v1)
+            pub mod v1 {
+                include!("viam.app.packages.v1.rs");
+                // @@protoc_insertion_point(viam.app.packages.v1)
             }
         }
     }
@@ -68,6 +82,13 @@ pub mod proto {
             pub mod v1 {
                 include!("viam.component.camera.v1.rs");
                 // @@protoc_insertion_point(viam.component.camera.v1)
+            }
+        }
+        pub mod encoder {
+            // @@protoc_insertion_point(attribute:viam.component.encoder.v1)
+            pub mod v1 {
+                include!("viam.component.encoder.v1.rs");
+                // @@protoc_insertion_point(viam.component.encoder.v1)
             }
         }
         pub mod generic {
@@ -134,6 +155,13 @@ pub mod proto {
             }
         }
     }
+    pub mod module {
+        // @@protoc_insertion_point(attribute:viam.module.v1)
+        pub mod v1 {
+            include!("viam.module.v1.rs");
+            // @@protoc_insertion_point(viam.module.v1)
+        }
+    }
     pub mod robot {
         // @@protoc_insertion_point(attribute:viam.robot.v1)
         pub mod v1 {
@@ -149,18 +177,11 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.service.datamanager.v1)
             }
         }
-        pub mod shell {
-            // @@protoc_insertion_point(attribute:viam.service.shell.v1)
+        pub mod mlmodel {
+            // @@protoc_insertion_point(attribute:viam.service.mlmodel.v1)
             pub mod v1 {
-                include!("viam.service.shell.v1.rs");
-                // @@protoc_insertion_point(viam.service.shell.v1)
-            }
-        }
-        pub mod slam {
-            // @@protoc_insertion_point(attribute:viam.service.slam.v1)
-            pub mod v1 {
-                include!("viam.service.slam.v1.rs");
-                // @@protoc_insertion_point(viam.service.slam.v1)
+                include!("viam.service.mlmodel.v1.rs");
+                // @@protoc_insertion_point(viam.service.mlmodel.v1)
             }
         }
         pub mod motion {
@@ -182,6 +203,20 @@ pub mod proto {
             pub mod v1 {
                 include!("viam.service.sensors.v1.rs");
                 // @@protoc_insertion_point(viam.service.sensors.v1)
+            }
+        }
+        pub mod shell {
+            // @@protoc_insertion_point(attribute:viam.service.shell.v1)
+            pub mod v1 {
+                include!("viam.service.shell.v1.rs");
+                // @@protoc_insertion_point(viam.service.shell.v1)
+            }
+        }
+        pub mod slam {
+            // @@protoc_insertion_point(attribute:viam.service.slam.v1)
+            pub mod v1 {
+                include!("viam.service.slam.v1.rs");
+                // @@protoc_insertion_point(viam.service.slam.v1)
             }
         }
         pub mod vision {

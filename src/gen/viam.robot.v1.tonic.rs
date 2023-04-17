@@ -233,6 +233,25 @@ pub mod robot_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn transform_pcd(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TransformPcdRequest>,
+        ) -> Result<tonic::Response<super::TransformPcdResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.robot.v1.RobotService/TransformPCD",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn get_status(
             &mut self,
             request: impl tonic::IntoRequest<super::GetStatusRequest>,
@@ -379,6 +398,10 @@ pub mod robot_service_server {
             &self,
             request: tonic::Request<super::TransformPoseRequest>,
         ) -> Result<tonic::Response<super::TransformPoseResponse>, tonic::Status>;
+        async fn transform_pcd(
+            &self,
+            request: tonic::Request<super::TransformPcdRequest>,
+        ) -> Result<tonic::Response<super::TransformPcdResponse>, tonic::Status>;
         async fn get_status(
             &self,
             request: tonic::Request<super::GetStatusRequest>,
@@ -814,6 +837,46 @@ pub mod robot_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = TransformPoseSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.robot.v1.RobotService/TransformPCD" => {
+                    #[allow(non_camel_case_types)]
+                    struct TransformPCDSvc<T: RobotService>(pub Arc<T>);
+                    impl<
+                        T: RobotService,
+                    > tonic::server::UnaryService<super::TransformPcdRequest>
+                    for TransformPCDSvc<T> {
+                        type Response = super::TransformPcdResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TransformPcdRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).transform_pcd(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = TransformPCDSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

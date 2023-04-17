@@ -1,13 +1,13 @@
 // @generated
 /// Generated client implementations.
-pub mod sensors_service_client {
+pub mod encoder_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
-    pub struct SensorsServiceClient<T> {
+    pub struct EncoderServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl SensorsServiceClient<tonic::transport::Channel> {
+    impl EncoderServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -18,7 +18,7 @@ pub mod sensors_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> SensorsServiceClient<T>
+    impl<T> EncoderServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -32,7 +32,7 @@ pub mod sensors_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> SensorsServiceClient<InterceptedService<T, F>>
+        ) -> EncoderServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
@@ -45,7 +45,7 @@ pub mod sensors_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            SensorsServiceClient::new(InterceptedService::new(inner, interceptor))
+            EncoderServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with `gzip`.
         ///
@@ -62,10 +62,10 @@ pub mod sensors_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn get_sensors(
+        pub async fn get_position(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetSensorsRequest>,
-        ) -> Result<tonic::Response<super::GetSensorsResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::GetPositionRequest>,
+        ) -> Result<tonic::Response<super::GetPositionResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -77,14 +77,14 @@ pub mod sensors_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.sensors.v1.SensorsService/GetSensors",
+                "/viam.component.encoder.v1.EncoderService/GetPosition",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn get_readings(
+        pub async fn reset_position(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetReadingsRequest>,
-        ) -> Result<tonic::Response<super::GetReadingsResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::ResetPositionRequest>,
+        ) -> Result<tonic::Response<super::ResetPositionResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -96,7 +96,26 @@ pub mod sensors_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.sensors.v1.SensorsService/GetReadings",
+                "/viam.component.encoder.v1.EncoderService/ResetPosition",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn get_properties(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetPropertiesRequest>,
+        ) -> Result<tonic::Response<super::GetPropertiesResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.encoder.v1.EncoderService/GetProperties",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -122,27 +141,31 @@ pub mod sensors_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.sensors.v1.SensorsService/DoCommand",
+                "/viam.component.encoder.v1.EncoderService/DoCommand",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod sensors_service_server {
+pub mod encoder_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with SensorsServiceServer.
+    ///Generated trait containing gRPC methods that should be implemented for use with EncoderServiceServer.
     #[async_trait]
-    pub trait SensorsService: Send + Sync + 'static {
-        async fn get_sensors(
+    pub trait EncoderService: Send + Sync + 'static {
+        async fn get_position(
             &self,
-            request: tonic::Request<super::GetSensorsRequest>,
-        ) -> Result<tonic::Response<super::GetSensorsResponse>, tonic::Status>;
-        async fn get_readings(
+            request: tonic::Request<super::GetPositionRequest>,
+        ) -> Result<tonic::Response<super::GetPositionResponse>, tonic::Status>;
+        async fn reset_position(
             &self,
-            request: tonic::Request<super::GetReadingsRequest>,
-        ) -> Result<tonic::Response<super::GetReadingsResponse>, tonic::Status>;
+            request: tonic::Request<super::ResetPositionRequest>,
+        ) -> Result<tonic::Response<super::ResetPositionResponse>, tonic::Status>;
+        async fn get_properties(
+            &self,
+            request: tonic::Request<super::GetPropertiesRequest>,
+        ) -> Result<tonic::Response<super::GetPropertiesResponse>, tonic::Status>;
         async fn do_command(
             &self,
             request: tonic::Request<
@@ -156,13 +179,13 @@ pub mod sensors_service_server {
             >;
     }
     #[derive(Debug)]
-    pub struct SensorsServiceServer<T: SensorsService> {
+    pub struct EncoderServiceServer<T: EncoderService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: SensorsService> SensorsServiceServer<T> {
+    impl<T: EncoderService> EncoderServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -196,9 +219,9 @@ pub mod sensors_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for SensorsServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for EncoderServiceServer<T>
     where
-        T: SensorsService,
+        T: EncoderService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -214,63 +237,25 @@ pub mod sensors_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.service.sensors.v1.SensorsService/GetSensors" => {
+                "/viam.component.encoder.v1.EncoderService/GetPosition" => {
                     #[allow(non_camel_case_types)]
-                    struct GetSensorsSvc<T: SensorsService>(pub Arc<T>);
+                    struct GetPositionSvc<T: EncoderService>(pub Arc<T>);
                     impl<
-                        T: SensorsService,
-                    > tonic::server::UnaryService<super::GetSensorsRequest>
-                    for GetSensorsSvc<T> {
-                        type Response = super::GetSensorsResponse;
+                        T: EncoderService,
+                    > tonic::server::UnaryService<super::GetPositionRequest>
+                    for GetPositionSvc<T> {
+                        type Response = super::GetPositionResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetSensorsRequest>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).get_sensors(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetSensorsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.sensors.v1.SensorsService/GetReadings" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetReadingsSvc<T: SensorsService>(pub Arc<T>);
-                    impl<
-                        T: SensorsService,
-                    > tonic::server::UnaryService<super::GetReadingsRequest>
-                    for GetReadingsSvc<T> {
-                        type Response = super::GetReadingsResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetReadingsRequest>,
+                            request: tonic::Request<super::GetPositionRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).get_readings(request).await
+                                (*inner).get_position(request).await
                             };
                             Box::pin(fut)
                         }
@@ -280,7 +265,7 @@ pub mod sensors_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetReadingsSvc(inner);
+                        let method = GetPositionSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -292,11 +277,91 @@ pub mod sensors_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.sensors.v1.SensorsService/DoCommand" => {
+                "/viam.component.encoder.v1.EncoderService/ResetPosition" => {
                     #[allow(non_camel_case_types)]
-                    struct DoCommandSvc<T: SensorsService>(pub Arc<T>);
+                    struct ResetPositionSvc<T: EncoderService>(pub Arc<T>);
                     impl<
-                        T: SensorsService,
+                        T: EncoderService,
+                    > tonic::server::UnaryService<super::ResetPositionRequest>
+                    for ResetPositionSvc<T> {
+                        type Response = super::ResetPositionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ResetPositionRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).reset_position(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ResetPositionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.encoder.v1.EncoderService/GetProperties" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetPropertiesSvc<T: EncoderService>(pub Arc<T>);
+                    impl<
+                        T: EncoderService,
+                    > tonic::server::UnaryService<super::GetPropertiesRequest>
+                    for GetPropertiesSvc<T> {
+                        type Response = super::GetPropertiesResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetPropertiesRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_properties(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetPropertiesSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.encoder.v1.EncoderService/DoCommand" => {
+                    #[allow(non_camel_case_types)]
+                    struct DoCommandSvc<T: EncoderService>(pub Arc<T>);
+                    impl<
+                        T: EncoderService,
                     > tonic::server::UnaryService<
                         super::super::super::super::common::v1::DoCommandRequest,
                     > for DoCommandSvc<T> {
@@ -348,7 +413,7 @@ pub mod sensors_service_server {
             }
         }
     }
-    impl<T: SensorsService> Clone for SensorsServiceServer<T> {
+    impl<T: EncoderService> Clone for EncoderServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -358,7 +423,7 @@ pub mod sensors_service_server {
             }
         }
     }
-    impl<T: SensorsService> Clone for _Inner<T> {
+    impl<T: EncoderService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(self.0.clone())
         }
@@ -368,7 +433,7 @@ pub mod sensors_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: SensorsService> tonic::transport::NamedService for SensorsServiceServer<T> {
-        const NAME: &'static str = "viam.service.sensors.v1.SensorsService";
+    impl<T: EncoderService> tonic::transport::NamedService for EncoderServiceServer<T> {
+        const NAME: &'static str = "viam.component.encoder.v1.EncoderService";
     }
 }

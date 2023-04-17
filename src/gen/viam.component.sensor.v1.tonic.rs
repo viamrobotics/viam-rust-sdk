@@ -3,6 +3,8 @@
 pub mod sensor_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
+    /** SensorService services all generic sensors associated with a robot
+*/
     #[derive(Debug, Clone)]
     pub struct SensorServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -62,6 +64,8 @@ pub mod sensor_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
+        /** GetReadings returns the readings of a sensor of the underlying robot.
+*/
         pub async fn get_readings(
             &mut self,
             request: impl tonic::IntoRequest<super::GetReadingsRequest>,
@@ -81,6 +85,34 @@ pub mod sensor_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        /** DoCommand sends/receives arbitrary commands
+*/
+        pub async fn do_command(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::super::super::super::common::v1::DoCommandRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::DoCommandResponse,
+                >,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.sensor.v1.SensorService/DoCommand",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -90,11 +122,28 @@ pub mod sensor_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with SensorServiceServer.
     #[async_trait]
     pub trait SensorService: Send + Sync + 'static {
+        /** GetReadings returns the readings of a sensor of the underlying robot.
+*/
         async fn get_readings(
             &self,
             request: tonic::Request<super::GetReadingsRequest>,
         ) -> Result<tonic::Response<super::GetReadingsResponse>, tonic::Status>;
+        /** DoCommand sends/receives arbitrary commands
+*/
+        async fn do_command(
+            &self,
+            request: tonic::Request<
+                super::super::super::super::common::v1::DoCommandRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::DoCommandResponse,
+                >,
+                tonic::Status,
+            >;
     }
+    /** SensorService services all generic sensors associated with a robot
+*/
     #[derive(Debug)]
     pub struct SensorServiceServer<T: SensorService> {
         inner: _Inner<T>,
@@ -183,6 +232,47 @@ pub mod sensor_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetReadingsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.sensor.v1.SensorService/DoCommand" => {
+                    #[allow(non_camel_case_types)]
+                    struct DoCommandSvc<T: SensorService>(pub Arc<T>);
+                    impl<
+                        T: SensorService,
+                    > tonic::server::UnaryService<
+                        super::super::super::super::common::v1::DoCommandRequest,
+                    > for DoCommandSvc<T> {
+                        type Response = super::super::super::super::common::v1::DoCommandResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::super::super::super::common::v1::DoCommandRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).do_command(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DoCommandSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

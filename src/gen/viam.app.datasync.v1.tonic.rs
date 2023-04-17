@@ -62,13 +62,10 @@ pub mod data_sync_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn upload(
+        pub async fn data_capture_upload(
             &mut self,
-            request: impl tonic::IntoStreamingRequest<Message = super::UploadRequest>,
-        ) -> Result<
-                tonic::Response<tonic::codec::Streaming<super::UploadResponse>>,
-                tonic::Status,
-            > {
+            request: impl tonic::IntoRequest<super::DataCaptureUploadRequest>,
+        ) -> Result<tonic::Response<super::DataCaptureUploadResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -80,9 +77,30 @@ pub mod data_sync_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.datasync.v1.DataSyncService/Upload",
+                "/viam.app.datasync.v1.DataSyncService/DataCaptureUpload",
             );
-            self.inner.streaming(request.into_streaming_request(), path, codec).await
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn file_upload(
+            &mut self,
+            request: impl tonic::IntoStreamingRequest<Message = super::FileUploadRequest>,
+        ) -> Result<tonic::Response<super::FileUploadResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.datasync.v1.DataSyncService/FileUpload",
+            );
+            self.inner
+                .client_streaming(request.into_streaming_request(), path, codec)
+                .await
         }
     }
 }
@@ -93,16 +111,14 @@ pub mod data_sync_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with DataSyncServiceServer.
     #[async_trait]
     pub trait DataSyncService: Send + Sync + 'static {
-        ///Server streaming response type for the Upload method.
-        type UploadStream: futures_core::Stream<
-                Item = Result<super::UploadResponse, tonic::Status>,
-            >
-            + Send
-            + 'static;
-        async fn upload(
+        async fn data_capture_upload(
             &self,
-            request: tonic::Request<tonic::Streaming<super::UploadRequest>>,
-        ) -> Result<tonic::Response<Self::UploadStream>, tonic::Status>;
+            request: tonic::Request<super::DataCaptureUploadRequest>,
+        ) -> Result<tonic::Response<super::DataCaptureUploadResponse>, tonic::Status>;
+        async fn file_upload(
+            &self,
+            request: tonic::Request<tonic::Streaming<super::FileUploadRequest>>,
+        ) -> Result<tonic::Response<super::FileUploadResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct DataSyncServiceServer<T: DataSyncService> {
@@ -163,27 +179,26 @@ pub mod data_sync_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.app.datasync.v1.DataSyncService/Upload" => {
+                "/viam.app.datasync.v1.DataSyncService/DataCaptureUpload" => {
                     #[allow(non_camel_case_types)]
-                    struct UploadSvc<T: DataSyncService>(pub Arc<T>);
+                    struct DataCaptureUploadSvc<T: DataSyncService>(pub Arc<T>);
                     impl<
                         T: DataSyncService,
-                    > tonic::server::StreamingService<super::UploadRequest>
-                    for UploadSvc<T> {
-                        type Response = super::UploadResponse;
-                        type ResponseStream = T::UploadStream;
+                    > tonic::server::UnaryService<super::DataCaptureUploadRequest>
+                    for DataCaptureUploadSvc<T> {
+                        type Response = super::DataCaptureUploadResponse;
                         type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
+                            tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                tonic::Streaming<super::UploadRequest>,
-                            >,
+                            request: tonic::Request<super::DataCaptureUploadRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).upload(request).await };
+                            let fut = async move {
+                                (*inner).data_capture_upload(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -192,14 +207,54 @@ pub mod data_sync_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = UploadSvc(inner);
+                        let method = DataCaptureUploadSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
                             );
-                        let res = grpc.streaming(method, req).await;
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.datasync.v1.DataSyncService/FileUpload" => {
+                    #[allow(non_camel_case_types)]
+                    struct FileUploadSvc<T: DataSyncService>(pub Arc<T>);
+                    impl<
+                        T: DataSyncService,
+                    > tonic::server::ClientStreamingService<super::FileUploadRequest>
+                    for FileUploadSvc<T> {
+                        type Response = super::FileUploadResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                tonic::Streaming<super::FileUploadRequest>,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).file_upload(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = FileUploadSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.client_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)

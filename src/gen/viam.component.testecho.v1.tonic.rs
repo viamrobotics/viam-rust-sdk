@@ -1,13 +1,13 @@
 // @generated
 /// Generated client implementations.
-pub mod sensors_service_client {
+pub mod test_echo_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
-    pub struct SensorsServiceClient<T> {
+    pub struct TestEchoServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl SensorsServiceClient<tonic::transport::Channel> {
+    impl TestEchoServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -18,7 +18,7 @@ pub mod sensors_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> SensorsServiceClient<T>
+    impl<T> TestEchoServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -32,7 +32,7 @@ pub mod sensors_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> SensorsServiceClient<InterceptedService<T, F>>
+        ) -> TestEchoServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
@@ -45,7 +45,7 @@ pub mod sensors_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            SensorsServiceClient::new(InterceptedService::new(inner, interceptor))
+            TestEchoServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with `gzip`.
         ///
@@ -62,10 +62,10 @@ pub mod sensors_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        pub async fn get_sensors(
+        pub async fn echo(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetSensorsRequest>,
-        ) -> Result<tonic::Response<super::GetSensorsResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::EchoRequest>,
+        ) -> Result<tonic::Response<super::EchoResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -77,38 +77,15 @@ pub mod sensors_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.sensors.v1.SensorsService/GetSensors",
+                "/viam.component.testecho.v1.TestEchoService/Echo",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn get_readings(
+        pub async fn echo_multiple(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetReadingsRequest>,
-        ) -> Result<tonic::Response<super::GetReadingsResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.sensors.v1.SensorsService/GetReadings",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn do_command(
-            &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::super::super::common::v1::DoCommandRequest,
-            >,
+            request: impl tonic::IntoRequest<super::EchoMultipleRequest>,
         ) -> Result<
-                tonic::Response<
-                    super::super::super::super::common::v1::DoCommandResponse,
-                >,
+                tonic::Response<tonic::codec::Streaming<super::EchoMultipleResponse>>,
                 tonic::Status,
             > {
             self.inner
@@ -122,47 +99,97 @@ pub mod sensors_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.sensors.v1.SensorsService/DoCommand",
+                "/viam.component.testecho.v1.TestEchoService/EchoMultiple",
+            );
+            self.inner.server_streaming(request.into_request(), path, codec).await
+        }
+        pub async fn echo_bi_di(
+            &mut self,
+            request: impl tonic::IntoStreamingRequest<Message = super::EchoBiDiRequest>,
+        ) -> Result<
+                tonic::Response<tonic::codec::Streaming<super::EchoBiDiResponse>>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.testecho.v1.TestEchoService/EchoBiDi",
+            );
+            self.inner.streaming(request.into_streaming_request(), path, codec).await
+        }
+        pub async fn stop(
+            &mut self,
+            request: impl tonic::IntoRequest<super::StopRequest>,
+        ) -> Result<tonic::Response<super::StopResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.testecho.v1.TestEchoService/Stop",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod sensors_service_server {
+pub mod test_echo_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with SensorsServiceServer.
+    ///Generated trait containing gRPC methods that should be implemented for use with TestEchoServiceServer.
     #[async_trait]
-    pub trait SensorsService: Send + Sync + 'static {
-        async fn get_sensors(
+    pub trait TestEchoService: Send + Sync + 'static {
+        async fn echo(
             &self,
-            request: tonic::Request<super::GetSensorsRequest>,
-        ) -> Result<tonic::Response<super::GetSensorsResponse>, tonic::Status>;
-        async fn get_readings(
+            request: tonic::Request<super::EchoRequest>,
+        ) -> Result<tonic::Response<super::EchoResponse>, tonic::Status>;
+        ///Server streaming response type for the EchoMultiple method.
+        type EchoMultipleStream: futures_core::Stream<
+                Item = Result<super::EchoMultipleResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn echo_multiple(
             &self,
-            request: tonic::Request<super::GetReadingsRequest>,
-        ) -> Result<tonic::Response<super::GetReadingsResponse>, tonic::Status>;
-        async fn do_command(
+            request: tonic::Request<super::EchoMultipleRequest>,
+        ) -> Result<tonic::Response<Self::EchoMultipleStream>, tonic::Status>;
+        ///Server streaming response type for the EchoBiDi method.
+        type EchoBiDiStream: futures_core::Stream<
+                Item = Result<super::EchoBiDiResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn echo_bi_di(
             &self,
-            request: tonic::Request<
-                super::super::super::super::common::v1::DoCommandRequest,
-            >,
-        ) -> Result<
-                tonic::Response<
-                    super::super::super::super::common::v1::DoCommandResponse,
-                >,
-                tonic::Status,
-            >;
+            request: tonic::Request<tonic::Streaming<super::EchoBiDiRequest>>,
+        ) -> Result<tonic::Response<Self::EchoBiDiStream>, tonic::Status>;
+        async fn stop(
+            &self,
+            request: tonic::Request<super::StopRequest>,
+        ) -> Result<tonic::Response<super::StopResponse>, tonic::Status>;
     }
     #[derive(Debug)]
-    pub struct SensorsServiceServer<T: SensorsService> {
+    pub struct TestEchoServiceServer<T: TestEchoService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: SensorsService> SensorsServiceServer<T> {
+    impl<T: TestEchoService> TestEchoServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -196,9 +223,9 @@ pub mod sensors_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for SensorsServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for TestEchoServiceServer<T>
     where
-        T: SensorsService,
+        T: TestEchoService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -214,24 +241,23 @@ pub mod sensors_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.service.sensors.v1.SensorsService/GetSensors" => {
+                "/viam.component.testecho.v1.TestEchoService/Echo" => {
                     #[allow(non_camel_case_types)]
-                    struct GetSensorsSvc<T: SensorsService>(pub Arc<T>);
+                    struct EchoSvc<T: TestEchoService>(pub Arc<T>);
                     impl<
-                        T: SensorsService,
-                    > tonic::server::UnaryService<super::GetSensorsRequest>
-                    for GetSensorsSvc<T> {
-                        type Response = super::GetSensorsResponse;
+                        T: TestEchoService,
+                    > tonic::server::UnaryService<super::EchoRequest> for EchoSvc<T> {
+                        type Response = super::EchoResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetSensorsRequest>,
+                            request: tonic::Request<super::EchoRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).get_sensors(request).await };
+                            let fut = async move { (*inner).echo(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -240,7 +266,7 @@ pub mod sensors_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetSensorsSvc(inner);
+                        let method = EchoSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -252,25 +278,26 @@ pub mod sensors_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.sensors.v1.SensorsService/GetReadings" => {
+                "/viam.component.testecho.v1.TestEchoService/EchoMultiple" => {
                     #[allow(non_camel_case_types)]
-                    struct GetReadingsSvc<T: SensorsService>(pub Arc<T>);
+                    struct EchoMultipleSvc<T: TestEchoService>(pub Arc<T>);
                     impl<
-                        T: SensorsService,
-                    > tonic::server::UnaryService<super::GetReadingsRequest>
-                    for GetReadingsSvc<T> {
-                        type Response = super::GetReadingsResponse;
+                        T: TestEchoService,
+                    > tonic::server::ServerStreamingService<super::EchoMultipleRequest>
+                    for EchoMultipleSvc<T> {
+                        type Response = super::EchoMultipleResponse;
+                        type ResponseStream = T::EchoMultipleStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
+                            tonic::Response<Self::ResponseStream>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetReadingsRequest>,
+                            request: tonic::Request<super::EchoMultipleRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).get_readings(request).await
+                                (*inner).echo_multiple(request).await
                             };
                             Box::pin(fut)
                         }
@@ -280,39 +307,39 @@ pub mod sensors_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetReadingsSvc(inner);
+                        let method = EchoMultipleSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
                             );
-                        let res = grpc.unary(method, req).await;
+                        let res = grpc.server_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.sensors.v1.SensorsService/DoCommand" => {
+                "/viam.component.testecho.v1.TestEchoService/EchoBiDi" => {
                     #[allow(non_camel_case_types)]
-                    struct DoCommandSvc<T: SensorsService>(pub Arc<T>);
+                    struct EchoBiDiSvc<T: TestEchoService>(pub Arc<T>);
                     impl<
-                        T: SensorsService,
-                    > tonic::server::UnaryService<
-                        super::super::super::super::common::v1::DoCommandRequest,
-                    > for DoCommandSvc<T> {
-                        type Response = super::super::super::super::common::v1::DoCommandResponse;
+                        T: TestEchoService,
+                    > tonic::server::StreamingService<super::EchoBiDiRequest>
+                    for EchoBiDiSvc<T> {
+                        type Response = super::EchoBiDiResponse;
+                        type ResponseStream = T::EchoBiDiStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
+                            tonic::Response<Self::ResponseStream>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::super::super::common::v1::DoCommandRequest,
+                                tonic::Streaming<super::EchoBiDiRequest>,
                             >,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).do_command(request).await };
+                            let fut = async move { (*inner).echo_bi_di(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -321,7 +348,44 @@ pub mod sensors_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DoCommandSvc(inner);
+                        let method = EchoBiDiSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.testecho.v1.TestEchoService/Stop" => {
+                    #[allow(non_camel_case_types)]
+                    struct StopSvc<T: TestEchoService>(pub Arc<T>);
+                    impl<
+                        T: TestEchoService,
+                    > tonic::server::UnaryService<super::StopRequest> for StopSvc<T> {
+                        type Response = super::StopResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::StopRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).stop(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = StopSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -348,7 +412,7 @@ pub mod sensors_service_server {
             }
         }
     }
-    impl<T: SensorsService> Clone for SensorsServiceServer<T> {
+    impl<T: TestEchoService> Clone for TestEchoServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -358,7 +422,7 @@ pub mod sensors_service_server {
             }
         }
     }
-    impl<T: SensorsService> Clone for _Inner<T> {
+    impl<T: TestEchoService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(self.0.clone())
         }
@@ -368,7 +432,8 @@ pub mod sensors_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: SensorsService> tonic::transport::NamedService for SensorsServiceServer<T> {
-        const NAME: &'static str = "viam.service.sensors.v1.SensorsService";
+    impl<T: TestEchoService> tonic::transport::NamedService
+    for TestEchoServiceServer<T> {
+        const NAME: &'static str = "viam.component.testecho.v1.TestEchoService";
     }
 }

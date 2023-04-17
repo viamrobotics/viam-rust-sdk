@@ -81,6 +81,25 @@ pub mod motion_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn move_on_map(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MoveOnMapRequest>,
+        ) -> Result<tonic::Response<super::MoveOnMapResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.motion.v1.MotionService/MoveOnMap",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn move_single_component(
             &mut self,
             request: impl tonic::IntoRequest<super::MoveSingleComponentRequest>,
@@ -119,6 +138,32 @@ pub mod motion_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn do_command(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::super::super::super::common::v1::DoCommandRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::DoCommandResponse,
+                >,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.motion.v1.MotionService/DoCommand",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -132,6 +177,10 @@ pub mod motion_service_server {
             &self,
             request: tonic::Request<super::MoveRequest>,
         ) -> Result<tonic::Response<super::MoveResponse>, tonic::Status>;
+        async fn move_on_map(
+            &self,
+            request: tonic::Request<super::MoveOnMapRequest>,
+        ) -> Result<tonic::Response<super::MoveOnMapResponse>, tonic::Status>;
         async fn move_single_component(
             &self,
             request: tonic::Request<super::MoveSingleComponentRequest>,
@@ -140,6 +189,17 @@ pub mod motion_service_server {
             &self,
             request: tonic::Request<super::GetPoseRequest>,
         ) -> Result<tonic::Response<super::GetPoseResponse>, tonic::Status>;
+        async fn do_command(
+            &self,
+            request: tonic::Request<
+                super::super::super::super::common::v1::DoCommandRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::DoCommandResponse,
+                >,
+                tonic::Status,
+            >;
     }
     #[derive(Debug)]
     pub struct MotionServiceServer<T: MotionService> {
@@ -237,6 +297,44 @@ pub mod motion_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/viam.service.motion.v1.MotionService/MoveOnMap" => {
+                    #[allow(non_camel_case_types)]
+                    struct MoveOnMapSvc<T: MotionService>(pub Arc<T>);
+                    impl<
+                        T: MotionService,
+                    > tonic::server::UnaryService<super::MoveOnMapRequest>
+                    for MoveOnMapSvc<T> {
+                        type Response = super::MoveOnMapResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::MoveOnMapRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).move_on_map(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = MoveOnMapSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.service.motion.v1.MotionService/MoveSingleComponent" => {
                     #[allow(non_camel_case_types)]
                     struct MoveSingleComponentSvc<T: MotionService>(pub Arc<T>);
@@ -304,6 +402,47 @@ pub mod motion_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetPoseSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.service.motion.v1.MotionService/DoCommand" => {
+                    #[allow(non_camel_case_types)]
+                    struct DoCommandSvc<T: MotionService>(pub Arc<T>);
+                    impl<
+                        T: MotionService,
+                    > tonic::server::UnaryService<
+                        super::super::super::super::common::v1::DoCommandRequest,
+                    > for DoCommandSvc<T> {
+                        type Response = super::super::super::super::common::v1::DoCommandResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::super::super::super::common::v1::DoCommandRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).do_command(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DoCommandSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

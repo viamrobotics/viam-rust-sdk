@@ -62,6 +62,8 @@ pub mod pose_tracker_service_client {
             self.inner = self.inner.accept_gzip();
             self
         }
+        /** GetPoses returns the current pose of each body tracked by the pose tracker
+*/
         pub async fn get_poses(
             &mut self,
             request: impl tonic::IntoRequest<super::GetPosesRequest>,
@@ -81,6 +83,34 @@ pub mod pose_tracker_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        /** DoCommand sends/receives arbitrary commands
+*/
+        pub async fn do_command(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::super::super::super::common::v1::DoCommandRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::DoCommandResponse,
+                >,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.posetracker.v1.PoseTrackerService/DoCommand",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -90,10 +120,25 @@ pub mod pose_tracker_service_server {
     ///Generated trait containing gRPC methods that should be implemented for use with PoseTrackerServiceServer.
     #[async_trait]
     pub trait PoseTrackerService: Send + Sync + 'static {
+        /** GetPoses returns the current pose of each body tracked by the pose tracker
+*/
         async fn get_poses(
             &self,
             request: tonic::Request<super::GetPosesRequest>,
         ) -> Result<tonic::Response<super::GetPosesResponse>, tonic::Status>;
+        /** DoCommand sends/receives arbitrary commands
+*/
+        async fn do_command(
+            &self,
+            request: tonic::Request<
+                super::super::super::super::common::v1::DoCommandRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::DoCommandResponse,
+                >,
+                tonic::Status,
+            >;
     }
     #[derive(Debug)]
     pub struct PoseTrackerServiceServer<T: PoseTrackerService> {
@@ -181,6 +226,47 @@ pub mod pose_tracker_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetPosesSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.posetracker.v1.PoseTrackerService/DoCommand" => {
+                    #[allow(non_camel_case_types)]
+                    struct DoCommandSvc<T: PoseTrackerService>(pub Arc<T>);
+                    impl<
+                        T: PoseTrackerService,
+                    > tonic::server::UnaryService<
+                        super::super::super::super::common::v1::DoCommandRequest,
+                    > for DoCommandSvc<T> {
+                        type Response = super::super::super::super::common::v1::DoCommandResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::super::super::super::common::v1::DoCommandRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).do_command(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DoCommandSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
