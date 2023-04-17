@@ -296,6 +296,74 @@ pub mod data_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn add_bounding_box_to_image_by_id(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AddBoundingBoxToImageByIdRequest>,
+        ) -> Result<
+                tonic::Response<super::AddBoundingBoxToImageByIdResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/AddBoundingBoxToImageByID",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn remove_bounding_box_from_image_by_id(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::RemoveBoundingBoxFromImageByIdRequest,
+            >,
+        ) -> Result<
+                tonic::Response<super::RemoveBoundingBoxFromImageByIdResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/RemoveBoundingBoxFromImageByID",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn bounding_box_labels_by_filter(
+            &mut self,
+            request: impl tonic::IntoRequest<super::BoundingBoxLabelsByFilterRequest>,
+        ) -> Result<
+                tonic::Response<super::BoundingBoxLabelsByFilterResponse>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/BoundingBoxLabelsByFilter",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -370,6 +438,27 @@ pub mod data_service_server {
             &self,
             request: tonic::Request<super::TagsByFilterRequest>,
         ) -> Result<tonic::Response<super::TagsByFilterResponse>, tonic::Status>;
+        async fn add_bounding_box_to_image_by_id(
+            &self,
+            request: tonic::Request<super::AddBoundingBoxToImageByIdRequest>,
+        ) -> Result<
+                tonic::Response<super::AddBoundingBoxToImageByIdResponse>,
+                tonic::Status,
+            >;
+        async fn remove_bounding_box_from_image_by_id(
+            &self,
+            request: tonic::Request<super::RemoveBoundingBoxFromImageByIdRequest>,
+        ) -> Result<
+                tonic::Response<super::RemoveBoundingBoxFromImageByIdResponse>,
+                tonic::Status,
+            >;
+        async fn bounding_box_labels_by_filter(
+            &self,
+            request: tonic::Request<super::BoundingBoxLabelsByFilterRequest>,
+        ) -> Result<
+                tonic::Response<super::BoundingBoxLabelsByFilterResponse>,
+                tonic::Status,
+            >;
     }
     #[derive(Debug)]
     pub struct DataServiceServer<T: DataService> {
@@ -884,6 +973,135 @@ pub mod data_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = TagsByFilterSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/AddBoundingBoxToImageByID" => {
+                    #[allow(non_camel_case_types)]
+                    struct AddBoundingBoxToImageByIDSvc<T: DataService>(pub Arc<T>);
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<
+                        super::AddBoundingBoxToImageByIdRequest,
+                    > for AddBoundingBoxToImageByIDSvc<T> {
+                        type Response = super::AddBoundingBoxToImageByIdResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::AddBoundingBoxToImageByIdRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).add_bounding_box_to_image_by_id(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AddBoundingBoxToImageByIDSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/RemoveBoundingBoxFromImageByID" => {
+                    #[allow(non_camel_case_types)]
+                    struct RemoveBoundingBoxFromImageByIDSvc<T: DataService>(pub Arc<T>);
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<
+                        super::RemoveBoundingBoxFromImageByIdRequest,
+                    > for RemoveBoundingBoxFromImageByIDSvc<T> {
+                        type Response = super::RemoveBoundingBoxFromImageByIdResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::RemoveBoundingBoxFromImageByIdRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).remove_bounding_box_from_image_by_id(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RemoveBoundingBoxFromImageByIDSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/BoundingBoxLabelsByFilter" => {
+                    #[allow(non_camel_case_types)]
+                    struct BoundingBoxLabelsByFilterSvc<T: DataService>(pub Arc<T>);
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<
+                        super::BoundingBoxLabelsByFilterRequest,
+                    > for BoundingBoxLabelsByFilterSvc<T> {
+                        type Response = super::BoundingBoxLabelsByFilterResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::BoundingBoxLabelsByFilterRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).bounding_box_labels_by_filter(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = BoundingBoxLabelsByFilterSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
