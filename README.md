@@ -3,7 +3,7 @@
 ## (In)stability Notice
 
 > **Warning**
-> This is a beta release of the Viam Rust SDK. Stability is not guaranteed. Breaking changes are likely to occur, and occur often.
+> This is an alpha release of the Viam Rust SDK. Stability is not guaranteed. Breaking changes are likely to occur, and occur often.
 
 
 ## Prerequisites
