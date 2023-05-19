@@ -32,10 +32,11 @@ Outside of the SDK repository simply run `cargo new my-robot` this will create a
 
 ### Configure Cargo.toml
 The details of Cargo.toml are beyond the scope of this README please refer to [this](https://doc.rust-lang.org/cargo/reference/manifest.html) for more info
-Add the following to your Cargo.toml :
+Add the following to your Cargo.toml, we'll be using the `viam-rust-utils` package to connect to the robot:
 ``` toml
 [dependencies]
 viam = {path = "../"} #this path should point to the Rust SDK repository
+viam-rust-utils = { git = "https://github.com/viamrobotics/rust-utils.git", rev = "e177376c084bdadf8d67d077629fb16b3cd72097" }
 anyhow = { version = "1.0", features = ["backtrace"]}
 tokio = { version = "1.0", features = [ "rt-multi-thread", "time", "fs", "macros", "net",] }
 tonic = {version = "0.6.2",features = ["tls", "compression", "tls-roots"]}
@@ -45,8 +46,8 @@ At the top of the file add :
 
 ``` rust
 use anyhow::Result;
-use viam::gen::proto::api::robot::v1::{robot_service_client, ResourceNamesRequest};
-use viam::rpc::dial;
+use viam::gen::proto::robot::v1::{robot_service_client, ResourceNamesRequest};
+use viam_rust_utils::rpc::dial;
 ```
 Replace the main function signature with :
 
@@ -82,31 +83,49 @@ cargo run --bin test-echo
 If you are connecting to a robot with authentication you will need to create credentials :
 
 ``` rust
-let creds = dial::CredentialsExt::new(
-        String::from("robot-location-secret"),
-        String::from("secret"),
-    );
+let creds = dial::RPCCredentials::new(
+    None,
+    "robot-location-secret".to_string(),
+    "<SECRET>".to_string(),
+);
 ```
 Then to obtain a channel do :
 
 ``` rust
 let c = dial::DialConfig::builder()
-        .uri("test-main.33vvxnbbw9.local.viam.cloud:8080") // Robot address
-        .with_credentials(creds) // credentials
-        .connect()
-        .await?; // if the connection complete you will have a channel otherwise an error
+    .uri("<ROBOT SECRET>")
+    .with_credentials(creds)
+    .connect()
+    .await?; // if the connection complete you will have a channel otherwise an error
 ```
 
 Now if we want to get the metadata of the robots we just have to do :
 
 ``` rust
 let mut service = robot_service_client::RobotServiceClient::new(c);
-    let _rsp = service
-        .resource_names(tonic::Request::new(ResourceNamesRequest {}))
-        .await?;
-    println!("Rsp {:?}", _rsp);
+let _rsp = service
+    .resource_names(ResourceNamesRequest {})
+    .await?;
+println!("Rsp {:?}", _rsp);
 ```
 Note that after that the channel has been moved and therefore will not be usable again, to avoid this clone it first.
+
+To connect to a base, for example, add the below line to the top of the file.
+
+``` rust
+use viam::gen::proto::component::base::v1::{base_service_client, IsMovingRequest};
+```
+
+And add this to the bottom of the script:
+
+``` rust
+let mut base_service = base_service_client::BaseServiceClient::new(c.clone());
+let _rsp = base_service
+    .is_moving(IsMovingRequest {name:"viam_base".to_string()})
+    .await?;
+println!("Rsp {:?}", _rsp);
+```
+
 
 If you want to connect to a robot without credentials then just do :
 
@@ -130,53 +149,12 @@ let c = dial::DialConfig::builder()
         .await?; // if the connection complete you will have a channel otherwise an error
 ```
 
-## Using FFI (Foreign Functions Interface)
-The rust sdk exposes a few functions conforming to the platform's C calling convention. Most languages support calling C code but their particular implementation is beyond the scope of this README. However we provide example in C++.
-
-### Set up
-For now we only support Unix-like systems. Before continuing make sure that GRPCCpp has been installed on your system.
-Navigate to :
-
-``` shell
-cd examples/src/ffi/cpp
-# Then
-make buf
-```
-
-### Echo example
-The echo example communicate with the goutils sample server, navigate to your goutils clone and run
-
-``` shell
-go run rpc/examples/echo/server/cmd/main.go
-```
-
-Then run 
-
-``` shell
-make ffi_echo && ./ffi_echo
-```
-
-### Robot example
-The robot example communicate with a rdk server
-Update the dial function with your address and secret in the file ffi_robot.cc
-
-``` c++
-dial("<robot-address>",
-            "<robot-secret>",
-            false, ptr);
-```
-Then run 
-
-``` shell
-make ffi_robot && ./ffi_robot
-```
-
 ## Two Notes on Connectivity and webRTC Functionality
 First: the rust SDK attempts to dial over webRTC by default. You can override this by calling `disable_webrtc()` on the dial builder.
 
 Second: the rust webRTC implementation is still new, and liable to have bugs. At a minimum, we expect that calls to `ShellService::shell()` have a high likelihood of strange behavior. If you encounter any issues with streaming requests over webRTC, direct dial (by disabling webrtc as above) should resolve them. And please file a bug report! We will endeavor to be as responsive as possible, and resolve issues as quickly as possible.
 
 ## License 
-Copyright 2021-2022 Viam Inc.
+Copyright 2021-2023 Viam Inc.
 
 Apache 2.0 - See [LICENSE](https://github.com/viamrobotics/viam-rust-sdk/blob/main/LICENSE) file
