@@ -100,6 +100,25 @@ pub mod motion_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn move_on_globe(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MoveOnGlobeRequest>,
+        ) -> Result<tonic::Response<super::MoveOnGlobeResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.motion.v1.MotionService/MoveOnGlobe",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn move_single_component(
             &mut self,
             request: impl tonic::IntoRequest<super::MoveSingleComponentRequest>,
@@ -181,6 +200,10 @@ pub mod motion_service_server {
             &self,
             request: tonic::Request<super::MoveOnMapRequest>,
         ) -> Result<tonic::Response<super::MoveOnMapResponse>, tonic::Status>;
+        async fn move_on_globe(
+            &self,
+            request: tonic::Request<super::MoveOnGlobeRequest>,
+        ) -> Result<tonic::Response<super::MoveOnGlobeResponse>, tonic::Status>;
         async fn move_single_component(
             &self,
             request: tonic::Request<super::MoveSingleComponentRequest>,
@@ -324,6 +347,46 @@ pub mod motion_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = MoveOnMapSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.service.motion.v1.MotionService/MoveOnGlobe" => {
+                    #[allow(non_camel_case_types)]
+                    struct MoveOnGlobeSvc<T: MotionService>(pub Arc<T>);
+                    impl<
+                        T: MotionService,
+                    > tonic::server::UnaryService<super::MoveOnGlobeRequest>
+                    for MoveOnGlobeSvc<T> {
+                        type Response = super::MoveOnGlobeResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::MoveOnGlobeRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).move_on_globe(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = MoveOnGlobeSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
