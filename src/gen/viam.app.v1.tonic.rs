@@ -3419,6 +3419,28 @@ pub mod billing_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn get_invoice_pdf(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetInvoicePdfRequest>,
+        ) -> Result<
+                tonic::Response<tonic::codec::Streaming<super::GetInvoicePdfResponse>>,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.BillingService/GetInvoicePdf",
+            );
+            self.inner.server_streaming(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -3466,6 +3488,16 @@ pub mod billing_service_server {
             &self,
             request: tonic::Request<super::GetInvoicesSummaryRequest>,
         ) -> Result<tonic::Response<super::GetInvoicesSummaryResponse>, tonic::Status>;
+        ///Server streaming response type for the GetInvoicePdf method.
+        type GetInvoicePdfStream: futures_core::Stream<
+                Item = Result<super::GetInvoicePdfResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn get_invoice_pdf(
+            &self,
+            request: tonic::Request<super::GetInvoicePdfRequest>,
+        ) -> Result<tonic::Response<Self::GetInvoicePdfStream>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct BillingServiceServer<T: BillingService> {
@@ -3847,6 +3879,47 @@ pub mod billing_service_server {
                                 send_compression_encodings,
                             );
                         let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.BillingService/GetInvoicePdf" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetInvoicePdfSvc<T: BillingService>(pub Arc<T>);
+                    impl<
+                        T: BillingService,
+                    > tonic::server::ServerStreamingService<super::GetInvoicePdfRequest>
+                    for GetInvoicePdfSvc<T> {
+                        type Response = super::GetInvoicePdfResponse;
+                        type ResponseStream = T::GetInvoicePdfStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetInvoicePdfRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_invoice_pdf(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetInvoicePdfSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
