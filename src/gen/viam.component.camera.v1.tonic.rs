@@ -169,6 +169,32 @@ pub mod camera_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn get_geometries(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::super::super::super::common::v1::GetGeometriesRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::GetGeometriesResponse,
+                >,
+                tonic::Status,
+            > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.camera.v1.CameraService/GetGeometries",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -207,6 +233,17 @@ pub mod camera_service_server {
         ) -> Result<
                 tonic::Response<
                     super::super::super::super::common::v1::DoCommandResponse,
+                >,
+                tonic::Status,
+            >;
+        async fn get_geometries(
+            &self,
+            request: tonic::Request<
+                super::super::super::super::common::v1::GetGeometriesRequest,
+            >,
+        ) -> Result<
+                tonic::Response<
+                    super::super::super::super::common::v1::GetGeometriesResponse,
                 >,
                 tonic::Status,
             >;
@@ -458,6 +495,49 @@ pub mod camera_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = DoCommandSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.camera.v1.CameraService/GetGeometries" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetGeometriesSvc<T: CameraService>(pub Arc<T>);
+                    impl<
+                        T: CameraService,
+                    > tonic::server::UnaryService<
+                        super::super::super::super::common::v1::GetGeometriesRequest,
+                    > for GetGeometriesSvc<T> {
+                        type Response = super::super::super::super::common::v1::GetGeometriesResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::super::super::super::common::v1::GetGeometriesRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_geometries(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetGeometriesSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
