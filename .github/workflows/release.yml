@@ -1,14 +1,27 @@
-name: Build release binaries
+name: Build + draft release
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'The type of version bump. Use "nobump" for no change.'
+        type: choice
+        required: true
+        default: nobump
+        options:
+        - major
+        - minor
+        - patch
+        - nobump
 
 jobs:
-  check_if_org_member:
+  prepare:
     if: github.repository_owner == 'viamrobotics'
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/viamrobotics/canon:amd64
+    outputs:
+      version: ${{ steps.which_version.outputs.version }}
     steps:
       - name: Check if organization member
         id: is_organization_member
@@ -18,10 +31,52 @@ jobs:
           username: ${{ github.actor }}
           token:  ${{ secrets.GITHUB_TOKEN }}
 
-      - name: cancelling
+      - name: Cancelling - user not part of organization
         uses: andymckay/cancel-action@0.2
         if: |
           steps.is_organization_member.outputs.result == 'false'
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Bump Version
+        shell: bash
+        if: inputs.version != 'nobump'
+        run: |
+          cargo install cargo-bump
+          cargo bump ${{ inputs.version }}
+
+      - name: Which Version
+        id: which_version
+        shell: bash
+        run: |
+          echo "version=$(cargo pkgid | sed 's/.*@//g')" >> $GITHUB_OUTPUT
+
+      - name: Check if release exists
+        uses: cardinalby/git-get-release-action@1.2.4
+        id: release_exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseName: v${{ steps.which_version.outputs.version }}
+          doNotFailIfNotFound: 'true'
+
+      - name: Cancelling - release already exists
+        uses: andymckay/cancel-action@0.2
+        if: steps.release_exists.outputs.id != ''
+
+      - name: Commit + Push
+        id: commit
+        uses: EndBug/add-and-commit@v9.0.0
+        with:
+          default_author: github_actions
+          message: Bumping version to v${{ steps.which_version.outputs.version }} [skip ci]
+
 
   build_native:
     runs-on: ${{ matrix.os }}
@@ -59,45 +114,95 @@ jobs:
           name: builds
           path: builds
 
-  build_in_container:
-    runs-on: ${{ matrix.arch }}
-    container:
-      image: ${{ matrix.image }}
-      options: ${{ matrix.opts }}
+  build_macos:
+    if: github.repository_owner == 'viamrobotics'
+    needs: [prepare]
+    runs-on: [self-hosted, ARM64, macOS]
     strategy:
       fail-fast: false
       matrix:
         include:
-          - arch: [arm64, qemu-host]
-            target: aarch64-unknown-linux-gnu
-            platform: linux_aarch64
-            ext: so
-            image: 'ghcr.io/viamrobotics/canon:arm64-cache'
-            opts: '--platform linux/arm64'
-          - arch: [x64, qemu-host]
-            target: x86_64-unknown-linux-gnu
-            platform: linux_x86_64
-            ext: so
-            image: 'ghcr.io/viamrobotics/canon:amd64-cache'
-            opts: '--platform linux/amd64'
+          - target: aarch64-apple-darwin
+            platform: macosx_arm64
+          - target: x86_64-apple-darwin
+            platform: macosx_x86_64
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          target: ${{ matrix.target }}
+          targets: ${{ matrix.target }}
       - name: Setup build directory
         run: mkdir builds
       - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --target=${{ matrix.target }}
+        run: |
+          cargo build --release --target=${{ matrix.target }}
       - name: Copy
-        run: cp target/${{ matrix.target }}/release/libviam.${{ matrix.ext }} builds/libviam-${{ matrix.platform }}.${{ matrix.ext }}
+        run: cp target/${{ matrix.target }}/release/libviam_rust_utils.dylib builds/libviam_rust_utils-${{ matrix.platform }}.dylib
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: builds
           path: builds
+
+  build_linux:
+    if: github.repository_owner == 'viamrobotics'
+    needs: [prepare]
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/cross-rs/${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-unknown-linux-gnu
+            platform: linux_aarch64
+            image: aarch64-unknown-linux-gnu:main-centos
+          - target: x86_64-unknown-linux-gnu
+            platform: linux_x86_64
+            image: x86_64-unknown-linux-gnu:main-centos
+          - target: arm-unknown-linux-gnueabihf
+            platform: linux_armv6l
+            image: arm-unknown-linux-gnueabihf:main
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup rust toolchain
+        shell: bash
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          rustup target add ${{ matrix.target }}
+      - name: Setup build directory
+        run: mkdir builds
+      - name: Build
+        shell: bash
+        run: |
+          source "$HOME/.cargo/env"
+          cargo build --release --target=${{ matrix.target }}
+      - name: Copy
+        run: cp target/${{ matrix.target }}/release/libviam_rust_utils.so builds/libviam_rust_utils-${{ matrix.platform }}.so
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: builds
+          path: builds
+
+  release:
+    needs: [prepare, build_macos, build_linux]
+    if: github.repository_owner == 'viamrobotics'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+
+    steps:
+      - uses: actions/download-artifact@v3
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.prepare.outputs.version }}
+          files: builds/*
+          draft: true
+          prerelease: false
+          fail_on_unmatched_files: true
