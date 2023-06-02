@@ -144,7 +144,7 @@ jobs:
           source "$HOME/.cargo/env"
           cargo build --release --target=${{ matrix.target }}
       - name: Copy
-        run: cp target/${{ matrix.target }}/release/libviam.${{ matrix.ext }} builds/libviam-${{ matrix.platform }}.${{ matrix.ext }}
+        run: cp target/${{ matrix.target }}/release/libviam.so builds/libviam-${{ matrix.platform }}.so
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
