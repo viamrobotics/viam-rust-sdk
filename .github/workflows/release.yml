@@ -22,6 +22,7 @@ jobs:
       image: ghcr.io/viamrobotics/canon:amd64
     outputs:
       version: ${{ steps.which_version.outputs.version }}
+      sha: ${{ steps.commit.outputs.commit_long_sha }}
     steps:
       - name: Check if organization member
         id: is_organization_member
@@ -90,7 +91,10 @@ jobs:
           - target: x86_64-apple-darwin
             platform: macosx_x86_64
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
       - name: Setup rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -129,7 +133,10 @@ jobs:
             platform: linux_armv6l
             image: arm-unknown-linux-gnueabihf:main
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
       - name: Setup rust toolchain
         shell: bash
         run: |
