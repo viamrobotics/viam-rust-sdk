@@ -100,6 +100,25 @@ pub mod gantry_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn home(
+            &mut self,
+            request: impl tonic::IntoRequest<super::HomeRequest>,
+        ) -> Result<tonic::Response<super::HomeResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.gantry.v1.GantryService/Home",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn get_lengths(
             &mut self,
             request: impl tonic::IntoRequest<super::GetLengthsRequest>,
@@ -226,6 +245,10 @@ pub mod gantry_service_server {
             &self,
             request: tonic::Request<super::MoveToPositionRequest>,
         ) -> Result<tonic::Response<super::MoveToPositionResponse>, tonic::Status>;
+        async fn home(
+            &self,
+            request: tonic::Request<super::HomeRequest>,
+        ) -> Result<tonic::Response<super::HomeResponse>, tonic::Status>;
         async fn get_lengths(
             &self,
             request: tonic::Request<super::GetLengthsRequest>,
@@ -389,6 +412,43 @@ pub mod gantry_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = MoveToPositionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.gantry.v1.GantryService/Home" => {
+                    #[allow(non_camel_case_types)]
+                    struct HomeSvc<T: GantryService>(pub Arc<T>);
+                    impl<
+                        T: GantryService,
+                    > tonic::server::UnaryService<super::HomeRequest> for HomeSvc<T> {
+                        type Response = super::HomeResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::HomeRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).home(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = HomeSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
