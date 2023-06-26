@@ -129,6 +129,25 @@ pub mod slam_service_client {
             );
             self.inner.server_streaming(request.into_request(), path, codec).await
         }
+        pub async fn get_latest_map_info(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetLatestMapInfoRequest>,
+        ) -> Result<tonic::Response<super::GetLatestMapInfoResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.slam.v1.SLAMService/GetLatestMapInfo",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         pub async fn do_command(
             &mut self,
             request: impl tonic::IntoRequest<
@@ -188,6 +207,10 @@ pub mod slam_service_server {
             &self,
             request: tonic::Request<super::GetInternalStateRequest>,
         ) -> Result<tonic::Response<Self::GetInternalStateStream>, tonic::Status>;
+        async fn get_latest_map_info(
+            &self,
+            request: tonic::Request<super::GetLatestMapInfoRequest>,
+        ) -> Result<tonic::Response<super::GetLatestMapInfoResponse>, tonic::Status>;
         async fn do_command(
             &self,
             request: tonic::Request<
@@ -379,6 +402,46 @@ pub mod slam_service_server {
                                 send_compression_encodings,
                             );
                         let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.service.slam.v1.SLAMService/GetLatestMapInfo" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetLatestMapInfoSvc<T: SlamService>(pub Arc<T>);
+                    impl<
+                        T: SlamService,
+                    > tonic::server::UnaryService<super::GetLatestMapInfoRequest>
+                    for GetLatestMapInfoSvc<T> {
+                        type Response = super::GetLatestMapInfoResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetLatestMapInfoRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).get_latest_map_info(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetLatestMapInfoSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
