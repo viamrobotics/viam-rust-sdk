@@ -33,13 +33,6 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.app.mltraining.v1)
             }
         }
-        pub mod model {
-            // @@protoc_insertion_point(attribute:viam.app.model.v1)
-            pub mod v1 {
-                include!("viam.app.model.v1.rs");
-                // @@protoc_insertion_point(viam.app.model.v1)
-            }
-        }
         pub mod packages {
             // @@protoc_insertion_point(attribute:viam.app.packages.v1)
             pub mod v1 {
