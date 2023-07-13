@@ -84,13 +84,14 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.component.encoder.v1)
             }
         }
-        pub mod generic {
-            // @@protoc_insertion_point(attribute:viam.component.generic.v1)
-            pub mod v1 {
-                include!("viam.component.generic.v1.rs");
-                // @@protoc_insertion_point(viam.component.generic.v1)
-            }
-        }
+        // TODO - why isn't the generic component API code being generated?
+        // pub mod generic {
+        //     // @@protoc_insertion_point(attribute:viam.component.generic.v1)
+        //     pub mod v1 {
+        //         include!("viam.component.generic.v1.rs");
+        //         // @@protoc_insertion_point(viam.component.generic.v1)
+        //     }
+        // }
         pub mod gantry {
             // @@protoc_insertion_point(attribute:viam.component.gantry.v1)
             pub mod v1 {
