@@ -88,8 +88,8 @@ pub struct GetPackageRequest {
     pub version: ::prost::alloc::string::String,
     #[prost(bool, optional, tag="3")]
     pub include_url: ::core::option::Option<bool>,
-    #[prost(string, optional, tag="4")]
-    pub r#type: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(enumeration="PackageType", optional, tag="4")]
+    pub r#type: ::core::option::Option<i32>,
     #[prost(string, optional, tag="5")]
     pub platform: ::core::option::Option<::prost::alloc::string::String>,
 }

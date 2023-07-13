@@ -131,6 +131,18 @@ pub struct GetOrganizationResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetOrganizationNamespaceAvailabilityRequest {
+    #[prost(string, tag="1")]
+    pub public_namespace: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetOrganizationNamespaceAvailabilityResponse {
+    #[prost(bool, tag="1")]
+    pub available: bool,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateOrganizationRequest {
     #[prost(string, tag="1")]
     pub organization_id: ::prost::alloc::string::String,
