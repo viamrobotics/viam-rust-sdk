@@ -84,16 +84,13 @@ pub mod proto {
                 // @@protoc_insertion_point(viam.component.encoder.v1)
             }
         }
-        // TODO - The generic component API is not generated due to a bug in the buf
-        // package around proto files that define services, but no messages: 
-        // https://github.com/neoeinstein/protoc-gen-prost/issues/61
-        // pub mod generic {
-        //     // @@protoc_insertion_point(attribute:viam.component.generic.v1)
-        //     pub mod v1 {
-        //         include!("viam.component.generic.v1.rs");
-        //         // @@protoc_insertion_point(viam.component.generic.v1)
-        //     }
-        // }
+        pub mod generic {
+            // @@protoc_insertion_point(attribute:viam.component.generic.v1)
+            pub mod v1 {
+                include!("viam.component.generic.v1.rs");
+                // @@protoc_insertion_point(viam.component.generic.v1)
+            }
+        }
         pub mod gantry {
             // @@protoc_insertion_point(attribute:viam.component.gantry.v1)
             pub mod v1 {
