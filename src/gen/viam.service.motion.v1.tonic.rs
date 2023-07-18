@@ -3,6 +3,7 @@
 pub mod motion_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
     pub struct MotionServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -11,7 +12,7 @@ pub mod motion_service_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -22,11 +23,15 @@ pub mod motion_service_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Default + Body<Data = Bytes> + Send + 'static,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
             Self { inner }
         }
         pub fn with_interceptor<F>(
@@ -35,6 +40,7 @@ pub mod motion_service_client {
         ) -> MotionServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -47,25 +53,41 @@ pub mod motion_service_client {
         {
             MotionServiceClient::new(InterceptedService::new(inner, interceptor))
         }
-        /// Compress requests with `gzip`.
+        /// Compress requests with the given encoding.
         ///
         /// This requires the server to support it otherwise it might respond with an
         /// error.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.inner = self.inner.send_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
             self
         }
-        /// Enable decompressing responses with `gzip`.
+        /// Enable decompressing responses.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.inner = self.inner.accept_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
         pub async fn r#move(
             &mut self,
             request: impl tonic::IntoRequest<super::MoveRequest>,
-        ) -> Result<tonic::Response<super::MoveResponse>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::MoveResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -79,12 +101,18 @@ pub mod motion_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.service.motion.v1.MotionService/Move",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.service.motion.v1.MotionService", "Move"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn move_on_map(
             &mut self,
             request: impl tonic::IntoRequest<super::MoveOnMapRequest>,
-        ) -> Result<tonic::Response<super::MoveOnMapResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::MoveOnMapResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -98,12 +126,20 @@ pub mod motion_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.service.motion.v1.MotionService/MoveOnMap",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.service.motion.v1.MotionService", "MoveOnMap"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn move_on_globe(
             &mut self,
             request: impl tonic::IntoRequest<super::MoveOnGlobeRequest>,
-        ) -> Result<tonic::Response<super::MoveOnGlobeResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::MoveOnGlobeResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -117,12 +153,23 @@ pub mod motion_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.service.motion.v1.MotionService/MoveOnGlobe",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.service.motion.v1.MotionService",
+                        "MoveOnGlobe",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn move_single_component(
             &mut self,
             request: impl tonic::IntoRequest<super::MoveSingleComponentRequest>,
-        ) -> Result<tonic::Response<super::MoveSingleComponentResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::MoveSingleComponentResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -136,12 +183,23 @@ pub mod motion_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.service.motion.v1.MotionService/MoveSingleComponent",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.service.motion.v1.MotionService",
+                        "MoveSingleComponent",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_pose(
             &mut self,
             request: impl tonic::IntoRequest<super::GetPoseRequest>,
-        ) -> Result<tonic::Response<super::GetPoseResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetPoseResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -155,19 +213,22 @@ pub mod motion_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.service.motion.v1.MotionService/GetPose",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.service.motion.v1.MotionService", "GetPose"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn do_command(
             &mut self,
             request: impl tonic::IntoRequest<
                 super::super::super::super::common::v1::DoCommandRequest,
             >,
-        ) -> Result<
-                tonic::Response<
-                    super::super::super::super::common::v1::DoCommandResponse,
-                >,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -181,7 +242,12 @@ pub mod motion_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.service.motion.v1.MotionService/DoCommand",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.service.motion.v1.MotionService", "DoCommand"),
+                );
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -189,46 +255,55 @@ pub mod motion_service_client {
 pub mod motion_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with MotionServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with MotionServiceServer.
     #[async_trait]
     pub trait MotionService: Send + Sync + 'static {
         async fn r#move(
             &self,
             request: tonic::Request<super::MoveRequest>,
-        ) -> Result<tonic::Response<super::MoveResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::MoveResponse>, tonic::Status>;
         async fn move_on_map(
             &self,
             request: tonic::Request<super::MoveOnMapRequest>,
-        ) -> Result<tonic::Response<super::MoveOnMapResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::MoveOnMapResponse>,
+            tonic::Status,
+        >;
         async fn move_on_globe(
             &self,
             request: tonic::Request<super::MoveOnGlobeRequest>,
-        ) -> Result<tonic::Response<super::MoveOnGlobeResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::MoveOnGlobeResponse>,
+            tonic::Status,
+        >;
         async fn move_single_component(
             &self,
             request: tonic::Request<super::MoveSingleComponentRequest>,
-        ) -> Result<tonic::Response<super::MoveSingleComponentResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::MoveSingleComponentResponse>,
+            tonic::Status,
+        >;
         async fn get_pose(
             &self,
             request: tonic::Request<super::GetPoseRequest>,
-        ) -> Result<tonic::Response<super::GetPoseResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::GetPoseResponse>, tonic::Status>;
         async fn do_command(
             &self,
             request: tonic::Request<
                 super::super::super::super::common::v1::DoCommandRequest,
             >,
-        ) -> Result<
-                tonic::Response<
-                    super::super::super::super::common::v1::DoCommandResponse,
-                >,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
+            tonic::Status,
+        >;
     }
     #[derive(Debug)]
     pub struct MotionServiceServer<T: MotionService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: MotionService> MotionServiceServer<T> {
@@ -241,6 +316,8 @@ pub mod motion_service_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -252,16 +329,32 @@ pub mod motion_service_server {
         {
             InterceptedService::new(Self::new(inner), interceptor)
         }
-        /// Enable decompressing requests with `gzip`.
+        /// Enable decompressing requests with the given encoding.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.accept_compression_encodings.enable_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
             self
         }
-        /// Compress responses with `gzip`, if the client supports it.
+        /// Compress responses with the given encoding, if the client supports it.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.send_compression_encodings.enable_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
             self
         }
     }
@@ -277,7 +370,7 @@ pub mod motion_service_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -298,13 +391,15 @@ pub mod motion_service_server {
                             &mut self,
                             request: tonic::Request<super::MoveRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).r#move(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -314,6 +409,10 @@ pub mod motion_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -336,13 +435,15 @@ pub mod motion_service_server {
                             &mut self,
                             request: tonic::Request<super::MoveOnMapRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).move_on_map(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -352,6 +453,10 @@ pub mod motion_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -374,7 +479,7 @@ pub mod motion_service_server {
                             &mut self,
                             request: tonic::Request<super::MoveOnGlobeRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).move_on_globe(request).await
                             };
@@ -383,6 +488,8 @@ pub mod motion_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -392,6 +499,10 @@ pub mod motion_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -414,7 +525,7 @@ pub mod motion_service_server {
                             &mut self,
                             request: tonic::Request<super::MoveSingleComponentRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).move_single_component(request).await
                             };
@@ -423,6 +534,8 @@ pub mod motion_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -432,6 +545,10 @@ pub mod motion_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -454,13 +571,15 @@ pub mod motion_service_server {
                             &mut self,
                             request: tonic::Request<super::GetPoseRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).get_pose(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -470,6 +589,10 @@ pub mod motion_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -495,13 +618,15 @@ pub mod motion_service_server {
                                 super::super::super::super::common::v1::DoCommandRequest,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).do_command(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -511,6 +636,10 @@ pub mod motion_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -539,12 +668,14 @@ pub mod motion_service_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: MotionService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
@@ -552,7 +683,7 @@ pub mod motion_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: MotionService> tonic::transport::NamedService for MotionServiceServer<T> {
+    impl<T: MotionService> tonic::server::NamedService for MotionServiceServer<T> {
         const NAME: &'static str = "viam.service.motion.v1.MotionService";
     }
 }

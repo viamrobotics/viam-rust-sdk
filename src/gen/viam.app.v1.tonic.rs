@@ -3,6 +3,7 @@
 pub mod app_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
     pub struct AppServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -11,7 +12,7 @@ pub mod app_service_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -22,11 +23,15 @@ pub mod app_service_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Default + Body<Data = Bytes> + Send + 'static,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
             Self { inner }
         }
         pub fn with_interceptor<F>(
@@ -35,6 +40,7 @@ pub mod app_service_client {
         ) -> AppServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -47,25 +53,69 @@ pub mod app_service_client {
         {
             AppServiceClient::new(InterceptedService::new(inner, interceptor))
         }
-        /// Compress requests with `gzip`.
+        /// Compress requests with the given encoding.
         ///
         /// This requires the server to support it otherwise it might respond with an
         /// error.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.inner = self.inner.send_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
             self
         }
-        /// Enable decompressing responses with `gzip`.
+        /// Enable decompressing responses.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.inner = self.inner.accept_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
             self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
+        pub async fn get_user_id_by_email(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetUserIdByEmailRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetUserIdByEmailResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/GetUserIDByEmail",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetUserIDByEmail"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn create_organization(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateOrganizationRequest>,
-        ) -> Result<tonic::Response<super::CreateOrganizationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::CreateOrganizationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -79,12 +129,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/CreateOrganization",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "CreateOrganization"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn list_organizations(
             &mut self,
             request: impl tonic::IntoRequest<super::ListOrganizationsRequest>,
-        ) -> Result<tonic::Response<super::ListOrganizationsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::ListOrganizationsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -98,12 +154,45 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/ListOrganizations",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ListOrganizations"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn list_organizations_by_user(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListOrganizationsByUserRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListOrganizationsByUserResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ListOrganizationsByUser",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "ListOrganizationsByUser"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_organization(
             &mut self,
             request: impl tonic::IntoRequest<super::GetOrganizationRequest>,
-        ) -> Result<tonic::Response<super::GetOrganizationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetOrganizationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -117,12 +206,50 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/GetOrganization",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetOrganization"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn get_organization_namespace_availability(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::GetOrganizationNamespaceAvailabilityRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::GetOrganizationNamespaceAvailabilityResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/GetOrganizationNamespaceAvailability",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.v1.AppService",
+                        "GetOrganizationNamespaceAvailability",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn update_organization(
             &mut self,
             request: impl tonic::IntoRequest<super::UpdateOrganizationRequest>,
-        ) -> Result<tonic::Response<super::UpdateOrganizationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateOrganizationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -136,12 +263,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/UpdateOrganization",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "UpdateOrganization"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn delete_organization(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteOrganizationRequest>,
-        ) -> Result<tonic::Response<super::DeleteOrganizationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteOrganizationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -155,15 +288,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteOrganization",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "DeleteOrganization"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn list_organization_members(
             &mut self,
             request: impl tonic::IntoRequest<super::ListOrganizationMembersRequest>,
-        ) -> Result<
-                tonic::Response<super::ListOrganizationMembersResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::ListOrganizationMembersResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -177,15 +313,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/ListOrganizationMembers",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "ListOrganizationMembers"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn create_organization_invite(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateOrganizationInviteRequest>,
-        ) -> Result<
-                tonic::Response<super::CreateOrganizationInviteResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::CreateOrganizationInviteResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -199,15 +340,52 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/CreateOrganizationInvite",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "CreateOrganizationInvite"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn update_organization_invite_authorizations(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::UpdateOrganizationInviteAuthorizationsRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateOrganizationInviteAuthorizationsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/UpdateOrganizationInviteAuthorizations",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.v1.AppService",
+                        "UpdateOrganizationInviteAuthorizations",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn delete_organization_member(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteOrganizationMemberRequest>,
-        ) -> Result<
-                tonic::Response<super::DeleteOrganizationMemberResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteOrganizationMemberResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -221,15 +399,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteOrganizationMember",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "DeleteOrganizationMember"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn delete_organization_invite(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteOrganizationInviteRequest>,
-        ) -> Result<
-                tonic::Response<super::DeleteOrganizationInviteResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteOrganizationInviteResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -243,15 +426,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteOrganizationInvite",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "DeleteOrganizationInvite"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn resend_organization_invite(
             &mut self,
             request: impl tonic::IntoRequest<super::ResendOrganizationInviteRequest>,
-        ) -> Result<
-                tonic::Response<super::ResendOrganizationInviteResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::ResendOrganizationInviteResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -265,12 +453,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/ResendOrganizationInvite",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "ResendOrganizationInvite"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn create_location(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateLocationRequest>,
-        ) -> Result<tonic::Response<super::CreateLocationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::CreateLocationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -284,12 +480,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/CreateLocation",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "CreateLocation"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_location(
             &mut self,
             request: impl tonic::IntoRequest<super::GetLocationRequest>,
-        ) -> Result<tonic::Response<super::GetLocationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetLocationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -303,12 +505,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/GetLocation",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetLocation"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn update_location(
             &mut self,
             request: impl tonic::IntoRequest<super::UpdateLocationRequest>,
-        ) -> Result<tonic::Response<super::UpdateLocationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateLocationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -322,12 +530,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/UpdateLocation",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "UpdateLocation"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn delete_location(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteLocationRequest>,
-        ) -> Result<tonic::Response<super::DeleteLocationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteLocationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -341,12 +555,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteLocation",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "DeleteLocation"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn list_locations(
             &mut self,
             request: impl tonic::IntoRequest<super::ListLocationsRequest>,
-        ) -> Result<tonic::Response<super::ListLocationsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::ListLocationsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -360,12 +580,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/ListLocations",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ListLocations"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn share_location(
             &mut self,
             request: impl tonic::IntoRequest<super::ShareLocationRequest>,
-        ) -> Result<tonic::Response<super::ShareLocationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::ShareLocationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -379,12 +605,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/ShareLocation",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ShareLocation"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn unshare_location(
             &mut self,
             request: impl tonic::IntoRequest<super::UnshareLocationRequest>,
-        ) -> Result<tonic::Response<super::UnshareLocationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::UnshareLocationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -398,12 +630,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/UnshareLocation",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "UnshareLocation"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn location_auth(
             &mut self,
             request: impl tonic::IntoRequest<super::LocationAuthRequest>,
-        ) -> Result<tonic::Response<super::LocationAuthResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::LocationAuthResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -417,15 +655,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/LocationAuth",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "LocationAuth"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn create_location_secret(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateLocationSecretRequest>,
-        ) -> Result<
-                tonic::Response<super::CreateLocationSecretResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::CreateLocationSecretResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -439,15 +680,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/CreateLocationSecret",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "CreateLocationSecret"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn delete_location_secret(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteLocationSecretRequest>,
-        ) -> Result<
-                tonic::Response<super::DeleteLocationSecretResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteLocationSecretResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -461,12 +707,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteLocationSecret",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "DeleteLocationSecret"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_robot(
             &mut self,
             request: impl tonic::IntoRequest<super::GetRobotRequest>,
-        ) -> Result<tonic::Response<super::GetRobotResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -480,15 +734,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/GetRobot",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetRobot"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_rover_rental_robots(
             &mut self,
             request: impl tonic::IntoRequest<super::GetRoverRentalRobotsRequest>,
-        ) -> Result<
-                tonic::Response<super::GetRoverRentalRobotsResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::GetRoverRentalRobotsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -502,12 +759,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/GetRoverRentalRobots",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "GetRoverRentalRobots"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_robot_parts(
             &mut self,
             request: impl tonic::IntoRequest<super::GetRobotPartsRequest>,
-        ) -> Result<tonic::Response<super::GetRobotPartsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotPartsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -521,12 +786,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/GetRobotParts",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetRobotParts"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_robot_part(
             &mut self,
             request: impl tonic::IntoRequest<super::GetRobotPartRequest>,
-        ) -> Result<tonic::Response<super::GetRobotPartResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotPartResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -540,12 +811,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/GetRobotPart",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetRobotPart"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_robot_part_logs(
             &mut self,
             request: impl tonic::IntoRequest<super::GetRobotPartLogsRequest>,
-        ) -> Result<tonic::Response<super::GetRobotPartLogsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotPartLogsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -559,17 +836,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/GetRobotPartLogs",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetRobotPartLogs"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn tail_robot_part_logs(
             &mut self,
             request: impl tonic::IntoRequest<super::TailRobotPartLogsRequest>,
-        ) -> Result<
-                tonic::Response<
-                    tonic::codec::Streaming<super::TailRobotPartLogsResponse>,
-                >,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::TailRobotPartLogsResponse>>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -583,12 +861,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/TailRobotPartLogs",
             );
-            self.inner.server_streaming(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "TailRobotPartLogs"));
+            self.inner.server_streaming(req, path, codec).await
         }
         pub async fn get_robot_part_history(
             &mut self,
             request: impl tonic::IntoRequest<super::GetRobotPartHistoryRequest>,
-        ) -> Result<tonic::Response<super::GetRobotPartHistoryResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotPartHistoryResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -602,12 +886,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/GetRobotPartHistory",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "GetRobotPartHistory"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn update_robot_part(
             &mut self,
             request: impl tonic::IntoRequest<super::UpdateRobotPartRequest>,
-        ) -> Result<tonic::Response<super::UpdateRobotPartResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateRobotPartResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -621,12 +913,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/UpdateRobotPart",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "UpdateRobotPart"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn new_robot_part(
             &mut self,
             request: impl tonic::IntoRequest<super::NewRobotPartRequest>,
-        ) -> Result<tonic::Response<super::NewRobotPartResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::NewRobotPartResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -640,12 +938,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/NewRobotPart",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "NewRobotPart"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn delete_robot_part(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteRobotPartRequest>,
-        ) -> Result<tonic::Response<super::DeleteRobotPartResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteRobotPartResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -659,12 +963,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteRobotPart",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "DeleteRobotPart"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn mark_part_as_main(
             &mut self,
             request: impl tonic::IntoRequest<super::MarkPartAsMainRequest>,
-        ) -> Result<tonic::Response<super::MarkPartAsMainResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::MarkPartAsMainResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -678,12 +988,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/MarkPartAsMain",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "MarkPartAsMain"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn mark_part_for_restart(
             &mut self,
             request: impl tonic::IntoRequest<super::MarkPartForRestartRequest>,
-        ) -> Result<tonic::Response<super::MarkPartForRestartResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::MarkPartForRestartResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -697,15 +1013,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/MarkPartForRestart",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "MarkPartForRestart"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn create_robot_part_secret(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateRobotPartSecretRequest>,
-        ) -> Result<
-                tonic::Response<super::CreateRobotPartSecretResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::CreateRobotPartSecretResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -719,15 +1038,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/CreateRobotPartSecret",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "CreateRobotPartSecret"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn delete_robot_part_secret(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteRobotPartSecretRequest>,
-        ) -> Result<
-                tonic::Response<super::DeleteRobotPartSecretResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteRobotPartSecretResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -741,12 +1065,20 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteRobotPartSecret",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.AppService", "DeleteRobotPartSecret"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn list_robots(
             &mut self,
             request: impl tonic::IntoRequest<super::ListRobotsRequest>,
-        ) -> Result<tonic::Response<super::ListRobotsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::ListRobotsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -760,12 +1092,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/ListRobots",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ListRobots"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn new_robot(
             &mut self,
             request: impl tonic::IntoRequest<super::NewRobotRequest>,
-        ) -> Result<tonic::Response<super::NewRobotResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::NewRobotResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -779,12 +1117,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/NewRobot",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "NewRobot"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn update_robot(
             &mut self,
             request: impl tonic::IntoRequest<super::UpdateRobotRequest>,
-        ) -> Result<tonic::Response<super::UpdateRobotResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateRobotResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -798,12 +1142,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/UpdateRobot",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "UpdateRobot"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn delete_robot(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteRobotRequest>,
-        ) -> Result<tonic::Response<super::DeleteRobotResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteRobotResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -817,12 +1167,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteRobot",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "DeleteRobot"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn list_fragments(
             &mut self,
             request: impl tonic::IntoRequest<super::ListFragmentsRequest>,
-        ) -> Result<tonic::Response<super::ListFragmentsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::ListFragmentsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -836,12 +1192,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/ListFragments",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ListFragments"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_fragment(
             &mut self,
             request: impl tonic::IntoRequest<super::GetFragmentRequest>,
-        ) -> Result<tonic::Response<super::GetFragmentResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetFragmentResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -855,12 +1217,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/GetFragment",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetFragment"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn create_fragment(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateFragmentRequest>,
-        ) -> Result<tonic::Response<super::CreateFragmentResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::CreateFragmentResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -874,12 +1242,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/CreateFragment",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "CreateFragment"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn update_fragment(
             &mut self,
             request: impl tonic::IntoRequest<super::UpdateFragmentRequest>,
-        ) -> Result<tonic::Response<super::UpdateFragmentResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateFragmentResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -893,12 +1267,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/UpdateFragment",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "UpdateFragment"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn delete_fragment(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteFragmentRequest>,
-        ) -> Result<tonic::Response<super::DeleteFragmentResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteFragmentResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -912,12 +1292,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/DeleteFragment",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "DeleteFragment"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn add_role(
             &mut self,
             request: impl tonic::IntoRequest<super::AddRoleRequest>,
-        ) -> Result<tonic::Response<super::AddRoleResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::AddRoleResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -931,12 +1317,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/AddRole",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "AddRole"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn remove_role(
             &mut self,
             request: impl tonic::IntoRequest<super::RemoveRoleRequest>,
-        ) -> Result<tonic::Response<super::RemoveRoleResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::RemoveRoleResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -950,12 +1342,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/RemoveRole",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "RemoveRole"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn list_authorizations(
             &mut self,
             request: impl tonic::IntoRequest<super::ListAuthorizationsRequest>,
-        ) -> Result<tonic::Response<super::ListAuthorizationsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::ListAuthorizationsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -969,12 +1367,18 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/ListAuthorizations",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ListAuthorizations"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn check_permissions(
             &mut self,
             request: impl tonic::IntoRequest<super::CheckPermissionsRequest>,
-        ) -> Result<tonic::Response<super::CheckPermissionsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::CheckPermissionsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -988,7 +1392,137 @@ pub mod app_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.AppService/CheckPermissions",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "CheckPermissions"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn create_module(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateModuleRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateModuleResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateModule",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "CreateModule"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn update_module(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpdateModuleRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateModuleResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/UpdateModule",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "UpdateModule"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn upload_module_file(
+            &mut self,
+            request: impl tonic::IntoStreamingRequest<
+                Message = super::UploadModuleFileRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::UploadModuleFileResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/UploadModuleFile",
+            );
+            let mut req = request.into_streaming_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "UploadModuleFile"));
+            self.inner.client_streaming(req, path, codec).await
+        }
+        pub async fn get_module(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetModuleRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetModuleResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/GetModule",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetModule"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn list_modules(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListModulesRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListModulesResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ListModules",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ListModules"));
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -996,230 +1530,415 @@ pub mod app_service_client {
 pub mod app_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with AppServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with AppServiceServer.
     #[async_trait]
     pub trait AppService: Send + Sync + 'static {
+        async fn get_user_id_by_email(
+            &self,
+            request: tonic::Request<super::GetUserIdByEmailRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetUserIdByEmailResponse>,
+            tonic::Status,
+        >;
         async fn create_organization(
             &self,
             request: tonic::Request<super::CreateOrganizationRequest>,
-        ) -> Result<tonic::Response<super::CreateOrganizationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::CreateOrganizationResponse>,
+            tonic::Status,
+        >;
         async fn list_organizations(
             &self,
             request: tonic::Request<super::ListOrganizationsRequest>,
-        ) -> Result<tonic::Response<super::ListOrganizationsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ListOrganizationsResponse>,
+            tonic::Status,
+        >;
+        async fn list_organizations_by_user(
+            &self,
+            request: tonic::Request<super::ListOrganizationsByUserRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListOrganizationsByUserResponse>,
+            tonic::Status,
+        >;
         async fn get_organization(
             &self,
             request: tonic::Request<super::GetOrganizationRequest>,
-        ) -> Result<tonic::Response<super::GetOrganizationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetOrganizationResponse>,
+            tonic::Status,
+        >;
+        async fn get_organization_namespace_availability(
+            &self,
+            request: tonic::Request<super::GetOrganizationNamespaceAvailabilityRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetOrganizationNamespaceAvailabilityResponse>,
+            tonic::Status,
+        >;
         async fn update_organization(
             &self,
             request: tonic::Request<super::UpdateOrganizationRequest>,
-        ) -> Result<tonic::Response<super::UpdateOrganizationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateOrganizationResponse>,
+            tonic::Status,
+        >;
         async fn delete_organization(
             &self,
             request: tonic::Request<super::DeleteOrganizationRequest>,
-        ) -> Result<tonic::Response<super::DeleteOrganizationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteOrganizationResponse>,
+            tonic::Status,
+        >;
         async fn list_organization_members(
             &self,
             request: tonic::Request<super::ListOrganizationMembersRequest>,
-        ) -> Result<
-                tonic::Response<super::ListOrganizationMembersResponse>,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::ListOrganizationMembersResponse>,
+            tonic::Status,
+        >;
         async fn create_organization_invite(
             &self,
             request: tonic::Request<super::CreateOrganizationInviteRequest>,
-        ) -> Result<
-                tonic::Response<super::CreateOrganizationInviteResponse>,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::CreateOrganizationInviteResponse>,
+            tonic::Status,
+        >;
+        async fn update_organization_invite_authorizations(
+            &self,
+            request: tonic::Request<super::UpdateOrganizationInviteAuthorizationsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateOrganizationInviteAuthorizationsResponse>,
+            tonic::Status,
+        >;
         async fn delete_organization_member(
             &self,
             request: tonic::Request<super::DeleteOrganizationMemberRequest>,
-        ) -> Result<
-                tonic::Response<super::DeleteOrganizationMemberResponse>,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteOrganizationMemberResponse>,
+            tonic::Status,
+        >;
         async fn delete_organization_invite(
             &self,
             request: tonic::Request<super::DeleteOrganizationInviteRequest>,
-        ) -> Result<
-                tonic::Response<super::DeleteOrganizationInviteResponse>,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteOrganizationInviteResponse>,
+            tonic::Status,
+        >;
         async fn resend_organization_invite(
             &self,
             request: tonic::Request<super::ResendOrganizationInviteRequest>,
-        ) -> Result<
-                tonic::Response<super::ResendOrganizationInviteResponse>,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::ResendOrganizationInviteResponse>,
+            tonic::Status,
+        >;
         async fn create_location(
             &self,
             request: tonic::Request<super::CreateLocationRequest>,
-        ) -> Result<tonic::Response<super::CreateLocationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::CreateLocationResponse>,
+            tonic::Status,
+        >;
         async fn get_location(
             &self,
             request: tonic::Request<super::GetLocationRequest>,
-        ) -> Result<tonic::Response<super::GetLocationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetLocationResponse>,
+            tonic::Status,
+        >;
         async fn update_location(
             &self,
             request: tonic::Request<super::UpdateLocationRequest>,
-        ) -> Result<tonic::Response<super::UpdateLocationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateLocationResponse>,
+            tonic::Status,
+        >;
         async fn delete_location(
             &self,
             request: tonic::Request<super::DeleteLocationRequest>,
-        ) -> Result<tonic::Response<super::DeleteLocationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteLocationResponse>,
+            tonic::Status,
+        >;
         async fn list_locations(
             &self,
             request: tonic::Request<super::ListLocationsRequest>,
-        ) -> Result<tonic::Response<super::ListLocationsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ListLocationsResponse>,
+            tonic::Status,
+        >;
         async fn share_location(
             &self,
             request: tonic::Request<super::ShareLocationRequest>,
-        ) -> Result<tonic::Response<super::ShareLocationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ShareLocationResponse>,
+            tonic::Status,
+        >;
         async fn unshare_location(
             &self,
             request: tonic::Request<super::UnshareLocationRequest>,
-        ) -> Result<tonic::Response<super::UnshareLocationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::UnshareLocationResponse>,
+            tonic::Status,
+        >;
         async fn location_auth(
             &self,
             request: tonic::Request<super::LocationAuthRequest>,
-        ) -> Result<tonic::Response<super::LocationAuthResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::LocationAuthResponse>,
+            tonic::Status,
+        >;
         async fn create_location_secret(
             &self,
             request: tonic::Request<super::CreateLocationSecretRequest>,
-        ) -> Result<tonic::Response<super::CreateLocationSecretResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::CreateLocationSecretResponse>,
+            tonic::Status,
+        >;
         async fn delete_location_secret(
             &self,
             request: tonic::Request<super::DeleteLocationSecretRequest>,
-        ) -> Result<tonic::Response<super::DeleteLocationSecretResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteLocationSecretResponse>,
+            tonic::Status,
+        >;
         async fn get_robot(
             &self,
             request: tonic::Request<super::GetRobotRequest>,
-        ) -> Result<tonic::Response<super::GetRobotResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotResponse>,
+            tonic::Status,
+        >;
         async fn get_rover_rental_robots(
             &self,
             request: tonic::Request<super::GetRoverRentalRobotsRequest>,
-        ) -> Result<tonic::Response<super::GetRoverRentalRobotsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetRoverRentalRobotsResponse>,
+            tonic::Status,
+        >;
         async fn get_robot_parts(
             &self,
             request: tonic::Request<super::GetRobotPartsRequest>,
-        ) -> Result<tonic::Response<super::GetRobotPartsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotPartsResponse>,
+            tonic::Status,
+        >;
         async fn get_robot_part(
             &self,
             request: tonic::Request<super::GetRobotPartRequest>,
-        ) -> Result<tonic::Response<super::GetRobotPartResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotPartResponse>,
+            tonic::Status,
+        >;
         async fn get_robot_part_logs(
             &self,
             request: tonic::Request<super::GetRobotPartLogsRequest>,
-        ) -> Result<tonic::Response<super::GetRobotPartLogsResponse>, tonic::Status>;
-        ///Server streaming response type for the TailRobotPartLogs method.
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotPartLogsResponse>,
+            tonic::Status,
+        >;
+        /// Server streaming response type for the TailRobotPartLogs method.
         type TailRobotPartLogsStream: futures_core::Stream<
-                Item = Result<super::TailRobotPartLogsResponse, tonic::Status>,
+                Item = std::result::Result<
+                    super::TailRobotPartLogsResponse,
+                    tonic::Status,
+                >,
             >
             + Send
             + 'static;
         async fn tail_robot_part_logs(
             &self,
             request: tonic::Request<super::TailRobotPartLogsRequest>,
-        ) -> Result<tonic::Response<Self::TailRobotPartLogsStream>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<Self::TailRobotPartLogsStream>,
+            tonic::Status,
+        >;
         async fn get_robot_part_history(
             &self,
             request: tonic::Request<super::GetRobotPartHistoryRequest>,
-        ) -> Result<tonic::Response<super::GetRobotPartHistoryResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotPartHistoryResponse>,
+            tonic::Status,
+        >;
         async fn update_robot_part(
             &self,
             request: tonic::Request<super::UpdateRobotPartRequest>,
-        ) -> Result<tonic::Response<super::UpdateRobotPartResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateRobotPartResponse>,
+            tonic::Status,
+        >;
         async fn new_robot_part(
             &self,
             request: tonic::Request<super::NewRobotPartRequest>,
-        ) -> Result<tonic::Response<super::NewRobotPartResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::NewRobotPartResponse>,
+            tonic::Status,
+        >;
         async fn delete_robot_part(
             &self,
             request: tonic::Request<super::DeleteRobotPartRequest>,
-        ) -> Result<tonic::Response<super::DeleteRobotPartResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteRobotPartResponse>,
+            tonic::Status,
+        >;
         async fn mark_part_as_main(
             &self,
             request: tonic::Request<super::MarkPartAsMainRequest>,
-        ) -> Result<tonic::Response<super::MarkPartAsMainResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::MarkPartAsMainResponse>,
+            tonic::Status,
+        >;
         async fn mark_part_for_restart(
             &self,
             request: tonic::Request<super::MarkPartForRestartRequest>,
-        ) -> Result<tonic::Response<super::MarkPartForRestartResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::MarkPartForRestartResponse>,
+            tonic::Status,
+        >;
         async fn create_robot_part_secret(
             &self,
             request: tonic::Request<super::CreateRobotPartSecretRequest>,
-        ) -> Result<
-                tonic::Response<super::CreateRobotPartSecretResponse>,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::CreateRobotPartSecretResponse>,
+            tonic::Status,
+        >;
         async fn delete_robot_part_secret(
             &self,
             request: tonic::Request<super::DeleteRobotPartSecretRequest>,
-        ) -> Result<
-                tonic::Response<super::DeleteRobotPartSecretResponse>,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteRobotPartSecretResponse>,
+            tonic::Status,
+        >;
         async fn list_robots(
             &self,
             request: tonic::Request<super::ListRobotsRequest>,
-        ) -> Result<tonic::Response<super::ListRobotsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ListRobotsResponse>,
+            tonic::Status,
+        >;
         async fn new_robot(
             &self,
             request: tonic::Request<super::NewRobotRequest>,
-        ) -> Result<tonic::Response<super::NewRobotResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::NewRobotResponse>,
+            tonic::Status,
+        >;
         async fn update_robot(
             &self,
             request: tonic::Request<super::UpdateRobotRequest>,
-        ) -> Result<tonic::Response<super::UpdateRobotResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateRobotResponse>,
+            tonic::Status,
+        >;
         async fn delete_robot(
             &self,
             request: tonic::Request<super::DeleteRobotRequest>,
-        ) -> Result<tonic::Response<super::DeleteRobotResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteRobotResponse>,
+            tonic::Status,
+        >;
         async fn list_fragments(
             &self,
             request: tonic::Request<super::ListFragmentsRequest>,
-        ) -> Result<tonic::Response<super::ListFragmentsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ListFragmentsResponse>,
+            tonic::Status,
+        >;
         async fn get_fragment(
             &self,
             request: tonic::Request<super::GetFragmentRequest>,
-        ) -> Result<tonic::Response<super::GetFragmentResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetFragmentResponse>,
+            tonic::Status,
+        >;
         async fn create_fragment(
             &self,
             request: tonic::Request<super::CreateFragmentRequest>,
-        ) -> Result<tonic::Response<super::CreateFragmentResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::CreateFragmentResponse>,
+            tonic::Status,
+        >;
         async fn update_fragment(
             &self,
             request: tonic::Request<super::UpdateFragmentRequest>,
-        ) -> Result<tonic::Response<super::UpdateFragmentResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateFragmentResponse>,
+            tonic::Status,
+        >;
         async fn delete_fragment(
             &self,
             request: tonic::Request<super::DeleteFragmentRequest>,
-        ) -> Result<tonic::Response<super::DeleteFragmentResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteFragmentResponse>,
+            tonic::Status,
+        >;
         async fn add_role(
             &self,
             request: tonic::Request<super::AddRoleRequest>,
-        ) -> Result<tonic::Response<super::AddRoleResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::AddRoleResponse>, tonic::Status>;
         async fn remove_role(
             &self,
             request: tonic::Request<super::RemoveRoleRequest>,
-        ) -> Result<tonic::Response<super::RemoveRoleResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::RemoveRoleResponse>,
+            tonic::Status,
+        >;
         async fn list_authorizations(
             &self,
             request: tonic::Request<super::ListAuthorizationsRequest>,
-        ) -> Result<tonic::Response<super::ListAuthorizationsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ListAuthorizationsResponse>,
+            tonic::Status,
+        >;
         async fn check_permissions(
             &self,
             request: tonic::Request<super::CheckPermissionsRequest>,
-        ) -> Result<tonic::Response<super::CheckPermissionsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::CheckPermissionsResponse>,
+            tonic::Status,
+        >;
+        async fn create_module(
+            &self,
+            request: tonic::Request<super::CreateModuleRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateModuleResponse>,
+            tonic::Status,
+        >;
+        async fn update_module(
+            &self,
+            request: tonic::Request<super::UpdateModuleRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateModuleResponse>,
+            tonic::Status,
+        >;
+        async fn upload_module_file(
+            &self,
+            request: tonic::Request<tonic::Streaming<super::UploadModuleFileRequest>>,
+        ) -> std::result::Result<
+            tonic::Response<super::UploadModuleFileResponse>,
+            tonic::Status,
+        >;
+        async fn get_module(
+            &self,
+            request: tonic::Request<super::GetModuleRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetModuleResponse>,
+            tonic::Status,
+        >;
+        async fn list_modules(
+            &self,
+            request: tonic::Request<super::ListModulesRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListModulesResponse>,
+            tonic::Status,
+        >;
     }
     #[derive(Debug)]
     pub struct AppServiceServer<T: AppService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: AppService> AppServiceServer<T> {
@@ -1232,6 +1951,8 @@ pub mod app_service_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -1243,16 +1964,32 @@ pub mod app_service_server {
         {
             InterceptedService::new(Self::new(inner), interceptor)
         }
-        /// Enable decompressing requests with `gzip`.
+        /// Enable decompressing requests with the given encoding.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.accept_compression_encodings.enable_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
             self
         }
-        /// Compress responses with `gzip`, if the client supports it.
+        /// Compress responses with the given encoding, if the client supports it.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.send_compression_encodings.enable_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
             self
         }
     }
@@ -1268,12 +2005,58 @@ pub mod app_service_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
+                "/viam.app.v1.AppService/GetUserIDByEmail" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetUserIDByEmailSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::GetUserIdByEmailRequest>
+                    for GetUserIDByEmailSvc<T> {
+                        type Response = super::GetUserIdByEmailResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetUserIdByEmailRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).get_user_id_by_email(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetUserIDByEmailSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.app.v1.AppService/CreateOrganization" => {
                     #[allow(non_camel_case_types)]
                     struct CreateOrganizationSvc<T: AppService>(pub Arc<T>);
@@ -1290,7 +2073,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::CreateOrganizationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).create_organization(request).await
                             };
@@ -1299,6 +2082,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1308,6 +2093,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1330,7 +2119,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::ListOrganizationsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).list_organizations(request).await
                             };
@@ -1339,6 +2128,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1348,6 +2139,58 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ListOrganizationsByUser" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListOrganizationsByUserSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ListOrganizationsByUserRequest>
+                    for ListOrganizationsByUserSvc<T> {
+                        type Response = super::ListOrganizationsByUserResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::ListOrganizationsByUserRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).list_organizations_by_user(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListOrganizationsByUserSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1370,7 +2213,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::GetOrganizationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_organization(request).await
                             };
@@ -1379,6 +2222,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1388,6 +2233,63 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/GetOrganizationNamespaceAvailability" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetOrganizationNamespaceAvailabilitySvc<T: AppService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<
+                        super::GetOrganizationNamespaceAvailabilityRequest,
+                    > for GetOrganizationNamespaceAvailabilitySvc<T> {
+                        type Response = super::GetOrganizationNamespaceAvailabilityResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::GetOrganizationNamespaceAvailabilityRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner)
+                                    .get_organization_namespace_availability(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetOrganizationNamespaceAvailabilitySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1410,7 +2312,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::UpdateOrganizationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).update_organization(request).await
                             };
@@ -1419,6 +2321,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1428,6 +2332,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1450,7 +2358,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::DeleteOrganizationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).delete_organization(request).await
                             };
@@ -1459,6 +2367,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1468,6 +2378,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1492,7 +2406,7 @@ pub mod app_service_server {
                                 super::ListOrganizationMembersRequest,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).list_organization_members(request).await
                             };
@@ -1501,6 +2415,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1510,6 +2426,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1534,7 +2454,7 @@ pub mod app_service_server {
                                 super::CreateOrganizationInviteRequest,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).create_organization_invite(request).await
                             };
@@ -1543,6 +2463,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1552,6 +2474,63 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/UpdateOrganizationInviteAuthorizations" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateOrganizationInviteAuthorizationsSvc<T: AppService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<
+                        super::UpdateOrganizationInviteAuthorizationsRequest,
+                    > for UpdateOrganizationInviteAuthorizationsSvc<T> {
+                        type Response = super::UpdateOrganizationInviteAuthorizationsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::UpdateOrganizationInviteAuthorizationsRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner)
+                                    .update_organization_invite_authorizations(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateOrganizationInviteAuthorizationsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1576,7 +2555,7 @@ pub mod app_service_server {
                                 super::DeleteOrganizationMemberRequest,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).delete_organization_member(request).await
                             };
@@ -1585,6 +2564,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1594,6 +2575,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1618,7 +2603,7 @@ pub mod app_service_server {
                                 super::DeleteOrganizationInviteRequest,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).delete_organization_invite(request).await
                             };
@@ -1627,6 +2612,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1636,6 +2623,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1660,7 +2651,7 @@ pub mod app_service_server {
                                 super::ResendOrganizationInviteRequest,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).resend_organization_invite(request).await
                             };
@@ -1669,6 +2660,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1678,6 +2671,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1700,7 +2697,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::CreateLocationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).create_location(request).await
                             };
@@ -1709,6 +2706,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1718,6 +2717,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1740,7 +2743,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::GetLocationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_location(request).await
                             };
@@ -1749,6 +2752,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1758,6 +2763,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1780,7 +2789,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::UpdateLocationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).update_location(request).await
                             };
@@ -1789,6 +2798,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1798,6 +2809,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1820,7 +2835,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::DeleteLocationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).delete_location(request).await
                             };
@@ -1829,6 +2844,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1838,6 +2855,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1860,7 +2881,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::ListLocationsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).list_locations(request).await
                             };
@@ -1869,6 +2890,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1878,6 +2901,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1900,7 +2927,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::ShareLocationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).share_location(request).await
                             };
@@ -1909,6 +2936,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1918,6 +2947,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1940,7 +2973,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::UnshareLocationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).unshare_location(request).await
                             };
@@ -1949,6 +2982,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1958,6 +2993,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1980,7 +3019,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::LocationAuthRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).location_auth(request).await
                             };
@@ -1989,6 +3028,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1998,6 +3039,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2020,7 +3065,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::CreateLocationSecretRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).create_location_secret(request).await
                             };
@@ -2029,6 +3074,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2038,6 +3085,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2060,7 +3111,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::DeleteLocationSecretRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).delete_location_secret(request).await
                             };
@@ -2069,6 +3120,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2078,6 +3131,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2100,13 +3157,15 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::GetRobotRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).get_robot(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2116,6 +3175,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2138,7 +3201,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::GetRoverRentalRobotsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_rover_rental_robots(request).await
                             };
@@ -2147,6 +3210,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2156,6 +3221,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2178,7 +3247,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::GetRobotPartsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_robot_parts(request).await
                             };
@@ -2187,6 +3256,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2196,6 +3267,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2218,7 +3293,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::GetRobotPartRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_robot_part(request).await
                             };
@@ -2227,6 +3302,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2236,6 +3313,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2258,7 +3339,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::GetRobotPartLogsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_robot_part_logs(request).await
                             };
@@ -2267,6 +3348,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2276,6 +3359,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2300,7 +3387,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::TailRobotPartLogsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).tail_robot_part_logs(request).await
                             };
@@ -2309,6 +3396,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2318,6 +3407,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.server_streaming(method, req).await;
                         Ok(res)
@@ -2340,7 +3433,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::GetRobotPartHistoryRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_robot_part_history(request).await
                             };
@@ -2349,6 +3442,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2358,6 +3453,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2380,7 +3479,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::UpdateRobotPartRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).update_robot_part(request).await
                             };
@@ -2389,6 +3488,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2398,6 +3499,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2420,7 +3525,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::NewRobotPartRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).new_robot_part(request).await
                             };
@@ -2429,6 +3534,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2438,6 +3545,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2460,7 +3571,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::DeleteRobotPartRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).delete_robot_part(request).await
                             };
@@ -2469,6 +3580,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2478,6 +3591,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2500,7 +3617,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::MarkPartAsMainRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).mark_part_as_main(request).await
                             };
@@ -2509,6 +3626,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2518,6 +3637,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2540,7 +3663,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::MarkPartForRestartRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).mark_part_for_restart(request).await
                             };
@@ -2549,6 +3672,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2558,6 +3683,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2580,7 +3709,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::CreateRobotPartSecretRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).create_robot_part_secret(request).await
                             };
@@ -2589,6 +3718,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2598,6 +3729,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2620,7 +3755,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::DeleteRobotPartSecretRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).delete_robot_part_secret(request).await
                             };
@@ -2629,6 +3764,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2638,6 +3775,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2660,13 +3801,15 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::ListRobotsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).list_robots(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2676,6 +3819,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2698,13 +3845,15 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::NewRobotRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).new_robot(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2714,6 +3863,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2736,7 +3889,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::UpdateRobotRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).update_robot(request).await
                             };
@@ -2745,6 +3898,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2754,6 +3909,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2776,7 +3935,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::DeleteRobotRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).delete_robot(request).await
                             };
@@ -2785,6 +3944,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2794,6 +3955,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2816,7 +3981,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::ListFragmentsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).list_fragments(request).await
                             };
@@ -2825,6 +3990,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2834,6 +4001,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2856,7 +4027,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::GetFragmentRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_fragment(request).await
                             };
@@ -2865,6 +4036,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2874,6 +4047,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2896,7 +4073,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::CreateFragmentRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).create_fragment(request).await
                             };
@@ -2905,6 +4082,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2914,6 +4093,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2936,7 +4119,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::UpdateFragmentRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).update_fragment(request).await
                             };
@@ -2945,6 +4128,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2954,6 +4139,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -2976,7 +4165,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::DeleteFragmentRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).delete_fragment(request).await
                             };
@@ -2985,6 +4174,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -2994,6 +4185,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3016,13 +4211,15 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::AddRoleRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).add_role(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3032,6 +4229,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3054,13 +4255,15 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::RemoveRoleRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).remove_role(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3070,6 +4273,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3092,7 +4299,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::ListAuthorizationsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).list_authorizations(request).await
                             };
@@ -3101,6 +4308,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3110,6 +4319,10 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3132,7 +4345,7 @@ pub mod app_service_server {
                             &mut self,
                             request: tonic::Request<super::CheckPermissionsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).check_permissions(request).await
                             };
@@ -3141,6 +4354,8 @@ pub mod app_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3150,6 +4365,241 @@ pub mod app_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/CreateModule" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateModuleSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CreateModuleRequest>
+                    for CreateModuleSvc<T> {
+                        type Response = super::CreateModuleResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateModuleRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).create_module(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateModuleSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/UpdateModule" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateModuleSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::UpdateModuleRequest>
+                    for UpdateModuleSvc<T> {
+                        type Response = super::UpdateModuleResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::UpdateModuleRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).update_module(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateModuleSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/UploadModuleFile" => {
+                    #[allow(non_camel_case_types)]
+                    struct UploadModuleFileSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::ClientStreamingService<
+                        super::UploadModuleFileRequest,
+                    > for UploadModuleFileSvc<T> {
+                        type Response = super::UploadModuleFileResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                tonic::Streaming<super::UploadModuleFileRequest>,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).upload_module_file(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UploadModuleFileSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.client_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/GetModule" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetModuleSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::GetModuleRequest>
+                    for GetModuleSvc<T> {
+                        type Response = super::GetModuleResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetModuleRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move { (*inner).get_module(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetModuleSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ListModules" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListModulesSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ListModulesRequest>
+                    for ListModulesSvc<T> {
+                        type Response = super::ListModulesResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListModulesRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).list_modules(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListModulesSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3178,12 +4628,14 @@ pub mod app_service_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: AppService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
@@ -3191,7 +4643,7 @@ pub mod app_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: AppService> tonic::transport::NamedService for AppServiceServer<T> {
+    impl<T: AppService> tonic::server::NamedService for AppServiceServer<T> {
         const NAME: &'static str = "viam.app.v1.AppService";
     }
 }
@@ -3199,6 +4651,7 @@ pub mod app_service_server {
 pub mod billing_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
     pub struct BillingServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -3207,7 +4660,7 @@ pub mod billing_service_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -3218,11 +4671,15 @@ pub mod billing_service_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Default + Body<Data = Bytes> + Send + 'static,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
             Self { inner }
         }
         pub fn with_interceptor<F>(
@@ -3231,6 +4688,7 @@ pub mod billing_service_client {
         ) -> BillingServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3243,28 +4701,44 @@ pub mod billing_service_client {
         {
             BillingServiceClient::new(InterceptedService::new(inner, interceptor))
         }
-        /// Compress requests with `gzip`.
+        /// Compress requests with the given encoding.
         ///
         /// This requires the server to support it otherwise it might respond with an
         /// error.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.inner = self.inner.send_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
             self
         }
-        /// Enable decompressing responses with `gzip`.
+        /// Enable decompressing responses.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.inner = self.inner.accept_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
         pub async fn get_current_month_usage_summary(
             &mut self,
             request: impl tonic::IntoRequest<super::GetCurrentMonthUsageSummaryRequest>,
-        ) -> Result<
-                tonic::Response<super::GetCurrentMonthUsageSummaryResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::GetCurrentMonthUsageSummaryResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -3278,12 +4752,23 @@ pub mod billing_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.BillingService/GetCurrentMonthUsageSummary",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.v1.BillingService",
+                        "GetCurrentMonthUsageSummary",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_unpaid_balance(
             &mut self,
             request: impl tonic::IntoRequest<super::GetUnpaidBalanceRequest>,
-        ) -> Result<tonic::Response<super::GetUnpaidBalanceResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetUnpaidBalanceResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -3297,12 +4782,20 @@ pub mod billing_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.BillingService/GetUnpaidBalance",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.BillingService", "GetUnpaidBalance"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_invoice_history(
             &mut self,
             request: impl tonic::IntoRequest<super::GetInvoiceHistoryRequest>,
-        ) -> Result<tonic::Response<super::GetInvoiceHistoryResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetInvoiceHistoryResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -3316,12 +4809,20 @@ pub mod billing_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.BillingService/GetInvoiceHistory",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.BillingService", "GetInvoiceHistory"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_itemized_invoice(
             &mut self,
             request: impl tonic::IntoRequest<super::GetItemizedInvoiceRequest>,
-        ) -> Result<tonic::Response<super::GetItemizedInvoiceResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetItemizedInvoiceResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -3335,12 +4836,20 @@ pub mod billing_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.BillingService/GetItemizedInvoice",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.BillingService", "GetItemizedInvoice"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_billing_summary(
             &mut self,
             request: impl tonic::IntoRequest<super::GetBillingSummaryRequest>,
-        ) -> Result<tonic::Response<super::GetBillingSummaryResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetBillingSummaryResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -3354,15 +4863,20 @@ pub mod billing_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.BillingService/GetBillingSummary",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.BillingService", "GetBillingSummary"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_current_month_usage(
             &mut self,
             request: impl tonic::IntoRequest<super::GetCurrentMonthUsageRequest>,
-        ) -> Result<
-                tonic::Response<super::GetCurrentMonthUsageResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::GetCurrentMonthUsageResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -3376,15 +4890,20 @@ pub mod billing_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.BillingService/GetCurrentMonthUsage",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.BillingService", "GetCurrentMonthUsage"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_org_billing_information(
             &mut self,
             request: impl tonic::IntoRequest<super::GetOrgBillingInformationRequest>,
-        ) -> Result<
-                tonic::Response<super::GetOrgBillingInformationResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::GetOrgBillingInformationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -3398,12 +4917,23 @@ pub mod billing_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.BillingService/GetOrgBillingInformation",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.v1.BillingService",
+                        "GetOrgBillingInformation",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_invoices_summary(
             &mut self,
             request: impl tonic::IntoRequest<super::GetInvoicesSummaryRequest>,
-        ) -> Result<tonic::Response<super::GetInvoicesSummaryResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetInvoicesSummaryResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -3417,15 +4947,20 @@ pub mod billing_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.BillingService/GetInvoicesSummary",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.BillingService", "GetInvoicesSummary"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_invoice_pdf(
             &mut self,
             request: impl tonic::IntoRequest<super::GetInvoicePdfRequest>,
-        ) -> Result<
-                tonic::Response<tonic::codec::Streaming<super::GetInvoicePdfResponse>>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::GetInvoicePdfResponse>>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -3439,7 +4974,10 @@ pub mod billing_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.BillingService/GetInvoicePdf",
             );
-            self.inner.server_streaming(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.BillingService", "GetInvoicePdf"));
+            self.inner.server_streaming(req, path, codec).await
         }
     }
 }
@@ -3447,63 +4985,86 @@ pub mod billing_service_client {
 pub mod billing_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with BillingServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with BillingServiceServer.
     #[async_trait]
     pub trait BillingService: Send + Sync + 'static {
         async fn get_current_month_usage_summary(
             &self,
             request: tonic::Request<super::GetCurrentMonthUsageSummaryRequest>,
-        ) -> Result<
-                tonic::Response<super::GetCurrentMonthUsageSummaryResponse>,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::GetCurrentMonthUsageSummaryResponse>,
+            tonic::Status,
+        >;
         async fn get_unpaid_balance(
             &self,
             request: tonic::Request<super::GetUnpaidBalanceRequest>,
-        ) -> Result<tonic::Response<super::GetUnpaidBalanceResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetUnpaidBalanceResponse>,
+            tonic::Status,
+        >;
         async fn get_invoice_history(
             &self,
             request: tonic::Request<super::GetInvoiceHistoryRequest>,
-        ) -> Result<tonic::Response<super::GetInvoiceHistoryResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetInvoiceHistoryResponse>,
+            tonic::Status,
+        >;
         async fn get_itemized_invoice(
             &self,
             request: tonic::Request<super::GetItemizedInvoiceRequest>,
-        ) -> Result<tonic::Response<super::GetItemizedInvoiceResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetItemizedInvoiceResponse>,
+            tonic::Status,
+        >;
         async fn get_billing_summary(
             &self,
             request: tonic::Request<super::GetBillingSummaryRequest>,
-        ) -> Result<tonic::Response<super::GetBillingSummaryResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetBillingSummaryResponse>,
+            tonic::Status,
+        >;
         async fn get_current_month_usage(
             &self,
             request: tonic::Request<super::GetCurrentMonthUsageRequest>,
-        ) -> Result<tonic::Response<super::GetCurrentMonthUsageResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetCurrentMonthUsageResponse>,
+            tonic::Status,
+        >;
         async fn get_org_billing_information(
             &self,
             request: tonic::Request<super::GetOrgBillingInformationRequest>,
-        ) -> Result<
-                tonic::Response<super::GetOrgBillingInformationResponse>,
-                tonic::Status,
-            >;
+        ) -> std::result::Result<
+            tonic::Response<super::GetOrgBillingInformationResponse>,
+            tonic::Status,
+        >;
         async fn get_invoices_summary(
             &self,
             request: tonic::Request<super::GetInvoicesSummaryRequest>,
-        ) -> Result<tonic::Response<super::GetInvoicesSummaryResponse>, tonic::Status>;
-        ///Server streaming response type for the GetInvoicePdf method.
+        ) -> std::result::Result<
+            tonic::Response<super::GetInvoicesSummaryResponse>,
+            tonic::Status,
+        >;
+        /// Server streaming response type for the GetInvoicePdf method.
         type GetInvoicePdfStream: futures_core::Stream<
-                Item = Result<super::GetInvoicePdfResponse, tonic::Status>,
+                Item = std::result::Result<super::GetInvoicePdfResponse, tonic::Status>,
             >
             + Send
             + 'static;
         async fn get_invoice_pdf(
             &self,
             request: tonic::Request<super::GetInvoicePdfRequest>,
-        ) -> Result<tonic::Response<Self::GetInvoicePdfStream>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<Self::GetInvoicePdfStream>,
+            tonic::Status,
+        >;
     }
     #[derive(Debug)]
     pub struct BillingServiceServer<T: BillingService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: BillingService> BillingServiceServer<T> {
@@ -3516,6 +5077,8 @@ pub mod billing_service_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -3527,16 +5090,32 @@ pub mod billing_service_server {
         {
             InterceptedService::new(Self::new(inner), interceptor)
         }
-        /// Enable decompressing requests with `gzip`.
+        /// Enable decompressing requests with the given encoding.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.accept_compression_encodings.enable_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
             self
         }
-        /// Compress responses with `gzip`, if the client supports it.
+        /// Compress responses with the given encoding, if the client supports it.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.send_compression_encodings.enable_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
             self
         }
     }
@@ -3552,7 +5131,7 @@ pub mod billing_service_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -3577,7 +5156,7 @@ pub mod billing_service_server {
                                 super::GetCurrentMonthUsageSummaryRequest,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_current_month_usage_summary(request).await
                             };
@@ -3586,6 +5165,8 @@ pub mod billing_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3595,6 +5176,10 @@ pub mod billing_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3617,7 +5202,7 @@ pub mod billing_service_server {
                             &mut self,
                             request: tonic::Request<super::GetUnpaidBalanceRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_unpaid_balance(request).await
                             };
@@ -3626,6 +5211,8 @@ pub mod billing_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3635,6 +5222,10 @@ pub mod billing_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3657,7 +5248,7 @@ pub mod billing_service_server {
                             &mut self,
                             request: tonic::Request<super::GetInvoiceHistoryRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_invoice_history(request).await
                             };
@@ -3666,6 +5257,8 @@ pub mod billing_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3675,6 +5268,10 @@ pub mod billing_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3697,7 +5294,7 @@ pub mod billing_service_server {
                             &mut self,
                             request: tonic::Request<super::GetItemizedInvoiceRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_itemized_invoice(request).await
                             };
@@ -3706,6 +5303,8 @@ pub mod billing_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3715,6 +5314,10 @@ pub mod billing_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3737,7 +5340,7 @@ pub mod billing_service_server {
                             &mut self,
                             request: tonic::Request<super::GetBillingSummaryRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_billing_summary(request).await
                             };
@@ -3746,6 +5349,8 @@ pub mod billing_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3755,6 +5360,10 @@ pub mod billing_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3777,7 +5386,7 @@ pub mod billing_service_server {
                             &mut self,
                             request: tonic::Request<super::GetCurrentMonthUsageRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_current_month_usage(request).await
                             };
@@ -3786,6 +5395,8 @@ pub mod billing_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3795,6 +5406,10 @@ pub mod billing_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3819,7 +5434,7 @@ pub mod billing_service_server {
                                 super::GetOrgBillingInformationRequest,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_org_billing_information(request).await
                             };
@@ -3828,6 +5443,8 @@ pub mod billing_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3837,6 +5454,10 @@ pub mod billing_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3859,7 +5480,7 @@ pub mod billing_service_server {
                             &mut self,
                             request: tonic::Request<super::GetInvoicesSummaryRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_invoices_summary(request).await
                             };
@@ -3868,6 +5489,8 @@ pub mod billing_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3877,6 +5500,10 @@ pub mod billing_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -3900,7 +5527,7 @@ pub mod billing_service_server {
                             &mut self,
                             request: tonic::Request<super::GetInvoicePdfRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_invoice_pdf(request).await
                             };
@@ -3909,6 +5536,8 @@ pub mod billing_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -3918,6 +5547,10 @@ pub mod billing_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.server_streaming(method, req).await;
                         Ok(res)
@@ -3946,12 +5579,14 @@ pub mod billing_service_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: BillingService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
@@ -3959,7 +5594,7 @@ pub mod billing_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: BillingService> tonic::transport::NamedService for BillingServiceServer<T> {
+    impl<T: BillingService> tonic::server::NamedService for BillingServiceServer<T> {
         const NAME: &'static str = "viam.app.v1.BillingService";
     }
 }
@@ -3967,6 +5602,7 @@ pub mod billing_service_server {
 pub mod robot_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
     pub struct RobotServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -3975,7 +5611,7 @@ pub mod robot_service_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -3986,11 +5622,15 @@ pub mod robot_service_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Default + Body<Data = Bytes> + Send + 'static,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
             Self { inner }
         }
         pub fn with_interceptor<F>(
@@ -3999,6 +5639,7 @@ pub mod robot_service_client {
         ) -> RobotServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -4011,25 +5652,41 @@ pub mod robot_service_client {
         {
             RobotServiceClient::new(InterceptedService::new(inner, interceptor))
         }
-        /// Compress requests with `gzip`.
+        /// Compress requests with the given encoding.
         ///
         /// This requires the server to support it otherwise it might respond with an
         /// error.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.inner = self.inner.send_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
             self
         }
-        /// Enable decompressing responses with `gzip`.
+        /// Enable decompressing responses.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.inner = self.inner.accept_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
         pub async fn config(
             &mut self,
             request: impl tonic::IntoRequest<super::ConfigRequest>,
-        ) -> Result<tonic::Response<super::ConfigResponse>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::ConfigResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -4043,12 +5700,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.RobotService/Config",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.RobotService", "Config"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn certificate(
             &mut self,
             request: impl tonic::IntoRequest<super::CertificateRequest>,
-        ) -> Result<tonic::Response<super::CertificateResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::CertificateResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -4062,12 +5725,15 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.RobotService/Certificate",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.RobotService", "Certificate"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn log(
             &mut self,
             request: impl tonic::IntoRequest<super::LogRequest>,
-        ) -> Result<tonic::Response<super::LogResponse>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::LogResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -4081,12 +5747,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.RobotService/Log",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.RobotService", "Log"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn needs_restart(
             &mut self,
             request: impl tonic::IntoRequest<super::NeedsRestartRequest>,
-        ) -> Result<tonic::Response<super::NeedsRestartResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::NeedsRestartResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -4100,7 +5772,10 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.app.v1.RobotService/NeedsRestart",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.RobotService", "NeedsRestart"));
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -4108,31 +5783,39 @@ pub mod robot_service_client {
 pub mod robot_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with RobotServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with RobotServiceServer.
     #[async_trait]
     pub trait RobotService: Send + Sync + 'static {
         async fn config(
             &self,
             request: tonic::Request<super::ConfigRequest>,
-        ) -> Result<tonic::Response<super::ConfigResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::ConfigResponse>, tonic::Status>;
         async fn certificate(
             &self,
             request: tonic::Request<super::CertificateRequest>,
-        ) -> Result<tonic::Response<super::CertificateResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::CertificateResponse>,
+            tonic::Status,
+        >;
         async fn log(
             &self,
             request: tonic::Request<super::LogRequest>,
-        ) -> Result<tonic::Response<super::LogResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::LogResponse>, tonic::Status>;
         async fn needs_restart(
             &self,
             request: tonic::Request<super::NeedsRestartRequest>,
-        ) -> Result<tonic::Response<super::NeedsRestartResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::NeedsRestartResponse>,
+            tonic::Status,
+        >;
     }
     #[derive(Debug)]
     pub struct RobotServiceServer<T: RobotService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: RobotService> RobotServiceServer<T> {
@@ -4145,6 +5828,8 @@ pub mod robot_service_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -4156,16 +5841,32 @@ pub mod robot_service_server {
         {
             InterceptedService::new(Self::new(inner), interceptor)
         }
-        /// Enable decompressing requests with `gzip`.
+        /// Enable decompressing requests with the given encoding.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.accept_compression_encodings.enable_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
             self
         }
-        /// Compress responses with `gzip`, if the client supports it.
+        /// Compress responses with the given encoding, if the client supports it.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.send_compression_encodings.enable_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
             self
         }
     }
@@ -4181,7 +5882,7 @@ pub mod robot_service_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -4203,13 +5904,15 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::ConfigRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).config(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -4219,6 +5922,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -4241,13 +5948,15 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::CertificateRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).certificate(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -4257,6 +5966,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -4277,13 +5990,15 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::LogRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).log(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -4293,6 +6008,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -4315,7 +6034,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::NeedsRestartRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).needs_restart(request).await
                             };
@@ -4324,6 +6043,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -4333,6 +6054,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -4361,12 +6086,14 @@ pub mod robot_service_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: RobotService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
@@ -4374,7 +6101,7 @@ pub mod robot_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: RobotService> tonic::transport::NamedService for RobotServiceServer<T> {
+    impl<T: RobotService> tonic::server::NamedService for RobotServiceServer<T> {
         const NAME: &'static str = "viam.app.v1.RobotService";
     }
 }

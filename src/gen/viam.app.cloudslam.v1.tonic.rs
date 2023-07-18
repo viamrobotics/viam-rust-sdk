@@ -1,14 +1,14 @@
 // @generated
 /// Generated client implementations.
-pub mod input_controller_service_client {
+pub mod cloud_slam_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
-    pub struct InputControllerServiceClient<T> {
+    pub struct CloudSlamServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl InputControllerServiceClient<tonic::transport::Channel> {
+    impl CloudSlamServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -19,7 +19,7 @@ pub mod input_controller_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> InputControllerServiceClient<T>
+    impl<T> CloudSlamServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -37,7 +37,7 @@ pub mod input_controller_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> InputControllerServiceClient<InterceptedService<T, F>>
+        ) -> CloudSlamServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -51,9 +51,7 @@ pub mod input_controller_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            InputControllerServiceClient::new(
-                InterceptedService::new(inner, interceptor),
-            )
+            CloudSlamServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -86,11 +84,11 @@ pub mod input_controller_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn get_controls(
+        pub async fn start_mapping_session(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetControlsRequest>,
+            request: impl tonic::IntoRequest<super::StartMappingSessionRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetControlsResponse>,
+            tonic::Response<super::StartMappingSessionResponse>,
             tonic::Status,
         > {
             self.inner
@@ -104,115 +102,25 @@ pub mod input_controller_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.inputcontroller.v1.InputControllerService/GetControls",
+                "/viam.app.cloudslam.v1.CloudSLAMService/StartMappingSession",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "viam.component.inputcontroller.v1.InputControllerService",
-                        "GetControls",
+                        "viam.app.cloudslam.v1.CloudSLAMService",
+                        "StartMappingSession",
                     ),
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn get_events(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetEventsRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetEventsResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.inputcontroller.v1.InputControllerService/GetEvents",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "viam.component.inputcontroller.v1.InputControllerService",
-                        "GetEvents",
-                    ),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn stream_events(
-            &mut self,
-            request: impl tonic::IntoRequest<super::StreamEventsRequest>,
-        ) -> std::result::Result<
-            tonic::Response<tonic::codec::Streaming<super::StreamEventsResponse>>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.inputcontroller.v1.InputControllerService/StreamEvents",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "viam.component.inputcontroller.v1.InputControllerService",
-                        "StreamEvents",
-                    ),
-                );
-            self.inner.server_streaming(req, path, codec).await
-        }
-        pub async fn trigger_event(
-            &mut self,
-            request: impl tonic::IntoRequest<super::TriggerEventRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::TriggerEventResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.inputcontroller.v1.InputControllerService/TriggerEvent",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "viam.component.inputcontroller.v1.InputControllerService",
-                        "TriggerEvent",
-                    ),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn do_command(
+        pub async fn get_active_mapping_sessions_for_robot(
             &mut self,
             request: impl tonic::IntoRequest<
-                super::super::super::super::common::v1::DoCommandRequest,
+                super::GetActiveMappingSessionsForRobotRequest,
             >,
         ) -> std::result::Result<
-            tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
+            tonic::Response<super::GetActiveMappingSessionsForRobotResponse>,
             tonic::Status,
         > {
             self.inner
@@ -226,27 +134,23 @@ pub mod input_controller_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.inputcontroller.v1.InputControllerService/DoCommand",
+                "/viam.app.cloudslam.v1.CloudSLAMService/GetActiveMappingSessionsForRobot",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "viam.component.inputcontroller.v1.InputControllerService",
-                        "DoCommand",
+                        "viam.app.cloudslam.v1.CloudSLAMService",
+                        "GetActiveMappingSessionsForRobot",
                     ),
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn get_geometries(
+        pub async fn get_mapping_session_point_cloud(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::super::super::common::v1::GetGeometriesRequest,
-            >,
+            request: impl tonic::IntoRequest<super::GetMappingSessionPointCloudRequest>,
         ) -> std::result::Result<
-            tonic::Response<
-                super::super::super::super::common::v1::GetGeometriesResponse,
-            >,
+            tonic::Response<super::GetMappingSessionPointCloudResponse>,
             tonic::Status,
         > {
             self.inner
@@ -260,14 +164,74 @@ pub mod input_controller_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.inputcontroller.v1.InputControllerService/GetGeometries",
+                "/viam.app.cloudslam.v1.CloudSLAMService/GetMappingSessionPointCloud",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "viam.component.inputcontroller.v1.InputControllerService",
-                        "GetGeometries",
+                        "viam.app.cloudslam.v1.CloudSLAMService",
+                        "GetMappingSessionPointCloud",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn list_mapping_sessions(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListMappingSessionsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListMappingSessionsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.cloudslam.v1.CloudSLAMService/ListMappingSessions",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.cloudslam.v1.CloudSLAMService",
+                        "ListMappingSessions",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn stop_mapping_session(
+            &mut self,
+            request: impl tonic::IntoRequest<super::StopMappingSessionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::StopMappingSessionResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.cloudslam.v1.CloudSLAMService/StopMappingSession",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.cloudslam.v1.CloudSLAMService",
+                        "StopMappingSession",
                     ),
                 );
             self.inner.unary(req, path, codec).await
@@ -275,69 +239,50 @@ pub mod input_controller_service_client {
     }
 }
 /// Generated server implementations.
-pub mod input_controller_service_server {
+pub mod cloud_slam_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with InputControllerServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with CloudSlamServiceServer.
     #[async_trait]
-    pub trait InputControllerService: Send + Sync + 'static {
-        async fn get_controls(
+    pub trait CloudSlamService: Send + Sync + 'static {
+        async fn start_mapping_session(
             &self,
-            request: tonic::Request<super::GetControlsRequest>,
+            request: tonic::Request<super::StartMappingSessionRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetControlsResponse>,
+            tonic::Response<super::StartMappingSessionResponse>,
             tonic::Status,
         >;
-        async fn get_events(
+        async fn get_active_mapping_sessions_for_robot(
             &self,
-            request: tonic::Request<super::GetEventsRequest>,
+            request: tonic::Request<super::GetActiveMappingSessionsForRobotRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetEventsResponse>,
+            tonic::Response<super::GetActiveMappingSessionsForRobotResponse>,
             tonic::Status,
         >;
-        /// Server streaming response type for the StreamEvents method.
-        type StreamEventsStream: futures_core::Stream<
-                Item = std::result::Result<super::StreamEventsResponse, tonic::Status>,
-            >
-            + Send
-            + 'static;
-        async fn stream_events(
+        async fn get_mapping_session_point_cloud(
             &self,
-            request: tonic::Request<super::StreamEventsRequest>,
+            request: tonic::Request<super::GetMappingSessionPointCloudRequest>,
         ) -> std::result::Result<
-            tonic::Response<Self::StreamEventsStream>,
+            tonic::Response<super::GetMappingSessionPointCloudResponse>,
             tonic::Status,
         >;
-        async fn trigger_event(
+        async fn list_mapping_sessions(
             &self,
-            request: tonic::Request<super::TriggerEventRequest>,
+            request: tonic::Request<super::ListMappingSessionsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::TriggerEventResponse>,
+            tonic::Response<super::ListMappingSessionsResponse>,
             tonic::Status,
         >;
-        async fn do_command(
+        async fn stop_mapping_session(
             &self,
-            request: tonic::Request<
-                super::super::super::super::common::v1::DoCommandRequest,
-            >,
+            request: tonic::Request<super::StopMappingSessionRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
-            tonic::Status,
-        >;
-        async fn get_geometries(
-            &self,
-            request: tonic::Request<
-                super::super::super::super::common::v1::GetGeometriesRequest,
-            >,
-        ) -> std::result::Result<
-            tonic::Response<
-                super::super::super::super::common::v1::GetGeometriesResponse,
-            >,
+            tonic::Response<super::StopMappingSessionResponse>,
             tonic::Status,
         >;
     }
     #[derive(Debug)]
-    pub struct InputControllerServiceServer<T: InputControllerService> {
+    pub struct CloudSlamServiceServer<T: CloudSlamService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
@@ -345,7 +290,7 @@ pub mod input_controller_service_server {
         max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: InputControllerService> InputControllerServiceServer<T> {
+    impl<T: CloudSlamService> CloudSlamServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -397,10 +342,9 @@ pub mod input_controller_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>>
-    for InputControllerServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for CloudSlamServiceServer<T>
     where
-        T: InputControllerService,
+        T: CloudSlamService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -416,25 +360,25 @@ pub mod input_controller_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.component.inputcontroller.v1.InputControllerService/GetControls" => {
+                "/viam.app.cloudslam.v1.CloudSLAMService/StartMappingSession" => {
                     #[allow(non_camel_case_types)]
-                    struct GetControlsSvc<T: InputControllerService>(pub Arc<T>);
+                    struct StartMappingSessionSvc<T: CloudSlamService>(pub Arc<T>);
                     impl<
-                        T: InputControllerService,
-                    > tonic::server::UnaryService<super::GetControlsRequest>
-                    for GetControlsSvc<T> {
-                        type Response = super::GetControlsResponse;
+                        T: CloudSlamService,
+                    > tonic::server::UnaryService<super::StartMappingSessionRequest>
+                    for StartMappingSessionSvc<T> {
+                        type Response = super::StartMappingSessionResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetControlsRequest>,
+                            request: tonic::Request<super::StartMappingSessionRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).get_controls(request).await
+                                (*inner).start_mapping_session(request).await
                             };
                             Box::pin(fut)
                         }
@@ -446,7 +390,7 @@ pub mod input_controller_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetControlsSvc(inner);
+                        let method = StartMappingSessionSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -462,152 +406,17 @@ pub mod input_controller_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.component.inputcontroller.v1.InputControllerService/GetEvents" => {
+                "/viam.app.cloudslam.v1.CloudSLAMService/GetActiveMappingSessionsForRobot" => {
                     #[allow(non_camel_case_types)]
-                    struct GetEventsSvc<T: InputControllerService>(pub Arc<T>);
+                    struct GetActiveMappingSessionsForRobotSvc<T: CloudSlamService>(
+                        pub Arc<T>,
+                    );
                     impl<
-                        T: InputControllerService,
-                    > tonic::server::UnaryService<super::GetEventsRequest>
-                    for GetEventsSvc<T> {
-                        type Response = super::GetEventsResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetEventsRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).get_events(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetEventsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.component.inputcontroller.v1.InputControllerService/StreamEvents" => {
-                    #[allow(non_camel_case_types)]
-                    struct StreamEventsSvc<T: InputControllerService>(pub Arc<T>);
-                    impl<
-                        T: InputControllerService,
-                    > tonic::server::ServerStreamingService<super::StreamEventsRequest>
-                    for StreamEventsSvc<T> {
-                        type Response = super::StreamEventsResponse;
-                        type ResponseStream = T::StreamEventsStream;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::StreamEventsRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).stream_events(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = StreamEventsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.server_streaming(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.component.inputcontroller.v1.InputControllerService/TriggerEvent" => {
-                    #[allow(non_camel_case_types)]
-                    struct TriggerEventSvc<T: InputControllerService>(pub Arc<T>);
-                    impl<
-                        T: InputControllerService,
-                    > tonic::server::UnaryService<super::TriggerEventRequest>
-                    for TriggerEventSvc<T> {
-                        type Response = super::TriggerEventResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::TriggerEventRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).trigger_event(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = TriggerEventSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.component.inputcontroller.v1.InputControllerService/DoCommand" => {
-                    #[allow(non_camel_case_types)]
-                    struct DoCommandSvc<T: InputControllerService>(pub Arc<T>);
-                    impl<
-                        T: InputControllerService,
+                        T: CloudSlamService,
                     > tonic::server::UnaryService<
-                        super::super::super::super::common::v1::DoCommandRequest,
-                    > for DoCommandSvc<T> {
-                        type Response = super::super::super::super::common::v1::DoCommandResponse;
+                        super::GetActiveMappingSessionsForRobotRequest,
+                    > for GetActiveMappingSessionsForRobotSvc<T> {
+                        type Response = super::GetActiveMappingSessionsForRobotResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -615,11 +424,15 @@ pub mod input_controller_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::super::super::common::v1::DoCommandRequest,
+                                super::GetActiveMappingSessionsForRobotRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).do_command(request).await };
+                            let fut = async move {
+                                (*inner)
+                                    .get_active_mapping_sessions_for_robot(request)
+                                    .await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -630,7 +443,7 @@ pub mod input_controller_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DoCommandSvc(inner);
+                        let method = GetActiveMappingSessionsForRobotSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -646,15 +459,17 @@ pub mod input_controller_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.component.inputcontroller.v1.InputControllerService/GetGeometries" => {
+                "/viam.app.cloudslam.v1.CloudSLAMService/GetMappingSessionPointCloud" => {
                     #[allow(non_camel_case_types)]
-                    struct GetGeometriesSvc<T: InputControllerService>(pub Arc<T>);
+                    struct GetMappingSessionPointCloudSvc<T: CloudSlamService>(
+                        pub Arc<T>,
+                    );
                     impl<
-                        T: InputControllerService,
+                        T: CloudSlamService,
                     > tonic::server::UnaryService<
-                        super::super::super::super::common::v1::GetGeometriesRequest,
-                    > for GetGeometriesSvc<T> {
-                        type Response = super::super::super::super::common::v1::GetGeometriesResponse;
+                        super::GetMappingSessionPointCloudRequest,
+                    > for GetMappingSessionPointCloudSvc<T> {
+                        type Response = super::GetMappingSessionPointCloudResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -662,12 +477,12 @@ pub mod input_controller_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::super::super::common::v1::GetGeometriesRequest,
+                                super::GetMappingSessionPointCloudRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).get_geometries(request).await
+                                (*inner).get_mapping_session_point_cloud(request).await
                             };
                             Box::pin(fut)
                         }
@@ -679,7 +494,99 @@ pub mod input_controller_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetGeometriesSvc(inner);
+                        let method = GetMappingSessionPointCloudSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.cloudslam.v1.CloudSLAMService/ListMappingSessions" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListMappingSessionsSvc<T: CloudSlamService>(pub Arc<T>);
+                    impl<
+                        T: CloudSlamService,
+                    > tonic::server::UnaryService<super::ListMappingSessionsRequest>
+                    for ListMappingSessionsSvc<T> {
+                        type Response = super::ListMappingSessionsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListMappingSessionsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).list_mapping_sessions(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListMappingSessionsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.cloudslam.v1.CloudSLAMService/StopMappingSession" => {
+                    #[allow(non_camel_case_types)]
+                    struct StopMappingSessionSvc<T: CloudSlamService>(pub Arc<T>);
+                    impl<
+                        T: CloudSlamService,
+                    > tonic::server::UnaryService<super::StopMappingSessionRequest>
+                    for StopMappingSessionSvc<T> {
+                        type Response = super::StopMappingSessionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::StopMappingSessionRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).stop_mapping_session(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = StopMappingSessionSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -710,7 +617,7 @@ pub mod input_controller_service_server {
             }
         }
     }
-    impl<T: InputControllerService> Clone for InputControllerServiceServer<T> {
+    impl<T: CloudSlamService> Clone for CloudSlamServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -722,7 +629,7 @@ pub mod input_controller_service_server {
             }
         }
     }
-    impl<T: InputControllerService> Clone for _Inner<T> {
+    impl<T: CloudSlamService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(Arc::clone(&self.0))
         }
@@ -732,8 +639,7 @@ pub mod input_controller_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: InputControllerService> tonic::server::NamedService
-    for InputControllerServiceServer<T> {
-        const NAME: &'static str = "viam.component.inputcontroller.v1.InputControllerService";
+    impl<T: CloudSlamService> tonic::server::NamedService for CloudSlamServiceServer<T> {
+        const NAME: &'static str = "viam.app.cloudslam.v1.CloudSLAMService";
     }
 }
