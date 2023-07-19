@@ -10,12 +10,14 @@ pub mod proto {
         // @@protoc_insertion_point(attribute:viam.app.v1)
         pub mod v1 {
             include!("viam.app.v1.rs");
+            include!("viam.app.v1.tonic.rs");
             // @@protoc_insertion_point(viam.app.v1)
         }
         pub mod datasync {
             // @@protoc_insertion_point(attribute:viam.app.datasync.v1)
             pub mod v1 {
                 include!("viam.app.datasync.v1.rs");
+                include!("viam.app.datasync.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.app.datasync.v1)
             }
         }
@@ -23,6 +25,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.app.data.v1)
             pub mod v1 {
                 include!("viam.app.data.v1.rs");
+                include!("viam.app.data.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.app.data.v1)
             }
         }
@@ -30,6 +33,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.app.mltraining.v1)
             pub mod v1 {
                 include!("viam.app.mltraining.v1.rs");
+                include!("viam.app.mltraining.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.app.mltraining.v1)
             }
         }
@@ -37,6 +41,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.app.packages.v1)
             pub mod v1 {
                 include!("viam.app.packages.v1.rs");
+                include!("viam.app.packages.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.app.packages.v1)
             }
         }
@@ -46,6 +51,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.arm.v1)
             pub mod v1 {
                 include!("viam.component.arm.v1.rs");
+                include!("viam.component.arm.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.arm.v1)
             }
         }
@@ -53,6 +59,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.audioinput.v1)
             pub mod v1 {
                 include!("viam.component.audioinput.v1.rs");
+                include!("viam.component.audioinput.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.audioinput.v1)
             }
         }
@@ -60,6 +67,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.base.v1)
             pub mod v1 {
                 include!("viam.component.base.v1.rs");
+                include!("viam.component.base.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.base.v1)
             }
         }
@@ -67,6 +75,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.board.v1)
             pub mod v1 {
                 include!("viam.component.board.v1.rs");
+                include!("viam.component.board.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.board.v1)
             }
         }
@@ -74,6 +83,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.camera.v1)
             pub mod v1 {
                 include!("viam.component.camera.v1.rs");
+                include!("viam.component.camera.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.camera.v1)
             }
         }
@@ -81,13 +91,14 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.encoder.v1)
             pub mod v1 {
                 include!("viam.component.encoder.v1.rs");
+                include!("viam.component.encoder.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.encoder.v1)
             }
         }
         pub mod generic {
             // @@protoc_insertion_point(attribute:viam.component.generic.v1)
             pub mod v1 {
-                include!("viam.component.generic.v1.rs");
+                include!("viam.component.generic.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.generic.v1)
             }
         }
@@ -95,6 +106,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.gantry.v1)
             pub mod v1 {
                 include!("viam.component.gantry.v1.rs");
+                include!("viam.component.gantry.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.gantry.v1)
             }
         }
@@ -102,6 +114,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.gripper.v1)
             pub mod v1 {
                 include!("viam.component.gripper.v1.rs");
+                include!("viam.component.gripper.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.gripper.v1)
             }
         }
@@ -109,6 +122,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.inputcontroller.v1)
             pub mod v1 {
                 include!("viam.component.inputcontroller.v1.rs");
+                include!("viam.component.inputcontroller.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.inputcontroller.v1)
             }
         }
@@ -116,6 +130,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.motor.v1)
             pub mod v1 {
                 include!("viam.component.motor.v1.rs");
+                include!("viam.component.motor.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.motor.v1)
             }
         }
@@ -123,6 +138,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.movementsensor.v1)
             pub mod v1 {
                 include!("viam.component.movementsensor.v1.rs");
+                include!("viam.component.movementsensor.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.movementsensor.v1)
             }
         }
@@ -130,6 +146,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.posetracker.v1)
             pub mod v1 {
                 include!("viam.component.posetracker.v1.rs");
+                include!("viam.component.posetracker.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.posetracker.v1)
             }
         }
@@ -137,6 +154,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.sensor.v1)
             pub mod v1 {
                 include!("viam.component.sensor.v1.rs");
+                include!("viam.component.sensor.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.sensor.v1)
             }
         }
@@ -144,6 +162,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.component.servo.v1)
             pub mod v1 {
                 include!("viam.component.servo.v1.rs");
+                include!("viam.component.servo.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.component.servo.v1)
             }
         }
@@ -152,6 +171,7 @@ pub mod proto {
         // @@protoc_insertion_point(attribute:viam.module.v1)
         pub mod v1 {
             include!("viam.module.v1.rs");
+            include!("viam.module.v1.tonic.rs");
             // @@protoc_insertion_point(viam.module.v1)
         }
     }
@@ -159,6 +179,7 @@ pub mod proto {
         // @@protoc_insertion_point(attribute:viam.robot.v1)
         pub mod v1 {
             include!("viam.robot.v1.rs");
+            include!("viam.robot.v1.tonic.rs");
             // @@protoc_insertion_point(viam.robot.v1)
         }
     }
@@ -167,6 +188,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.service.datamanager.v1)
             pub mod v1 {
                 include!("viam.service.datamanager.v1.rs");
+                include!("viam.service.datamanager.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.service.datamanager.v1)
             }
         }
@@ -174,6 +196,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.service.mlmodel.v1)
             pub mod v1 {
                 include!("viam.service.mlmodel.v1.rs");
+                include!("viam.service.mlmodel.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.service.mlmodel.v1)
             }
         }
@@ -181,6 +204,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.service.motion.v1)
             pub mod v1 {
                 include!("viam.service.motion.v1.rs");
+                include!("viam.service.motion.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.service.motion.v1)
             }
         }
@@ -188,6 +212,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.service.navigation.v1)
             pub mod v1 {
                 include!("viam.service.navigation.v1.rs");
+                include!("viam.service.navigation.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.service.navigation.v1)
             }
         }
@@ -195,6 +220,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.service.sensors.v1)
             pub mod v1 {
                 include!("viam.service.sensors.v1.rs");
+                include!("viam.service.sensors.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.service.sensors.v1)
             }
         }
@@ -202,6 +228,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.service.shell.v1)
             pub mod v1 {
                 include!("viam.service.shell.v1.rs");
+                include!("viam.service.shell.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.service.shell.v1)
             }
         }
@@ -209,6 +236,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.service.slam.v1)
             pub mod v1 {
                 include!("viam.service.slam.v1.rs");
+                include!("viam.service.slam.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.service.slam.v1)
             }
         }
@@ -216,6 +244,7 @@ pub mod proto {
             // @@protoc_insertion_point(attribute:viam.service.vision.v1)
             pub mod v1 {
                 include!("viam.service.vision.v1.rs");
+                include!("viam.service.vision.v1.tonic.rs");
                 // @@protoc_insertion_point(viam.service.vision.v1)
             }
         }

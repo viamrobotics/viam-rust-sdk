@@ -3,6 +3,7 @@
 pub mod robot_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
     pub struct RobotServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -11,7 +12,7 @@ pub mod robot_service_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -22,11 +23,15 @@ pub mod robot_service_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Default + Body<Data = Bytes> + Send + 'static,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
             Self { inner }
         }
         pub fn with_interceptor<F>(
@@ -35,6 +40,7 @@ pub mod robot_service_client {
         ) -> RobotServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -47,25 +53,44 @@ pub mod robot_service_client {
         {
             RobotServiceClient::new(InterceptedService::new(inner, interceptor))
         }
-        /// Compress requests with `gzip`.
+        /// Compress requests with the given encoding.
         ///
         /// This requires the server to support it otherwise it might respond with an
         /// error.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.inner = self.inner.send_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
             self
         }
-        /// Enable decompressing responses with `gzip`.
+        /// Enable decompressing responses.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.inner = self.inner.accept_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
         pub async fn get_operations(
             &mut self,
             request: impl tonic::IntoRequest<super::GetOperationsRequest>,
-        ) -> Result<tonic::Response<super::GetOperationsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetOperationsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -79,12 +104,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/GetOperations",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "GetOperations"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_sessions(
             &mut self,
             request: impl tonic::IntoRequest<super::GetSessionsRequest>,
-        ) -> Result<tonic::Response<super::GetSessionsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetSessionsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -98,12 +129,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/GetSessions",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "GetSessions"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn resource_names(
             &mut self,
             request: impl tonic::IntoRequest<super::ResourceNamesRequest>,
-        ) -> Result<tonic::Response<super::ResourceNamesResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::ResourceNamesResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -117,12 +154,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/ResourceNames",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "ResourceNames"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn resource_rpc_subtypes(
             &mut self,
             request: impl tonic::IntoRequest<super::ResourceRpcSubtypesRequest>,
-        ) -> Result<tonic::Response<super::ResourceRpcSubtypesResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::ResourceRpcSubtypesResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -136,12 +179,20 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/ResourceRPCSubtypes",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.robot.v1.RobotService", "ResourceRPCSubtypes"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn cancel_operation(
             &mut self,
             request: impl tonic::IntoRequest<super::CancelOperationRequest>,
-        ) -> Result<tonic::Response<super::CancelOperationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::CancelOperationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -155,12 +206,20 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/CancelOperation",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.robot.v1.RobotService", "CancelOperation"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn block_for_operation(
             &mut self,
             request: impl tonic::IntoRequest<super::BlockForOperationRequest>,
-        ) -> Result<tonic::Response<super::BlockForOperationResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::BlockForOperationResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -174,12 +233,20 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/BlockForOperation",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.robot.v1.RobotService", "BlockForOperation"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn discover_components(
             &mut self,
             request: impl tonic::IntoRequest<super::DiscoverComponentsRequest>,
-        ) -> Result<tonic::Response<super::DiscoverComponentsResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::DiscoverComponentsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -193,12 +260,20 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/DiscoverComponents",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.robot.v1.RobotService", "DiscoverComponents"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn frame_system_config(
             &mut self,
             request: impl tonic::IntoRequest<super::FrameSystemConfigRequest>,
-        ) -> Result<tonic::Response<super::FrameSystemConfigResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::FrameSystemConfigResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -212,12 +287,20 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/FrameSystemConfig",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.robot.v1.RobotService", "FrameSystemConfig"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         pub async fn transform_pose(
             &mut self,
             request: impl tonic::IntoRequest<super::TransformPoseRequest>,
-        ) -> Result<tonic::Response<super::TransformPoseResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::TransformPoseResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -231,12 +314,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/TransformPose",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "TransformPose"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn transform_pcd(
             &mut self,
             request: impl tonic::IntoRequest<super::TransformPcdRequest>,
-        ) -> Result<tonic::Response<super::TransformPcdResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::TransformPcdResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -250,12 +339,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/TransformPCD",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "TransformPCD"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get_status(
             &mut self,
             request: impl tonic::IntoRequest<super::GetStatusRequest>,
-        ) -> Result<tonic::Response<super::GetStatusResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetStatusResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -269,15 +364,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/GetStatus",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "GetStatus"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn stream_status(
             &mut self,
             request: impl tonic::IntoRequest<super::StreamStatusRequest>,
-        ) -> Result<
-                tonic::Response<tonic::codec::Streaming<super::StreamStatusResponse>>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::StreamStatusResponse>>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -291,12 +389,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/StreamStatus",
             );
-            self.inner.server_streaming(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "StreamStatus"));
+            self.inner.server_streaming(req, path, codec).await
         }
         pub async fn stop_all(
             &mut self,
             request: impl tonic::IntoRequest<super::StopAllRequest>,
-        ) -> Result<tonic::Response<super::StopAllResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::StopAllResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -310,12 +414,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/StopAll",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "StopAll"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn start_session(
             &mut self,
             request: impl tonic::IntoRequest<super::StartSessionRequest>,
-        ) -> Result<tonic::Response<super::StartSessionResponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::StartSessionResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -329,15 +439,18 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/StartSession",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "StartSession"));
+            self.inner.unary(req, path, codec).await
         }
         pub async fn send_session_heartbeat(
             &mut self,
             request: impl tonic::IntoRequest<super::SendSessionHeartbeatRequest>,
-        ) -> Result<
-                tonic::Response<super::SendSessionHeartbeatResponse>,
-                tonic::Status,
-            > {
+        ) -> std::result::Result<
+            tonic::Response<super::SendSessionHeartbeatResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -351,7 +464,12 @@ pub mod robot_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/viam.robot.v1.RobotService/SendSessionHeartbeat",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.robot.v1.RobotService", "SendSessionHeartbeat"),
+                );
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -359,81 +477,125 @@ pub mod robot_service_client {
 pub mod robot_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with RobotServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with RobotServiceServer.
     #[async_trait]
     pub trait RobotService: Send + Sync + 'static {
         async fn get_operations(
             &self,
             request: tonic::Request<super::GetOperationsRequest>,
-        ) -> Result<tonic::Response<super::GetOperationsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetOperationsResponse>,
+            tonic::Status,
+        >;
         async fn get_sessions(
             &self,
             request: tonic::Request<super::GetSessionsRequest>,
-        ) -> Result<tonic::Response<super::GetSessionsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetSessionsResponse>,
+            tonic::Status,
+        >;
         async fn resource_names(
             &self,
             request: tonic::Request<super::ResourceNamesRequest>,
-        ) -> Result<tonic::Response<super::ResourceNamesResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ResourceNamesResponse>,
+            tonic::Status,
+        >;
         async fn resource_rpc_subtypes(
             &self,
             request: tonic::Request<super::ResourceRpcSubtypesRequest>,
-        ) -> Result<tonic::Response<super::ResourceRpcSubtypesResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ResourceRpcSubtypesResponse>,
+            tonic::Status,
+        >;
         async fn cancel_operation(
             &self,
             request: tonic::Request<super::CancelOperationRequest>,
-        ) -> Result<tonic::Response<super::CancelOperationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::CancelOperationResponse>,
+            tonic::Status,
+        >;
         async fn block_for_operation(
             &self,
             request: tonic::Request<super::BlockForOperationRequest>,
-        ) -> Result<tonic::Response<super::BlockForOperationResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::BlockForOperationResponse>,
+            tonic::Status,
+        >;
         async fn discover_components(
             &self,
             request: tonic::Request<super::DiscoverComponentsRequest>,
-        ) -> Result<tonic::Response<super::DiscoverComponentsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::DiscoverComponentsResponse>,
+            tonic::Status,
+        >;
         async fn frame_system_config(
             &self,
             request: tonic::Request<super::FrameSystemConfigRequest>,
-        ) -> Result<tonic::Response<super::FrameSystemConfigResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::FrameSystemConfigResponse>,
+            tonic::Status,
+        >;
         async fn transform_pose(
             &self,
             request: tonic::Request<super::TransformPoseRequest>,
-        ) -> Result<tonic::Response<super::TransformPoseResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::TransformPoseResponse>,
+            tonic::Status,
+        >;
         async fn transform_pcd(
             &self,
             request: tonic::Request<super::TransformPcdRequest>,
-        ) -> Result<tonic::Response<super::TransformPcdResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::TransformPcdResponse>,
+            tonic::Status,
+        >;
         async fn get_status(
             &self,
             request: tonic::Request<super::GetStatusRequest>,
-        ) -> Result<tonic::Response<super::GetStatusResponse>, tonic::Status>;
-        ///Server streaming response type for the StreamStatus method.
+        ) -> std::result::Result<
+            tonic::Response<super::GetStatusResponse>,
+            tonic::Status,
+        >;
+        /// Server streaming response type for the StreamStatus method.
         type StreamStatusStream: futures_core::Stream<
-                Item = Result<super::StreamStatusResponse, tonic::Status>,
+                Item = std::result::Result<super::StreamStatusResponse, tonic::Status>,
             >
             + Send
             + 'static;
         async fn stream_status(
             &self,
             request: tonic::Request<super::StreamStatusRequest>,
-        ) -> Result<tonic::Response<Self::StreamStatusStream>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<Self::StreamStatusStream>,
+            tonic::Status,
+        >;
         async fn stop_all(
             &self,
             request: tonic::Request<super::StopAllRequest>,
-        ) -> Result<tonic::Response<super::StopAllResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::StopAllResponse>, tonic::Status>;
         async fn start_session(
             &self,
             request: tonic::Request<super::StartSessionRequest>,
-        ) -> Result<tonic::Response<super::StartSessionResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::StartSessionResponse>,
+            tonic::Status,
+        >;
         async fn send_session_heartbeat(
             &self,
             request: tonic::Request<super::SendSessionHeartbeatRequest>,
-        ) -> Result<tonic::Response<super::SendSessionHeartbeatResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::SendSessionHeartbeatResponse>,
+            tonic::Status,
+        >;
     }
     #[derive(Debug)]
     pub struct RobotServiceServer<T: RobotService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: RobotService> RobotServiceServer<T> {
@@ -446,6 +608,8 @@ pub mod robot_service_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -457,16 +621,32 @@ pub mod robot_service_server {
         {
             InterceptedService::new(Self::new(inner), interceptor)
         }
-        /// Enable decompressing requests with `gzip`.
+        /// Enable decompressing requests with the given encoding.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.accept_compression_encodings.enable_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
             self
         }
-        /// Compress responses with `gzip`, if the client supports it.
+        /// Compress responses with the given encoding, if the client supports it.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.send_compression_encodings.enable_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
             self
         }
     }
@@ -482,7 +662,7 @@ pub mod robot_service_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -504,7 +684,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::GetOperationsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_operations(request).await
                             };
@@ -513,6 +693,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -522,6 +704,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -544,7 +730,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::GetSessionsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).get_sessions(request).await
                             };
@@ -553,6 +739,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -562,6 +750,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -584,7 +776,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::ResourceNamesRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).resource_names(request).await
                             };
@@ -593,6 +785,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -602,6 +796,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -624,7 +822,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::ResourceRpcSubtypesRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).resource_rpc_subtypes(request).await
                             };
@@ -633,6 +831,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -642,6 +842,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -664,7 +868,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::CancelOperationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).cancel_operation(request).await
                             };
@@ -673,6 +877,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -682,6 +888,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -704,7 +914,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::BlockForOperationRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).block_for_operation(request).await
                             };
@@ -713,6 +923,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -722,6 +934,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -744,7 +960,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::DiscoverComponentsRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).discover_components(request).await
                             };
@@ -753,6 +969,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -762,6 +980,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -784,7 +1006,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::FrameSystemConfigRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).frame_system_config(request).await
                             };
@@ -793,6 +1015,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -802,6 +1026,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -824,7 +1052,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::TransformPoseRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).transform_pose(request).await
                             };
@@ -833,6 +1061,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -842,6 +1072,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -864,7 +1098,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::TransformPcdRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).transform_pcd(request).await
                             };
@@ -873,6 +1107,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -882,6 +1118,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -904,13 +1144,15 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::GetStatusRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).get_status(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -920,6 +1162,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -943,7 +1189,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::StreamStatusRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).stream_status(request).await
                             };
@@ -952,6 +1198,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -961,6 +1209,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.server_streaming(method, req).await;
                         Ok(res)
@@ -983,13 +1235,15 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::StopAllRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).stop_all(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -999,6 +1253,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1021,7 +1279,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::StartSessionRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).start_session(request).await
                             };
@@ -1030,6 +1288,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1039,6 +1299,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1061,7 +1325,7 @@ pub mod robot_service_server {
                             &mut self,
                             request: tonic::Request<super::SendSessionHeartbeatRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
                                 (*inner).send_session_heartbeat(request).await
                             };
@@ -1070,6 +1334,8 @@ pub mod robot_service_server {
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -1079,6 +1345,10 @@ pub mod robot_service_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -1107,12 +1377,14 @@ pub mod robot_service_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: RobotService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
@@ -1120,7 +1392,7 @@ pub mod robot_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: RobotService> tonic::transport::NamedService for RobotServiceServer<T> {
+    impl<T: RobotService> tonic::server::NamedService for RobotServiceServer<T> {
         const NAME: &'static str = "viam.robot.v1.RobotService";
     }
 }
