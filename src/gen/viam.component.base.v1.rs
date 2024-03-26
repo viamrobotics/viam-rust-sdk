@@ -121,5 +121,7 @@ pub struct GetPropertiesResponse {
     pub width_meters: f64,
     #[prost(double, tag="2")]
     pub turning_radius_meters: f64,
+    #[prost(double, tag="3")]
+    pub wheel_circumference_meters: f64,
 }
 // @@protoc_insertion_point(module)

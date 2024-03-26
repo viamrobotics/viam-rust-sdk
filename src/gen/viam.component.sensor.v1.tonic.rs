@@ -84,13 +84,13 @@ pub mod sensor_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        /** GetReadings returns the readings of a sensor of the underlying robot.
-*/
         pub async fn get_readings(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetReadingsRequest>,
+            request: impl tonic::IntoRequest<
+                super::super::super::super::common::v1::GetReadingsRequest,
+            >,
         ) -> std::result::Result<
-            tonic::Response<super::GetReadingsResponse>,
+            tonic::Response<super::super::super::super::common::v1::GetReadingsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -150,6 +150,8 @@ pub mod sensor_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        /** GetGeometries returns the geometries of the component in their current configuration
+*/
         pub async fn get_geometries(
             &mut self,
             request: impl tonic::IntoRequest<
@@ -193,13 +195,13 @@ pub mod sensor_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with SensorServiceServer.
     #[async_trait]
     pub trait SensorService: Send + Sync + 'static {
-        /** GetReadings returns the readings of a sensor of the underlying robot.
-*/
         async fn get_readings(
             &self,
-            request: tonic::Request<super::GetReadingsRequest>,
+            request: tonic::Request<
+                super::super::super::super::common::v1::GetReadingsRequest,
+            >,
         ) -> std::result::Result<
-            tonic::Response<super::GetReadingsResponse>,
+            tonic::Response<super::super::super::super::common::v1::GetReadingsResponse>,
             tonic::Status,
         >;
         /** DoCommand sends/receives arbitrary commands
@@ -213,6 +215,8 @@ pub mod sensor_service_server {
             tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
             tonic::Status,
         >;
+        /** GetGeometries returns the geometries of the component in their current configuration
+*/
         async fn get_geometries(
             &self,
             request: tonic::Request<
@@ -309,16 +313,19 @@ pub mod sensor_service_server {
                     struct GetReadingsSvc<T: SensorService>(pub Arc<T>);
                     impl<
                         T: SensorService,
-                    > tonic::server::UnaryService<super::GetReadingsRequest>
-                    for GetReadingsSvc<T> {
-                        type Response = super::GetReadingsResponse;
+                    > tonic::server::UnaryService<
+                        super::super::super::super::common::v1::GetReadingsRequest,
+                    > for GetReadingsSvc<T> {
+                        type Response = super::super::super::super::common::v1::GetReadingsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetReadingsRequest>,
+                            request: tonic::Request<
+                                super::super::super::super::common::v1::GetReadingsRequest,
+                            >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {

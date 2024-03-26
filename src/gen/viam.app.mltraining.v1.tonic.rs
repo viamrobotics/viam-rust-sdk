@@ -204,6 +204,36 @@ pub mod ml_training_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn delete_completed_training_job(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteCompletedTrainingJobRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteCompletedTrainingJobResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.mltraining.v1.MLTrainingService/DeleteCompletedTrainingJob",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.mltraining.v1.MLTrainingService",
+                        "DeleteCompletedTrainingJob",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -239,6 +269,13 @@ pub mod ml_training_service_server {
             request: tonic::Request<super::CancelTrainingJobRequest>,
         ) -> std::result::Result<
             tonic::Response<super::CancelTrainingJobResponse>,
+            tonic::Status,
+        >;
+        async fn delete_completed_training_job(
+            &self,
+            request: tonic::Request<super::DeleteCompletedTrainingJobRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteCompletedTrainingJobResponse>,
             tonic::Status,
         >;
     }
@@ -490,6 +527,57 @@ pub mod ml_training_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = CancelTrainingJobSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.mltraining.v1.MLTrainingService/DeleteCompletedTrainingJob" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteCompletedTrainingJobSvc<T: MlTrainingService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: MlTrainingService,
+                    > tonic::server::UnaryService<
+                        super::DeleteCompletedTrainingJobRequest,
+                    > for DeleteCompletedTrainingJobSvc<T> {
+                        type Response = super::DeleteCompletedTrainingJobResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::DeleteCompletedTrainingJobRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).delete_completed_training_job(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteCompletedTrainingJobSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

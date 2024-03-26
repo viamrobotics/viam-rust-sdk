@@ -294,6 +294,66 @@ pub mod navigation_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn get_paths(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetPathsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetPathsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.navigation.v1.NavigationService/GetPaths",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.service.navigation.v1.NavigationService",
+                        "GetPaths",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn get_properties(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetPropertiesRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetPropertiesResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.service.navigation.v1.NavigationService/GetProperties",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.service.navigation.v1.NavigationService",
+                        "GetProperties",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn do_command(
             &mut self,
             request: impl tonic::IntoRequest<
@@ -376,6 +436,20 @@ pub mod navigation_service_server {
             request: tonic::Request<super::GetObstaclesRequest>,
         ) -> std::result::Result<
             tonic::Response<super::GetObstaclesResponse>,
+            tonic::Status,
+        >;
+        async fn get_paths(
+            &self,
+            request: tonic::Request<super::GetPathsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetPathsResponse>,
+            tonic::Status,
+        >;
+        async fn get_properties(
+            &self,
+            request: tonic::Request<super::GetPropertiesRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetPropertiesResponse>,
             tonic::Status,
         >;
         async fn do_command(
@@ -770,6 +844,96 @@ pub mod navigation_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetObstaclesSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.service.navigation.v1.NavigationService/GetPaths" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetPathsSvc<T: NavigationService>(pub Arc<T>);
+                    impl<
+                        T: NavigationService,
+                    > tonic::server::UnaryService<super::GetPathsRequest>
+                    for GetPathsSvc<T> {
+                        type Response = super::GetPathsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetPathsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move { (*inner).get_paths(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetPathsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.service.navigation.v1.NavigationService/GetProperties" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetPropertiesSvc<T: NavigationService>(pub Arc<T>);
+                    impl<
+                        T: NavigationService,
+                    > tonic::server::UnaryService<super::GetPropertiesRequest>
+                    for GetPropertiesSvc<T> {
+                        type Response = super::GetPropertiesResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetPropertiesRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).get_properties(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetPropertiesSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
