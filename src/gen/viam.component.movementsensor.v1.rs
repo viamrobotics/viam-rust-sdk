@@ -46,7 +46,7 @@ pub struct GetCompassHeadingRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetCompassHeadingResponse {
-    /// A number from 0-359 where
+    /// A number from 0-359 in degrees where
     /// 0 is North, 90 is East, 180 is South, and 270 is   West
     #[prost(double, tag="1")]
     pub value: f64,
@@ -64,6 +64,8 @@ pub struct GetOrientationRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetOrientationResponse {
+    /// Orientation is returned as an orientation message with
+    /// OX OY OZ as unit-normalized components of the axis of the vector, and Theta in degrees
     #[prost(message, optional, tag="1")]
     pub orientation: ::core::option::Option<super::super::super::common::v1::Orientation>,
 }
@@ -80,6 +82,8 @@ pub struct GetPositionRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetPositionResponse {
+    /// Position is returned in a coordinate of latitute and longitude
+    /// and an altidue in meters
     #[prost(message, optional, tag="1")]
     pub coordinate: ::core::option::Option<super::super::super::common::v1::GeoPoint>,
     #[prost(float, tag="2")]
@@ -126,6 +130,14 @@ pub struct GetAccuracyRequest {
 pub struct GetAccuracyResponse {
     #[prost(map="string, float", tag="1")]
     pub accuracy: ::std::collections::HashMap<::prost::alloc::string::String, f32>,
+    #[prost(float, optional, tag="2")]
+    pub position_hdop: ::core::option::Option<f32>,
+    #[prost(float, optional, tag="3")]
+    pub position_vdop: ::core::option::Option<f32>,
+    #[prost(int32, optional, tag="4")]
+    pub position_nmea_gga_fix: ::core::option::Option<i32>,
+    #[prost(float, optional, tag="5")]
+    pub compass_degrees_error: ::core::option::Option<f32>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

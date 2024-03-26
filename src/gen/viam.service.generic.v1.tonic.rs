@@ -84,8 +84,6 @@ pub mod generic_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        /** DoCommand sends/receives arbitrary commands
-*/
         pub async fn do_command(
             &mut self,
             request: impl tonic::IntoRequest<
@@ -106,50 +104,14 @@ pub mod generic_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.generic.v1.GenericService/DoCommand",
+                "/viam.service.generic.v1.GenericService/DoCommand",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "viam.component.generic.v1.GenericService",
+                        "viam.service.generic.v1.GenericService",
                         "DoCommand",
-                    ),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        /** GetGeometries returns the geometries of the component in their current configuration
-*/
-        pub async fn get_geometries(
-            &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::super::super::common::v1::GetGeometriesRequest,
-            >,
-        ) -> std::result::Result<
-            tonic::Response<
-                super::super::super::super::common::v1::GetGeometriesResponse,
-            >,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.component.generic.v1.GenericService/GetGeometries",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "viam.component.generic.v1.GenericService",
-                        "GetGeometries",
                     ),
                 );
             self.inner.unary(req, path, codec).await
@@ -163,8 +125,6 @@ pub mod generic_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with GenericServiceServer.
     #[async_trait]
     pub trait GenericService: Send + Sync + 'static {
-        /** DoCommand sends/receives arbitrary commands
-*/
         async fn do_command(
             &self,
             request: tonic::Request<
@@ -172,19 +132,6 @@ pub mod generic_service_server {
             >,
         ) -> std::result::Result<
             tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
-            tonic::Status,
-        >;
-        /** GetGeometries returns the geometries of the component in their current configuration
-*/
-        async fn get_geometries(
-            &self,
-            request: tonic::Request<
-                super::super::super::super::common::v1::GetGeometriesRequest,
-            >,
-        ) -> std::result::Result<
-            tonic::Response<
-                super::super::super::super::common::v1::GetGeometriesResponse,
-            >,
             tonic::Status,
         >;
     }
@@ -267,7 +214,7 @@ pub mod generic_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.component.generic.v1.GenericService/DoCommand" => {
+                "/viam.service.generic.v1.GenericService/DoCommand" => {
                     #[allow(non_camel_case_types)]
                     struct DoCommandSvc<T: GenericService>(pub Arc<T>);
                     impl<
@@ -299,55 +246,6 @@ pub mod generic_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = DoCommandSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.component.generic.v1.GenericService/GetGeometries" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetGeometriesSvc<T: GenericService>(pub Arc<T>);
-                    impl<
-                        T: GenericService,
-                    > tonic::server::UnaryService<
-                        super::super::super::super::common::v1::GetGeometriesRequest,
-                    > for GetGeometriesSvc<T> {
-                        type Response = super::super::super::super::common::v1::GetGeometriesResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<
-                                super::super::super::super::common::v1::GetGeometriesRequest,
-                            >,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).get_geometries(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetGeometriesSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -401,6 +299,6 @@ pub mod generic_service_server {
         }
     }
     impl<T: GenericService> tonic::server::NamedService for GenericServiceServer<T> {
-        const NAME: &'static str = "viam.component.generic.v1.GenericService";
+        const NAME: &'static str = "viam.service.generic.v1.GenericService";
     }
 }

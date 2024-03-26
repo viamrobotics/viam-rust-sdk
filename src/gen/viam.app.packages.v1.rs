@@ -60,6 +60,8 @@ pub struct DeletePackageRequest {
     pub id: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub version: ::prost::alloc::string::String,
+    #[prost(enumeration="PackageType", tag="3")]
+    pub r#type: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

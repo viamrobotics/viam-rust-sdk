@@ -1,4 +1,5 @@
 // @generated
+/// DataCaptureUploadRequest requests to upload the contents and metadata for tabular data.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DataCaptureUploadRequest {
@@ -7,12 +8,15 @@ pub struct DataCaptureUploadRequest {
     #[prost(message, repeated, tag="2")]
     pub sensor_contents: ::prost::alloc::vec::Vec<SensorData>,
 }
+/// DataCaptureUploadResponse returns the file id of the uploaded contents and metadata for tabular data.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DataCaptureUploadResponse {
     #[prost(string, tag="1")]
     pub file_id: ::prost::alloc::string::String,
 }
+/// FileUploadRequest requests to upload the contents and metadata for binary (image + file) data.
+/// The first packet must be the UploadMetadata associated with the binary data.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FileUploadRequest {
@@ -30,12 +34,40 @@ pub mod file_upload_request {
         FileContents(super::FileData),
     }
 }
+/// FileUploadResponse returns the file id of the uploaded contents and metadata for binary (image + file) data.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FileUploadResponse {
     #[prost(string, tag="1")]
     pub file_id: ::prost::alloc::string::String,
 }
+/// StreamingDataCaptureUploadRequest requests to upload the contents and metadata for streaming binary (image + file) data.
+/// The first packet must be the DataCaptureUploadMetadata associated with the data.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct StreamingDataCaptureUploadRequest {
+    #[prost(oneof="streaming_data_capture_upload_request::UploadPacket", tags="1, 2")]
+    pub upload_packet: ::core::option::Option<streaming_data_capture_upload_request::UploadPacket>,
+}
+/// Nested message and enum types in `StreamingDataCaptureUploadRequest`.
+pub mod streaming_data_capture_upload_request {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum UploadPacket {
+        #[prost(message, tag="1")]
+        Metadata(super::DataCaptureUploadMetadata),
+        #[prost(bytes, tag="2")]
+        Data(::prost::alloc::vec::Vec<u8>),
+    }
+}
+/// StreamingDataCaptureUploadResponse returns the file id of the uploaded contents and metadata for streaming binary (image + file) data.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct StreamingDataCaptureUploadResponse {
+    #[prost(string, tag="1")]
+    pub file_id: ::prost::alloc::string::String,
+}
+/// SensorMetadata contains the time the sensor data was requested and was received.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SensorMetadata {
@@ -44,6 +76,7 @@ pub struct SensorMetadata {
     #[prost(message, optional, tag="2")]
     pub time_received: ::core::option::Option<::prost_types::Timestamp>,
 }
+/// SensorData contains the contents and metadata for tabular data.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SensorData {
@@ -63,12 +96,14 @@ pub mod sensor_data {
         Binary(::prost::alloc::vec::Vec<u8>),
     }
 }
+/// FileData contains the contents of binary (image + file) data.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FileData {
     #[prost(bytes="vec", tag="1")]
     pub data: ::prost::alloc::vec::Vec<u8>,
 }
+/// UploadMetadata contains the metadata for binary (image + file) data.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UploadMetadata {
@@ -91,6 +126,7 @@ pub struct UploadMetadata {
     #[prost(string, repeated, tag="10")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
+/// CaptureInterval specifies the start and end times of the data capture.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CaptureInterval {
@@ -99,6 +135,7 @@ pub struct CaptureInterval {
     #[prost(message, optional, tag="2")]
     pub end: ::core::option::Option<::prost_types::Timestamp>,
 }
+/// DataCaptureMetadata contains the metadata for data captured by collectors.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DataCaptureMetadata {
@@ -117,6 +154,16 @@ pub struct DataCaptureMetadata {
     #[prost(string, repeated, tag="8")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
+/// DataCaptureUploadMetadata contains the metadata for streaming binary (image + file) data.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DataCaptureUploadMetadata {
+    #[prost(message, optional, tag="1")]
+    pub upload_metadata: ::core::option::Option<UploadMetadata>,
+    #[prost(message, optional, tag="2")]
+    pub sensor_metadata: ::core::option::Option<SensorMetadata>,
+}
+/// DataType specifies the type of data uploaded.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum DataType {

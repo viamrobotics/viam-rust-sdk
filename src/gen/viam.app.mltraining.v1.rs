@@ -2,8 +2,8 @@
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SubmitTrainingJobRequest {
-    #[prost(message, optional, tag="1")]
-    pub filter: ::core::option::Option<super::super::data::v1::Filter>,
+    #[prost(string, tag="7")]
+    pub dataset_id: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub organization_id: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
@@ -60,12 +60,14 @@ pub struct TrainingJobMetadata {
     pub last_modified: ::core::option::Option<::prost_types::Timestamp>,
     #[prost(string, tag="5")]
     pub synced_model_id: ::prost::alloc::string::String,
-    #[prost(string, tag="6")]
-    pub user_email: ::prost::alloc::string::String,
     #[prost(string, tag="7")]
     pub id: ::prost::alloc::string::String,
     #[prost(message, optional, tag="8")]
     pub error_status: ::core::option::Option<super::super::super::super::google::rpc::Status>,
+    #[prost(message, optional, tag="9")]
+    pub training_started: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(message, optional, tag="10")]
+    pub training_ended: ::core::option::Option<::prost_types::Timestamp>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -76,6 +78,16 @@ pub struct CancelTrainingJobRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CancelTrainingJobResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteCompletedTrainingJobRequest {
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteCompletedTrainingJobResponse {
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

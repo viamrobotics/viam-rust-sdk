@@ -114,6 +114,60 @@ pub mod data_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn tabular_data_by_sql(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TabularDataBySqlRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::TabularDataBySqlResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/TabularDataBySQL",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.data.v1.DataService", "TabularDataBySQL"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn tabular_data_by_mql(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TabularDataByMqlRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::TabularDataByMqlResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/TabularDataByMQL",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.data.v1.DataService", "TabularDataByMQL"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn binary_data_by_filter(
             &mut self,
             request: impl tonic::IntoRequest<super::BinaryDataByFilterRequest>,
@@ -168,11 +222,11 @@ pub mod data_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn delete_tabular_data_by_filter(
+        pub async fn delete_tabular_data(
             &mut self,
-            request: impl tonic::IntoRequest<super::DeleteTabularDataByFilterRequest>,
+            request: impl tonic::IntoRequest<super::DeleteTabularDataRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::DeleteTabularDataByFilterResponse>,
+            tonic::Response<super::DeleteTabularDataResponse>,
             tonic::Status,
         > {
             self.inner
@@ -186,15 +240,12 @@ pub mod data_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.data.v1.DataService/DeleteTabularDataByFilter",
+                "/viam.app.data.v1.DataService/DeleteTabularData",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new(
-                        "viam.app.data.v1.DataService",
-                        "DeleteTabularDataByFilter",
-                    ),
+                    GrpcMethod::new("viam.app.data.v1.DataService", "DeleteTabularData"),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -497,6 +548,128 @@ pub mod data_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn get_database_connection(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetDatabaseConnectionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetDatabaseConnectionResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/GetDatabaseConnection",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.data.v1.DataService",
+                        "GetDatabaseConnection",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn configure_database_user(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ConfigureDatabaseUserRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ConfigureDatabaseUserResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/ConfigureDatabaseUser",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.data.v1.DataService",
+                        "ConfigureDatabaseUser",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn add_binary_data_to_dataset_by_i_ds(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AddBinaryDataToDatasetByIDsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AddBinaryDataToDatasetByIDsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/AddBinaryDataToDatasetByIDs",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.data.v1.DataService",
+                        "AddBinaryDataToDatasetByIDs",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn remove_binary_data_from_dataset_by_i_ds(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::RemoveBinaryDataFromDatasetByIDsRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::RemoveBinaryDataFromDatasetByIDsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.data.v1.DataService/RemoveBinaryDataFromDatasetByIDs",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.data.v1.DataService",
+                        "RemoveBinaryDataFromDatasetByIDs",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -513,6 +686,20 @@ pub mod data_service_server {
             tonic::Response<super::TabularDataByFilterResponse>,
             tonic::Status,
         >;
+        async fn tabular_data_by_sql(
+            &self,
+            request: tonic::Request<super::TabularDataBySqlRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::TabularDataBySqlResponse>,
+            tonic::Status,
+        >;
+        async fn tabular_data_by_mql(
+            &self,
+            request: tonic::Request<super::TabularDataByMqlRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::TabularDataByMqlResponse>,
+            tonic::Status,
+        >;
         async fn binary_data_by_filter(
             &self,
             request: tonic::Request<super::BinaryDataByFilterRequest>,
@@ -527,11 +714,11 @@ pub mod data_service_server {
             tonic::Response<super::BinaryDataByIDsResponse>,
             tonic::Status,
         >;
-        async fn delete_tabular_data_by_filter(
+        async fn delete_tabular_data(
             &self,
-            request: tonic::Request<super::DeleteTabularDataByFilterRequest>,
+            request: tonic::Request<super::DeleteTabularDataRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::DeleteTabularDataByFilterResponse>,
+            tonic::Response<super::DeleteTabularDataResponse>,
             tonic::Status,
         >;
         async fn delete_binary_data_by_filter(
@@ -602,6 +789,34 @@ pub mod data_service_server {
             request: tonic::Request<super::BoundingBoxLabelsByFilterRequest>,
         ) -> std::result::Result<
             tonic::Response<super::BoundingBoxLabelsByFilterResponse>,
+            tonic::Status,
+        >;
+        async fn get_database_connection(
+            &self,
+            request: tonic::Request<super::GetDatabaseConnectionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetDatabaseConnectionResponse>,
+            tonic::Status,
+        >;
+        async fn configure_database_user(
+            &self,
+            request: tonic::Request<super::ConfigureDatabaseUserRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ConfigureDatabaseUserResponse>,
+            tonic::Status,
+        >;
+        async fn add_binary_data_to_dataset_by_i_ds(
+            &self,
+            request: tonic::Request<super::AddBinaryDataToDatasetByIDsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AddBinaryDataToDatasetByIDsResponse>,
+            tonic::Status,
+        >;
+        async fn remove_binary_data_from_dataset_by_i_ds(
+            &self,
+            request: tonic::Request<super::RemoveBinaryDataFromDatasetByIDsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::RemoveBinaryDataFromDatasetByIDsResponse>,
             tonic::Status,
         >;
     }
@@ -730,6 +945,98 @@ pub mod data_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/viam.app.data.v1.DataService/TabularDataBySQL" => {
+                    #[allow(non_camel_case_types)]
+                    struct TabularDataBySQLSvc<T: DataService>(pub Arc<T>);
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<super::TabularDataBySqlRequest>
+                    for TabularDataBySQLSvc<T> {
+                        type Response = super::TabularDataBySqlResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TabularDataBySqlRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).tabular_data_by_sql(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = TabularDataBySQLSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/TabularDataByMQL" => {
+                    #[allow(non_camel_case_types)]
+                    struct TabularDataByMQLSvc<T: DataService>(pub Arc<T>);
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<super::TabularDataByMqlRequest>
+                    for TabularDataByMQLSvc<T> {
+                        type Response = super::TabularDataByMqlResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TabularDataByMqlRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).tabular_data_by_mql(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = TabularDataByMQLSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.app.data.v1.DataService/BinaryDataByFilter" => {
                     #[allow(non_camel_case_types)]
                     struct BinaryDataByFilterSvc<T: DataService>(pub Arc<T>);
@@ -822,28 +1129,25 @@ pub mod data_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.app.data.v1.DataService/DeleteTabularDataByFilter" => {
+                "/viam.app.data.v1.DataService/DeleteTabularData" => {
                     #[allow(non_camel_case_types)]
-                    struct DeleteTabularDataByFilterSvc<T: DataService>(pub Arc<T>);
+                    struct DeleteTabularDataSvc<T: DataService>(pub Arc<T>);
                     impl<
                         T: DataService,
-                    > tonic::server::UnaryService<
-                        super::DeleteTabularDataByFilterRequest,
-                    > for DeleteTabularDataByFilterSvc<T> {
-                        type Response = super::DeleteTabularDataByFilterResponse;
+                    > tonic::server::UnaryService<super::DeleteTabularDataRequest>
+                    for DeleteTabularDataSvc<T> {
+                        type Response = super::DeleteTabularDataResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::DeleteTabularDataByFilterRequest,
-                            >,
+                            request: tonic::Request<super::DeleteTabularDataRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).delete_tabular_data_by_filter(request).await
+                                (*inner).delete_tabular_data(request).await
                             };
                             Box::pin(fut)
                         }
@@ -855,7 +1159,7 @@ pub mod data_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DeleteTabularDataByFilterSvc(inner);
+                        let method = DeleteTabularDataSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -1342,6 +1646,200 @@ pub mod data_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = BoundingBoxLabelsByFilterSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/GetDatabaseConnection" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetDatabaseConnectionSvc<T: DataService>(pub Arc<T>);
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<super::GetDatabaseConnectionRequest>
+                    for GetDatabaseConnectionSvc<T> {
+                        type Response = super::GetDatabaseConnectionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetDatabaseConnectionRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).get_database_connection(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetDatabaseConnectionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/ConfigureDatabaseUser" => {
+                    #[allow(non_camel_case_types)]
+                    struct ConfigureDatabaseUserSvc<T: DataService>(pub Arc<T>);
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<super::ConfigureDatabaseUserRequest>
+                    for ConfigureDatabaseUserSvc<T> {
+                        type Response = super::ConfigureDatabaseUserResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ConfigureDatabaseUserRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).configure_database_user(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ConfigureDatabaseUserSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/AddBinaryDataToDatasetByIDs" => {
+                    #[allow(non_camel_case_types)]
+                    struct AddBinaryDataToDatasetByIDsSvc<T: DataService>(pub Arc<T>);
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<
+                        super::AddBinaryDataToDatasetByIDsRequest,
+                    > for AddBinaryDataToDatasetByIDsSvc<T> {
+                        type Response = super::AddBinaryDataToDatasetByIDsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::AddBinaryDataToDatasetByIDsRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).add_binary_data_to_dataset_by_i_ds(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AddBinaryDataToDatasetByIDsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.data.v1.DataService/RemoveBinaryDataFromDatasetByIDs" => {
+                    #[allow(non_camel_case_types)]
+                    struct RemoveBinaryDataFromDatasetByIDsSvc<T: DataService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: DataService,
+                    > tonic::server::UnaryService<
+                        super::RemoveBinaryDataFromDatasetByIDsRequest,
+                    > for RemoveBinaryDataFromDatasetByIDsSvc<T> {
+                        type Response = super::RemoveBinaryDataFromDatasetByIDsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::RemoveBinaryDataFromDatasetByIDsRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner)
+                                    .remove_binary_data_from_dataset_by_i_ds(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RemoveBinaryDataFromDatasetByIDsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
