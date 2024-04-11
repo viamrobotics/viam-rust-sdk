@@ -10,6 +10,8 @@ pub struct ResourceName {
     pub subtype: ::prost::alloc::string::String,
     #[prost(string, tag="4")]
     pub name: ::prost::alloc::string::String,
+    #[prost(string, optional, tag="5")]
+    pub machine_part_id: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -262,6 +264,9 @@ pub struct GetKinematicsRequest {
     /// The component name
     #[prost(string, tag="1")]
     pub name: ::prost::alloc::string::String,
+    /// Additional arguments to the method
+    #[prost(message, optional, tag="99")]
+    pub extra: ::core::option::Option<::prost_types::Struct>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -280,6 +285,9 @@ pub struct GetGeometriesRequest {
     /// The component name
     #[prost(string, tag="1")]
     pub name: ::prost::alloc::string::String,
+    /// Additional arguments to the method
+    #[prost(message, optional, tag="99")]
+    pub extra: ::core::option::Option<::prost_types::Struct>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -287,6 +295,42 @@ pub struct GetGeometriesResponse {
     /// All geometries associated with the component, in their current configuration, in the frame of that component.
     #[prost(message, repeated, tag="1")]
     pub geometries: ::prost::alloc::vec::Vec<Geometry>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetReadingsRequest {
+    /// Name of a sensor
+    #[prost(string, tag="1")]
+    pub name: ::prost::alloc::string::String,
+    /// Additional arguments to the method
+    #[prost(message, optional, tag="99")]
+    pub extra: ::core::option::Option<::prost_types::Struct>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetReadingsResponse {
+    #[prost(map="string, message", tag="1")]
+    pub readings: ::std::collections::HashMap<::prost::alloc::string::String, ::prost_types::Value>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LogEntry {
+    #[prost(string, tag="1")]
+    pub host: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub level: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="3")]
+    pub time: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(string, tag="4")]
+    pub logger_name: ::prost::alloc::string::String,
+    #[prost(string, tag="5")]
+    pub message: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="6")]
+    pub caller: ::core::option::Option<::prost_types::Struct>,
+    #[prost(string, tag="7")]
+    pub stack: ::prost::alloc::string::String,
+    #[prost(message, repeated, tag="8")]
+    pub fields: ::prost::alloc::vec::Vec<::prost_types::Struct>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

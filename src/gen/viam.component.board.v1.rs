@@ -137,6 +137,25 @@ pub struct ReadAnalogReaderResponse {
     #[prost(int32, tag="1")]
     pub value: i32,
 }
+// Analog Writer
+
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WriteAnalogRequest {
+    #[prost(string, tag="1")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub pin: ::prost::alloc::string::String,
+    #[prost(int32, tag="3")]
+    pub value: i32,
+    /// Additional arguments to the method
+    #[prost(message, optional, tag="99")]
+    pub extra: ::core::option::Option<::prost_types::Struct>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WriteAnalogResponse {
+}
 // Digital Interrupt
 
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -155,6 +174,32 @@ pub struct GetDigitalInterruptValueRequest {
 pub struct GetDigitalInterruptValueResponse {
     #[prost(int64, tag="1")]
     pub value: i64,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct StreamTicksRequest {
+    /// Board name
+    #[prost(string, tag="1")]
+    pub name: ::prost::alloc::string::String,
+    /// Name of digital interrupts to recieve ticks from
+    #[prost(string, repeated, tag="2")]
+    pub pin_names: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Additional arguments to the method
+    #[prost(message, optional, tag="99")]
+    pub extra: ::core::option::Option<::prost_types::Struct>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct StreamTicksResponse {
+    /// name of interrupt
+    #[prost(string, tag="1")]
+    pub pin_name: ::prost::alloc::string::String,
+    /// Time in nanoseconds of a tick
+    #[prost(uint64, tag="2")]
+    pub time: u64,
+    /// Value high or low of the tick
+    #[prost(bool, tag="3")]
+    pub high: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

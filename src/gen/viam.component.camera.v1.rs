@@ -8,6 +8,9 @@ pub struct GetImageRequest {
     /// Requested MIME type of response
     #[prost(string, tag="2")]
     pub mime_type: ::prost::alloc::string::String,
+    /// Additional arguments to the method
+    #[prost(message, optional, tag="99")]
+    pub extra: ::core::option::Option<::prost_types::Struct>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -58,6 +61,9 @@ pub struct RenderFrameRequest {
     /// Requested MIME type of response
     #[prost(string, tag="2")]
     pub mime_type: ::prost::alloc::string::String,
+    /// Additional arguments to the method
+    #[prost(message, optional, tag="99")]
+    pub extra: ::core::option::Option<::prost_types::Struct>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -68,6 +74,9 @@ pub struct GetPointCloudRequest {
     /// Requested MIME type of response
     #[prost(string, tag="2")]
     pub mime_type: ::prost::alloc::string::String,
+    /// Additional arguments to the method
+    #[prost(message, optional, tag="99")]
+    pub extra: ::core::option::Option<::prost_types::Struct>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -102,6 +111,9 @@ pub struct GetPropertiesResponse {
     /// Initializing the parameters with 0-values is considered an error
     #[prost(message, optional, tag="3")]
     pub distortion_parameters: ::core::option::Option<DistortionParameters>,
+    /// Supported MIME types by the camera
+    #[prost(string, repeated, tag="4")]
+    pub mime_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

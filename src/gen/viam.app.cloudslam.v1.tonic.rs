@@ -236,6 +236,36 @@ pub mod cloud_slam_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn get_mapping_session_metadata_by_id(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetMappingSessionMetadataByIdRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetMappingSessionMetadataByIdResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.cloudslam.v1.CloudSLAMService/GetMappingSessionMetadataByID",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.cloudslam.v1.CloudSLAMService",
+                        "GetMappingSessionMetadataByID",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -278,6 +308,13 @@ pub mod cloud_slam_service_server {
             request: tonic::Request<super::StopMappingSessionRequest>,
         ) -> std::result::Result<
             tonic::Response<super::StopMappingSessionResponse>,
+            tonic::Status,
+        >;
+        async fn get_mapping_session_metadata_by_id(
+            &self,
+            request: tonic::Request<super::GetMappingSessionMetadataByIdRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetMappingSessionMetadataByIdResponse>,
             tonic::Status,
         >;
     }
@@ -587,6 +624,57 @@ pub mod cloud_slam_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = StopMappingSessionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.cloudslam.v1.CloudSLAMService/GetMappingSessionMetadataByID" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetMappingSessionMetadataByIDSvc<T: CloudSlamService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: CloudSlamService,
+                    > tonic::server::UnaryService<
+                        super::GetMappingSessionMetadataByIdRequest,
+                    > for GetMappingSessionMetadataByIDSvc<T> {
+                        type Response = super::GetMappingSessionMetadataByIdResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::GetMappingSessionMetadataByIdRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).get_mapping_session_metadata_by_id(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetMappingSessionMetadataByIDSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

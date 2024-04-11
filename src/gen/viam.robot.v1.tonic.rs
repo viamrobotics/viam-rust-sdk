@@ -471,6 +471,55 @@ pub mod robot_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn log(
+            &mut self,
+            request: impl tonic::IntoRequest<super::LogRequest>,
+        ) -> std::result::Result<tonic::Response<super::LogResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.robot.v1.RobotService/Log",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.robot.v1.RobotService", "Log"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn get_cloud_metadata(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetCloudMetadataRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetCloudMetadataResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.robot.v1.RobotService/GetCloudMetadata",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.robot.v1.RobotService", "GetCloudMetadata"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -586,6 +635,17 @@ pub mod robot_service_server {
             request: tonic::Request<super::SendSessionHeartbeatRequest>,
         ) -> std::result::Result<
             tonic::Response<super::SendSessionHeartbeatResponse>,
+            tonic::Status,
+        >;
+        async fn log(
+            &self,
+            request: tonic::Request<super::LogRequest>,
+        ) -> std::result::Result<tonic::Response<super::LogResponse>, tonic::Status>;
+        async fn get_cloud_metadata(
+            &self,
+            request: tonic::Request<super::GetCloudMetadataRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetCloudMetadataResponse>,
             tonic::Status,
         >;
     }
@@ -1340,6 +1400,94 @@ pub mod robot_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = SendSessionHeartbeatSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.robot.v1.RobotService/Log" => {
+                    #[allow(non_camel_case_types)]
+                    struct LogSvc<T: RobotService>(pub Arc<T>);
+                    impl<T: RobotService> tonic::server::UnaryService<super::LogRequest>
+                    for LogSvc<T> {
+                        type Response = super::LogResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::LogRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move { (*inner).log(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = LogSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.robot.v1.RobotService/GetCloudMetadata" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetCloudMetadataSvc<T: RobotService>(pub Arc<T>);
+                    impl<
+                        T: RobotService,
+                    > tonic::server::UnaryService<super::GetCloudMetadataRequest>
+                    for GetCloudMetadataSvc<T> {
+                        type Response = super::GetCloudMetadataResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetCloudMetadataRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).get_cloud_metadata(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetCloudMetadataSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

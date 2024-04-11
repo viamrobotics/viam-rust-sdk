@@ -203,6 +203,8 @@ pub struct Status {
     pub name: ::core::option::Option<super::super::common::v1::ResourceName>,
     #[prost(message, optional, tag="2")]
     pub status: ::core::option::Option<::prost_types::Struct>,
+    #[prost(message, optional, tag="3")]
+    pub last_reconfigured: ::core::option::Option<::prost_types::Timestamp>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -274,6 +276,34 @@ pub struct SendSessionHeartbeatRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SendSessionHeartbeatResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LogRequest {
+    #[prost(message, repeated, tag="1")]
+    pub logs: ::prost::alloc::vec::Vec<super::super::common::v1::LogEntry>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LogResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetCloudMetadataRequest {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetCloudMetadataResponse {
+    #[prost(string, tag="1")]
+    pub robot_part_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub primary_org_id: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub location_id: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub machine_id: ::prost::alloc::string::String,
+    #[prost(string, tag="5")]
+    pub machine_part_id: ::prost::alloc::string::String,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

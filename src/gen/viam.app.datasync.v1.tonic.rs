@@ -141,6 +141,38 @@ pub mod data_sync_service_client {
                 );
             self.inner.client_streaming(req, path, codec).await
         }
+        pub async fn streaming_data_capture_upload(
+            &mut self,
+            request: impl tonic::IntoStreamingRequest<
+                Message = super::StreamingDataCaptureUploadRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::StreamingDataCaptureUploadResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.datasync.v1.DataSyncService/StreamingDataCaptureUpload",
+            );
+            let mut req = request.into_streaming_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.datasync.v1.DataSyncService",
+                        "StreamingDataCaptureUpload",
+                    ),
+                );
+            self.inner.client_streaming(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -162,6 +194,15 @@ pub mod data_sync_service_server {
             request: tonic::Request<tonic::Streaming<super::FileUploadRequest>>,
         ) -> std::result::Result<
             tonic::Response<super::FileUploadResponse>,
+            tonic::Status,
+        >;
+        async fn streaming_data_capture_upload(
+            &self,
+            request: tonic::Request<
+                tonic::Streaming<super::StreamingDataCaptureUploadRequest>,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::StreamingDataCaptureUploadResponse>,
             tonic::Status,
         >;
     }
@@ -321,6 +362,55 @@ pub mod data_sync_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = FileUploadSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.client_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.datasync.v1.DataSyncService/StreamingDataCaptureUpload" => {
+                    #[allow(non_camel_case_types)]
+                    struct StreamingDataCaptureUploadSvc<T: DataSyncService>(pub Arc<T>);
+                    impl<
+                        T: DataSyncService,
+                    > tonic::server::ClientStreamingService<
+                        super::StreamingDataCaptureUploadRequest,
+                    > for StreamingDataCaptureUploadSvc<T> {
+                        type Response = super::StreamingDataCaptureUploadResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                tonic::Streaming<super::StreamingDataCaptureUploadRequest>,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).streaming_data_capture_upload(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = StreamingDataCaptureUploadSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

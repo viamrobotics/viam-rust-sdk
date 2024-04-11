@@ -60,6 +60,8 @@ pub struct DeletePackageRequest {
     pub id: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub version: ::prost::alloc::string::String,
+    #[prost(enumeration="PackageType", tag="3")]
+    pub r#type: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -127,6 +129,7 @@ pub enum PackageType {
     MlModel = 2,
     Module = 3,
     SlamMap = 4,
+    MlTraining = 5,
 }
 impl PackageType {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -140,6 +143,7 @@ impl PackageType {
             PackageType::MlModel => "PACKAGE_TYPE_ML_MODEL",
             PackageType::Module => "PACKAGE_TYPE_MODULE",
             PackageType::SlamMap => "PACKAGE_TYPE_SLAM_MAP",
+            PackageType::MlTraining => "PACKAGE_TYPE_ML_TRAINING",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -150,6 +154,7 @@ impl PackageType {
             "PACKAGE_TYPE_ML_MODEL" => Some(Self::MlModel),
             "PACKAGE_TYPE_MODULE" => Some(Self::Module),
             "PACKAGE_TYPE_SLAM_MAP" => Some(Self::SlamMap),
+            "PACKAGE_TYPE_ML_TRAINING" => Some(Self::MlTraining),
             _ => None,
         }
     }

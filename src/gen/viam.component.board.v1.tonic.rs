@@ -327,6 +327,36 @@ pub mod board_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn write_analog(
+            &mut self,
+            request: impl tonic::IntoRequest<super::WriteAnalogRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::WriteAnalogResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.board.v1.BoardService/WriteAnalog",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.component.board.v1.BoardService",
+                        "WriteAnalog",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn get_digital_interrupt_value(
             &mut self,
             request: impl tonic::IntoRequest<super::GetDigitalInterruptValueRequest>,
@@ -356,6 +386,36 @@ pub mod board_service_client {
                     ),
                 );
             self.inner.unary(req, path, codec).await
+        }
+        pub async fn stream_ticks(
+            &mut self,
+            request: impl tonic::IntoRequest<super::StreamTicksRequest>,
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::StreamTicksResponse>>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.component.board.v1.BoardService/StreamTicks",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.component.board.v1.BoardService",
+                        "StreamTicks",
+                    ),
+                );
+            self.inner.server_streaming(req, path, codec).await
         }
         pub async fn set_power_mode(
             &mut self,
@@ -480,11 +540,31 @@ pub mod board_service_server {
             tonic::Response<super::ReadAnalogReaderResponse>,
             tonic::Status,
         >;
+        async fn write_analog(
+            &self,
+            request: tonic::Request<super::WriteAnalogRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::WriteAnalogResponse>,
+            tonic::Status,
+        >;
         async fn get_digital_interrupt_value(
             &self,
             request: tonic::Request<super::GetDigitalInterruptValueRequest>,
         ) -> std::result::Result<
             tonic::Response<super::GetDigitalInterruptValueResponse>,
+            tonic::Status,
+        >;
+        /// Server streaming response type for the StreamTicks method.
+        type StreamTicksStream: futures_core::Stream<
+                Item = std::result::Result<super::StreamTicksResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn stream_ticks(
+            &self,
+            request: tonic::Request<super::StreamTicksRequest>,
+        ) -> std::result::Result<
+            tonic::Response<Self::StreamTicksStream>,
             tonic::Status,
         >;
         async fn set_power_mode(
@@ -988,6 +1068,52 @@ pub mod board_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/viam.component.board.v1.BoardService/WriteAnalog" => {
+                    #[allow(non_camel_case_types)]
+                    struct WriteAnalogSvc<T: BoardService>(pub Arc<T>);
+                    impl<
+                        T: BoardService,
+                    > tonic::server::UnaryService<super::WriteAnalogRequest>
+                    for WriteAnalogSvc<T> {
+                        type Response = super::WriteAnalogResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::WriteAnalogRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).write_analog(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = WriteAnalogSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.component.board.v1.BoardService/GetDigitalInterruptValue" => {
                     #[allow(non_camel_case_types)]
                     struct GetDigitalInterruptValueSvc<T: BoardService>(pub Arc<T>);
@@ -1032,6 +1158,53 @@ pub mod board_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.component.board.v1.BoardService/StreamTicks" => {
+                    #[allow(non_camel_case_types)]
+                    struct StreamTicksSvc<T: BoardService>(pub Arc<T>);
+                    impl<
+                        T: BoardService,
+                    > tonic::server::ServerStreamingService<super::StreamTicksRequest>
+                    for StreamTicksSvc<T> {
+                        type Response = super::StreamTicksResponse;
+                        type ResponseStream = T::StreamTicksStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::StreamTicksRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).stream_ticks(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = StreamTicksSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)

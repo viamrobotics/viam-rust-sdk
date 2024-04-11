@@ -1,14 +1,14 @@
 // @generated
 /// Generated client implementations.
-pub mod slam_service_client {
+pub mod provisioning_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
-    pub struct SlamServiceClient<T> {
+    pub struct ProvisioningServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl SlamServiceClient<tonic::transport::Channel> {
+    impl ProvisioningServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -19,7 +19,7 @@ pub mod slam_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> SlamServiceClient<T>
+    impl<T> ProvisioningServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -37,7 +37,7 @@ pub mod slam_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> SlamServiceClient<InterceptedService<T, F>>
+        ) -> ProvisioningServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -51,7 +51,7 @@ pub mod slam_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            SlamServiceClient::new(InterceptedService::new(inner, interceptor))
+            ProvisioningServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -84,11 +84,11 @@ pub mod slam_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn get_position(
+        pub async fn get_smart_machine_status(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetPositionRequest>,
+            request: impl tonic::IntoRequest<super::GetSmartMachineStatusRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetPositionResponse>,
+            tonic::Response<super::GetSmartMachineStatusResponse>,
             tonic::Status,
         > {
             self.inner
@@ -102,50 +102,23 @@ pub mod slam_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.slam.v1.SLAMService/GetPosition",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("viam.service.slam.v1.SLAMService", "GetPosition"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn get_point_cloud_map(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetPointCloudMapRequest>,
-        ) -> std::result::Result<
-            tonic::Response<tonic::codec::Streaming<super::GetPointCloudMapResponse>>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.slam.v1.SLAMService/GetPointCloudMap",
+                "/viam.provisioning.v1.ProvisioningService/GetSmartMachineStatus",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "viam.service.slam.v1.SLAMService",
-                        "GetPointCloudMap",
+                        "viam.provisioning.v1.ProvisioningService",
+                        "GetSmartMachineStatus",
                     ),
                 );
-            self.inner.server_streaming(req, path, codec).await
+            self.inner.unary(req, path, codec).await
         }
-        pub async fn get_internal_state(
+        pub async fn set_network_credentials(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetInternalStateRequest>,
+            request: impl tonic::IntoRequest<super::SetNetworkCredentialsRequest>,
         ) -> std::result::Result<
-            tonic::Response<tonic::codec::Streaming<super::GetInternalStateResponse>>,
+            tonic::Response<super::SetNetworkCredentialsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -159,52 +132,23 @@ pub mod slam_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.slam.v1.SLAMService/GetInternalState",
+                "/viam.provisioning.v1.ProvisioningService/SetNetworkCredentials",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "viam.service.slam.v1.SLAMService",
-                        "GetInternalState",
+                        "viam.provisioning.v1.ProvisioningService",
+                        "SetNetworkCredentials",
                     ),
-                );
-            self.inner.server_streaming(req, path, codec).await
-        }
-        pub async fn get_properties(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetPropertiesRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetPropertiesResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.slam.v1.SLAMService/GetProperties",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("viam.service.slam.v1.SLAMService", "GetProperties"),
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn do_command(
+        pub async fn set_smart_machine_credentials(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::super::super::common::v1::DoCommandRequest,
-            >,
+            request: impl tonic::IntoRequest<super::SetSmartMachineCredentialsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
+            tonic::Response<super::SetSmartMachineCredentialsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -218,82 +162,88 @@ pub mod slam_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.slam.v1.SLAMService/DoCommand",
+                "/viam.provisioning.v1.ProvisioningService/SetSmartMachineCredentials",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("viam.service.slam.v1.SLAMService", "DoCommand"),
+                    GrpcMethod::new(
+                        "viam.provisioning.v1.ProvisioningService",
+                        "SetSmartMachineCredentials",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn get_network_list(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetNetworkListRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetNetworkListResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.provisioning.v1.ProvisioningService/GetNetworkList",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.provisioning.v1.ProvisioningService",
+                        "GetNetworkList",
+                    ),
                 );
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod slam_service_server {
+pub mod provisioning_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with SlamServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with ProvisioningServiceServer.
     #[async_trait]
-    pub trait SlamService: Send + Sync + 'static {
-        async fn get_position(
+    pub trait ProvisioningService: Send + Sync + 'static {
+        async fn get_smart_machine_status(
             &self,
-            request: tonic::Request<super::GetPositionRequest>,
+            request: tonic::Request<super::GetSmartMachineStatusRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetPositionResponse>,
+            tonic::Response<super::GetSmartMachineStatusResponse>,
             tonic::Status,
         >;
-        /// Server streaming response type for the GetPointCloudMap method.
-        type GetPointCloudMapStream: futures_core::Stream<
-                Item = std::result::Result<
-                    super::GetPointCloudMapResponse,
-                    tonic::Status,
-                >,
-            >
-            + Send
-            + 'static;
-        async fn get_point_cloud_map(
+        async fn set_network_credentials(
             &self,
-            request: tonic::Request<super::GetPointCloudMapRequest>,
+            request: tonic::Request<super::SetNetworkCredentialsRequest>,
         ) -> std::result::Result<
-            tonic::Response<Self::GetPointCloudMapStream>,
+            tonic::Response<super::SetNetworkCredentialsResponse>,
             tonic::Status,
         >;
-        /// Server streaming response type for the GetInternalState method.
-        type GetInternalStateStream: futures_core::Stream<
-                Item = std::result::Result<
-                    super::GetInternalStateResponse,
-                    tonic::Status,
-                >,
-            >
-            + Send
-            + 'static;
-        async fn get_internal_state(
+        async fn set_smart_machine_credentials(
             &self,
-            request: tonic::Request<super::GetInternalStateRequest>,
+            request: tonic::Request<super::SetSmartMachineCredentialsRequest>,
         ) -> std::result::Result<
-            tonic::Response<Self::GetInternalStateStream>,
+            tonic::Response<super::SetSmartMachineCredentialsResponse>,
             tonic::Status,
         >;
-        async fn get_properties(
+        async fn get_network_list(
             &self,
-            request: tonic::Request<super::GetPropertiesRequest>,
+            request: tonic::Request<super::GetNetworkListRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetPropertiesResponse>,
-            tonic::Status,
-        >;
-        async fn do_command(
-            &self,
-            request: tonic::Request<
-                super::super::super::super::common::v1::DoCommandRequest,
-            >,
-        ) -> std::result::Result<
-            tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
+            tonic::Response<super::GetNetworkListResponse>,
             tonic::Status,
         >;
     }
     #[derive(Debug)]
-    pub struct SlamServiceServer<T: SlamService> {
+    pub struct ProvisioningServiceServer<T: ProvisioningService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
@@ -301,7 +251,7 @@ pub mod slam_service_server {
         max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: SlamService> SlamServiceServer<T> {
+    impl<T: ProvisioningService> ProvisioningServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -353,9 +303,9 @@ pub mod slam_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for SlamServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for ProvisioningServiceServer<T>
     where
-        T: SlamService,
+        T: ProvisioningService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -371,25 +321,25 @@ pub mod slam_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.service.slam.v1.SLAMService/GetPosition" => {
+                "/viam.provisioning.v1.ProvisioningService/GetSmartMachineStatus" => {
                     #[allow(non_camel_case_types)]
-                    struct GetPositionSvc<T: SlamService>(pub Arc<T>);
+                    struct GetSmartMachineStatusSvc<T: ProvisioningService>(pub Arc<T>);
                     impl<
-                        T: SlamService,
-                    > tonic::server::UnaryService<super::GetPositionRequest>
-                    for GetPositionSvc<T> {
-                        type Response = super::GetPositionResponse;
+                        T: ProvisioningService,
+                    > tonic::server::UnaryService<super::GetSmartMachineStatusRequest>
+                    for GetSmartMachineStatusSvc<T> {
+                        type Response = super::GetSmartMachineStatusResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetPositionRequest>,
+                            request: tonic::Request<super::GetSmartMachineStatusRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).get_position(request).await
+                                (*inner).get_smart_machine_status(request).await
                             };
                             Box::pin(fut)
                         }
@@ -401,7 +351,7 @@ pub mod slam_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetPositionSvc(inner);
+                        let method = GetSmartMachineStatusSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -417,121 +367,25 @@ pub mod slam_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.slam.v1.SLAMService/GetPointCloudMap" => {
+                "/viam.provisioning.v1.ProvisioningService/SetNetworkCredentials" => {
                     #[allow(non_camel_case_types)]
-                    struct GetPointCloudMapSvc<T: SlamService>(pub Arc<T>);
+                    struct SetNetworkCredentialsSvc<T: ProvisioningService>(pub Arc<T>);
                     impl<
-                        T: SlamService,
-                    > tonic::server::ServerStreamingService<
-                        super::GetPointCloudMapRequest,
-                    > for GetPointCloudMapSvc<T> {
-                        type Response = super::GetPointCloudMapResponse;
-                        type ResponseStream = T::GetPointCloudMapStream;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetPointCloudMapRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).get_point_cloud_map(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetPointCloudMapSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.server_streaming(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.slam.v1.SLAMService/GetInternalState" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetInternalStateSvc<T: SlamService>(pub Arc<T>);
-                    impl<
-                        T: SlamService,
-                    > tonic::server::ServerStreamingService<
-                        super::GetInternalStateRequest,
-                    > for GetInternalStateSvc<T> {
-                        type Response = super::GetInternalStateResponse;
-                        type ResponseStream = T::GetInternalStateStream;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetInternalStateRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).get_internal_state(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetInternalStateSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.server_streaming(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.slam.v1.SLAMService/GetProperties" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetPropertiesSvc<T: SlamService>(pub Arc<T>);
-                    impl<
-                        T: SlamService,
-                    > tonic::server::UnaryService<super::GetPropertiesRequest>
-                    for GetPropertiesSvc<T> {
-                        type Response = super::GetPropertiesResponse;
+                        T: ProvisioningService,
+                    > tonic::server::UnaryService<super::SetNetworkCredentialsRequest>
+                    for SetNetworkCredentialsSvc<T> {
+                        type Response = super::SetNetworkCredentialsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetPropertiesRequest>,
+                            request: tonic::Request<super::SetNetworkCredentialsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).get_properties(request).await
+                                (*inner).set_network_credentials(request).await
                             };
                             Box::pin(fut)
                         }
@@ -543,7 +397,7 @@ pub mod slam_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetPropertiesSvc(inner);
+                        let method = SetNetworkCredentialsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -559,15 +413,17 @@ pub mod slam_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.slam.v1.SLAMService/DoCommand" => {
+                "/viam.provisioning.v1.ProvisioningService/SetSmartMachineCredentials" => {
                     #[allow(non_camel_case_types)]
-                    struct DoCommandSvc<T: SlamService>(pub Arc<T>);
+                    struct SetSmartMachineCredentialsSvc<T: ProvisioningService>(
+                        pub Arc<T>,
+                    );
                     impl<
-                        T: SlamService,
+                        T: ProvisioningService,
                     > tonic::server::UnaryService<
-                        super::super::super::super::common::v1::DoCommandRequest,
-                    > for DoCommandSvc<T> {
-                        type Response = super::super::super::super::common::v1::DoCommandResponse;
+                        super::SetSmartMachineCredentialsRequest,
+                    > for SetSmartMachineCredentialsSvc<T> {
+                        type Response = super::SetSmartMachineCredentialsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -575,11 +431,13 @@ pub mod slam_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::super::super::common::v1::DoCommandRequest,
+                                super::SetSmartMachineCredentialsRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).do_command(request).await };
+                            let fut = async move {
+                                (*inner).set_smart_machine_credentials(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -590,7 +448,53 @@ pub mod slam_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DoCommandSvc(inner);
+                        let method = SetSmartMachineCredentialsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.provisioning.v1.ProvisioningService/GetNetworkList" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetNetworkListSvc<T: ProvisioningService>(pub Arc<T>);
+                    impl<
+                        T: ProvisioningService,
+                    > tonic::server::UnaryService<super::GetNetworkListRequest>
+                    for GetNetworkListSvc<T> {
+                        type Response = super::GetNetworkListResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetNetworkListRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).get_network_list(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetNetworkListSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -621,7 +525,7 @@ pub mod slam_service_server {
             }
         }
     }
-    impl<T: SlamService> Clone for SlamServiceServer<T> {
+    impl<T: ProvisioningService> Clone for ProvisioningServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -633,7 +537,7 @@ pub mod slam_service_server {
             }
         }
     }
-    impl<T: SlamService> Clone for _Inner<T> {
+    impl<T: ProvisioningService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(Arc::clone(&self.0))
         }
@@ -643,7 +547,8 @@ pub mod slam_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: SlamService> tonic::server::NamedService for SlamServiceServer<T> {
-        const NAME: &'static str = "viam.service.slam.v1.SLAMService";
+    impl<T: ProvisioningService> tonic::server::NamedService
+    for ProvisioningServiceServer<T> {
+        const NAME: &'static str = "viam.provisioning.v1.ProvisioningService";
     }
 }
