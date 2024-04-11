@@ -1,14 +1,14 @@
 // @generated
 /// Generated client implementations.
-pub mod motion_service_client {
+pub mod dataset_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
-    pub struct MotionServiceClient<T> {
+    pub struct DatasetServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl MotionServiceClient<tonic::transport::Channel> {
+    impl DatasetServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -19,7 +19,7 @@ pub mod motion_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> MotionServiceClient<T>
+    impl<T> DatasetServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -37,7 +37,7 @@ pub mod motion_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> MotionServiceClient<InterceptedService<T, F>>
+        ) -> DatasetServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -51,7 +51,7 @@ pub mod motion_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            MotionServiceClient::new(InterceptedService::new(inner, interceptor))
+            DatasetServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -84,33 +84,11 @@ pub mod motion_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn r#move(
+        pub async fn create_dataset(
             &mut self,
-            request: impl tonic::IntoRequest<super::MoveRequest>,
-        ) -> std::result::Result<tonic::Response<super::MoveResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.motion.v1.MotionService/Move",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("viam.service.motion.v1.MotionService", "Move"));
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn move_on_map(
-            &mut self,
-            request: impl tonic::IntoRequest<super::MoveOnMapRequest>,
+            request: impl tonic::IntoRequest<super::CreateDatasetRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::MoveOnMapResponse>,
+            tonic::Response<super::CreateDatasetResponse>,
             tonic::Status,
         > {
             self.inner
@@ -124,50 +102,23 @@ pub mod motion_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.motion.v1.MotionService/MoveOnMap",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("viam.service.motion.v1.MotionService", "MoveOnMap"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn move_on_globe(
-            &mut self,
-            request: impl tonic::IntoRequest<super::MoveOnGlobeRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::MoveOnGlobeResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.motion.v1.MotionService/MoveOnGlobe",
+                "/viam.app.dataset.v1.DatasetService/CreateDataset",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "viam.service.motion.v1.MotionService",
-                        "MoveOnGlobe",
+                        "viam.app.dataset.v1.DatasetService",
+                        "CreateDataset",
                     ),
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn get_pose(
+        pub async fn delete_dataset(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetPoseRequest>,
+            request: impl tonic::IntoRequest<super::DeleteDatasetRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetPoseResponse>,
+            tonic::Response<super::DeleteDatasetResponse>,
             tonic::Status,
         > {
             self.inner
@@ -181,77 +132,23 @@ pub mod motion_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.motion.v1.MotionService/GetPose",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("viam.service.motion.v1.MotionService", "GetPose"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn stop_plan(
-            &mut self,
-            request: impl tonic::IntoRequest<super::StopPlanRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::StopPlanResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.motion.v1.MotionService/StopPlan",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("viam.service.motion.v1.MotionService", "StopPlan"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn list_plan_statuses(
-            &mut self,
-            request: impl tonic::IntoRequest<super::ListPlanStatusesRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::ListPlanStatusesResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.motion.v1.MotionService/ListPlanStatuses",
+                "/viam.app.dataset.v1.DatasetService/DeleteDataset",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "viam.service.motion.v1.MotionService",
-                        "ListPlanStatuses",
+                        "viam.app.dataset.v1.DatasetService",
+                        "DeleteDataset",
                     ),
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn get_plan(
+        pub async fn rename_dataset(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetPlanRequest>,
+            request: impl tonic::IntoRequest<super::RenameDatasetRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetPlanResponse>,
+            tonic::Response<super::RenameDatasetResponse>,
             tonic::Status,
         > {
             self.inner
@@ -265,22 +162,23 @@ pub mod motion_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.motion.v1.MotionService/GetPlan",
+                "/viam.app.dataset.v1.DatasetService/RenameDataset",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("viam.service.motion.v1.MotionService", "GetPlan"),
+                    GrpcMethod::new(
+                        "viam.app.dataset.v1.DatasetService",
+                        "RenameDataset",
+                    ),
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn do_command(
+        pub async fn list_datasets_by_organization_id(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::super::super::common::v1::DoCommandRequest,
-            >,
+            request: impl tonic::IntoRequest<super::ListDatasetsByOrganizationIdRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
+            tonic::Response<super::ListDatasetsByOrganizationIdResponse>,
             tonic::Status,
         > {
             self.inner
@@ -294,76 +192,95 @@ pub mod motion_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/viam.service.motion.v1.MotionService/DoCommand",
+                "/viam.app.dataset.v1.DatasetService/ListDatasetsByOrganizationID",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("viam.service.motion.v1.MotionService", "DoCommand"),
+                    GrpcMethod::new(
+                        "viam.app.dataset.v1.DatasetService",
+                        "ListDatasetsByOrganizationID",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn list_datasets_by_i_ds(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListDatasetsByIDsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListDatasetsByIDsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.dataset.v1.DatasetService/ListDatasetsByIDs",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.dataset.v1.DatasetService",
+                        "ListDatasetsByIDs",
+                    ),
                 );
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod motion_service_server {
+pub mod dataset_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with MotionServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with DatasetServiceServer.
     #[async_trait]
-    pub trait MotionService: Send + Sync + 'static {
-        async fn r#move(
+    pub trait DatasetService: Send + Sync + 'static {
+        async fn create_dataset(
             &self,
-            request: tonic::Request<super::MoveRequest>,
-        ) -> std::result::Result<tonic::Response<super::MoveResponse>, tonic::Status>;
-        async fn move_on_map(
-            &self,
-            request: tonic::Request<super::MoveOnMapRequest>,
+            request: tonic::Request<super::CreateDatasetRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::MoveOnMapResponse>,
+            tonic::Response<super::CreateDatasetResponse>,
             tonic::Status,
         >;
-        async fn move_on_globe(
+        async fn delete_dataset(
             &self,
-            request: tonic::Request<super::MoveOnGlobeRequest>,
+            request: tonic::Request<super::DeleteDatasetRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::MoveOnGlobeResponse>,
+            tonic::Response<super::DeleteDatasetResponse>,
             tonic::Status,
         >;
-        async fn get_pose(
+        async fn rename_dataset(
             &self,
-            request: tonic::Request<super::GetPoseRequest>,
-        ) -> std::result::Result<tonic::Response<super::GetPoseResponse>, tonic::Status>;
-        async fn stop_plan(
-            &self,
-            request: tonic::Request<super::StopPlanRequest>,
+            request: tonic::Request<super::RenameDatasetRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::StopPlanResponse>,
+            tonic::Response<super::RenameDatasetResponse>,
             tonic::Status,
         >;
-        async fn list_plan_statuses(
+        async fn list_datasets_by_organization_id(
             &self,
-            request: tonic::Request<super::ListPlanStatusesRequest>,
+            request: tonic::Request<super::ListDatasetsByOrganizationIdRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ListPlanStatusesResponse>,
+            tonic::Response<super::ListDatasetsByOrganizationIdResponse>,
             tonic::Status,
         >;
-        async fn get_plan(
+        async fn list_datasets_by_i_ds(
             &self,
-            request: tonic::Request<super::GetPlanRequest>,
-        ) -> std::result::Result<tonic::Response<super::GetPlanResponse>, tonic::Status>;
-        async fn do_command(
-            &self,
-            request: tonic::Request<
-                super::super::super::super::common::v1::DoCommandRequest,
-            >,
+            request: tonic::Request<super::ListDatasetsByIDsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::super::super::common::v1::DoCommandResponse>,
+            tonic::Response<super::ListDatasetsByIDsResponse>,
             tonic::Status,
         >;
     }
     #[derive(Debug)]
-    pub struct MotionServiceServer<T: MotionService> {
+    pub struct DatasetServiceServer<T: DatasetService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
@@ -371,7 +288,7 @@ pub mod motion_service_server {
         max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: MotionService> MotionServiceServer<T> {
+    impl<T: DatasetService> DatasetServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -423,9 +340,9 @@ pub mod motion_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for MotionServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for DatasetServiceServer<T>
     where
-        T: MotionService,
+        T: DatasetService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -441,112 +358,25 @@ pub mod motion_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.service.motion.v1.MotionService/Move" => {
+                "/viam.app.dataset.v1.DatasetService/CreateDataset" => {
                     #[allow(non_camel_case_types)]
-                    struct MoveSvc<T: MotionService>(pub Arc<T>);
+                    struct CreateDatasetSvc<T: DatasetService>(pub Arc<T>);
                     impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::MoveRequest> for MoveSvc<T> {
-                        type Response = super::MoveResponse;
+                        T: DatasetService,
+                    > tonic::server::UnaryService<super::CreateDatasetRequest>
+                    for CreateDatasetSvc<T> {
+                        type Response = super::CreateDatasetResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::MoveRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).r#move(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = MoveSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.motion.v1.MotionService/MoveOnMap" => {
-                    #[allow(non_camel_case_types)]
-                    struct MoveOnMapSvc<T: MotionService>(pub Arc<T>);
-                    impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::MoveOnMapRequest>
-                    for MoveOnMapSvc<T> {
-                        type Response = super::MoveOnMapResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::MoveOnMapRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).move_on_map(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = MoveOnMapSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.motion.v1.MotionService/MoveOnGlobe" => {
-                    #[allow(non_camel_case_types)]
-                    struct MoveOnGlobeSvc<T: MotionService>(pub Arc<T>);
-                    impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::MoveOnGlobeRequest>
-                    for MoveOnGlobeSvc<T> {
-                        type Response = super::MoveOnGlobeResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::MoveOnGlobeRequest>,
+                            request: tonic::Request<super::CreateDatasetRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).move_on_globe(request).await
+                                (*inner).create_dataset(request).await
                             };
                             Box::pin(fut)
                         }
@@ -558,7 +388,7 @@ pub mod motion_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = MoveOnGlobeSvc(inner);
+                        let method = CreateDatasetSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -574,113 +404,25 @@ pub mod motion_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.motion.v1.MotionService/GetPose" => {
+                "/viam.app.dataset.v1.DatasetService/DeleteDataset" => {
                     #[allow(non_camel_case_types)]
-                    struct GetPoseSvc<T: MotionService>(pub Arc<T>);
+                    struct DeleteDatasetSvc<T: DatasetService>(pub Arc<T>);
                     impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::GetPoseRequest>
-                    for GetPoseSvc<T> {
-                        type Response = super::GetPoseResponse;
+                        T: DatasetService,
+                    > tonic::server::UnaryService<super::DeleteDatasetRequest>
+                    for DeleteDatasetSvc<T> {
+                        type Response = super::DeleteDatasetResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetPoseRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).get_pose(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetPoseSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.motion.v1.MotionService/StopPlan" => {
-                    #[allow(non_camel_case_types)]
-                    struct StopPlanSvc<T: MotionService>(pub Arc<T>);
-                    impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::StopPlanRequest>
-                    for StopPlanSvc<T> {
-                        type Response = super::StopPlanResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::StopPlanRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).stop_plan(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = StopPlanSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.service.motion.v1.MotionService/ListPlanStatuses" => {
-                    #[allow(non_camel_case_types)]
-                    struct ListPlanStatusesSvc<T: MotionService>(pub Arc<T>);
-                    impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::ListPlanStatusesRequest>
-                    for ListPlanStatusesSvc<T> {
-                        type Response = super::ListPlanStatusesResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::ListPlanStatusesRequest>,
+                            request: tonic::Request<super::DeleteDatasetRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).list_plan_statuses(request).await
+                                (*inner).delete_dataset(request).await
                             };
                             Box::pin(fut)
                         }
@@ -692,7 +434,7 @@ pub mod motion_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = ListPlanStatusesSvc(inner);
+                        let method = DeleteDatasetSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -708,24 +450,26 @@ pub mod motion_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.motion.v1.MotionService/GetPlan" => {
+                "/viam.app.dataset.v1.DatasetService/RenameDataset" => {
                     #[allow(non_camel_case_types)]
-                    struct GetPlanSvc<T: MotionService>(pub Arc<T>);
+                    struct RenameDatasetSvc<T: DatasetService>(pub Arc<T>);
                     impl<
-                        T: MotionService,
-                    > tonic::server::UnaryService<super::GetPlanRequest>
-                    for GetPlanSvc<T> {
-                        type Response = super::GetPlanResponse;
+                        T: DatasetService,
+                    > tonic::server::UnaryService<super::RenameDatasetRequest>
+                    for RenameDatasetSvc<T> {
+                        type Response = super::RenameDatasetResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetPlanRequest>,
+                            request: tonic::Request<super::RenameDatasetRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).get_plan(request).await };
+                            let fut = async move {
+                                (*inner).rename_dataset(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -736,7 +480,7 @@ pub mod motion_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetPlanSvc(inner);
+                        let method = RenameDatasetSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -752,15 +496,17 @@ pub mod motion_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/viam.service.motion.v1.MotionService/DoCommand" => {
+                "/viam.app.dataset.v1.DatasetService/ListDatasetsByOrganizationID" => {
                     #[allow(non_camel_case_types)]
-                    struct DoCommandSvc<T: MotionService>(pub Arc<T>);
+                    struct ListDatasetsByOrganizationIDSvc<T: DatasetService>(
+                        pub Arc<T>,
+                    );
                     impl<
-                        T: MotionService,
+                        T: DatasetService,
                     > tonic::server::UnaryService<
-                        super::super::super::super::common::v1::DoCommandRequest,
-                    > for DoCommandSvc<T> {
-                        type Response = super::super::super::super::common::v1::DoCommandResponse;
+                        super::ListDatasetsByOrganizationIdRequest,
+                    > for ListDatasetsByOrganizationIDSvc<T> {
+                        type Response = super::ListDatasetsByOrganizationIdResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -768,11 +514,13 @@ pub mod motion_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::super::super::common::v1::DoCommandRequest,
+                                super::ListDatasetsByOrganizationIdRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).do_command(request).await };
+                            let fut = async move {
+                                (*inner).list_datasets_by_organization_id(request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -783,7 +531,53 @@ pub mod motion_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DoCommandSvc(inner);
+                        let method = ListDatasetsByOrganizationIDSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.dataset.v1.DatasetService/ListDatasetsByIDs" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListDatasetsByIDsSvc<T: DatasetService>(pub Arc<T>);
+                    impl<
+                        T: DatasetService,
+                    > tonic::server::UnaryService<super::ListDatasetsByIDsRequest>
+                    for ListDatasetsByIDsSvc<T> {
+                        type Response = super::ListDatasetsByIDsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListDatasetsByIDsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).list_datasets_by_i_ds(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListDatasetsByIDsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -814,7 +608,7 @@ pub mod motion_service_server {
             }
         }
     }
-    impl<T: MotionService> Clone for MotionServiceServer<T> {
+    impl<T: DatasetService> Clone for DatasetServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -826,7 +620,7 @@ pub mod motion_service_server {
             }
         }
     }
-    impl<T: MotionService> Clone for _Inner<T> {
+    impl<T: DatasetService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(Arc::clone(&self.0))
         }
@@ -836,7 +630,7 @@ pub mod motion_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: MotionService> tonic::server::NamedService for MotionServiceServer<T> {
-        const NAME: &'static str = "viam.service.motion.v1.MotionService";
+    impl<T: DatasetService> tonic::server::NamedService for DatasetServiceServer<T> {
+        const NAME: &'static str = "viam.app.dataset.v1.DatasetService";
     }
 }

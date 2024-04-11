@@ -2,8 +2,8 @@
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SubmitTrainingJobRequest {
-    #[prost(message, optional, tag="1")]
-    pub filter: ::core::option::Option<super::super::data::v1::Filter>,
+    #[prost(string, tag="7")]
+    pub dataset_id: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub organization_id: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
@@ -52,20 +52,34 @@ pub struct ListTrainingJobsResponse {
 pub struct TrainingJobMetadata {
     #[prost(message, optional, tag="1")]
     pub request: ::core::option::Option<SubmitTrainingJobRequest>,
+    #[prost(string, tag="7")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, tag="11")]
+    pub dataset_id: ::prost::alloc::string::String,
+    #[prost(string, tag="12")]
+    pub organization_id: ::prost::alloc::string::String,
+    #[prost(string, tag="13")]
+    pub model_name: ::prost::alloc::string::String,
+    #[prost(string, tag="14")]
+    pub model_version: ::prost::alloc::string::String,
+    #[prost(enumeration="ModelType", tag="15")]
+    pub model_type: i32,
     #[prost(enumeration="TrainingStatus", tag="2")]
     pub status: i32,
+    #[prost(message, optional, tag="8")]
+    pub error_status: ::core::option::Option<super::super::super::super::google::rpc::Status>,
     #[prost(message, optional, tag="3")]
     pub created_on: ::core::option::Option<::prost_types::Timestamp>,
     #[prost(message, optional, tag="4")]
     pub last_modified: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(message, optional, tag="9")]
+    pub training_started: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(message, optional, tag="10")]
+    pub training_ended: ::core::option::Option<::prost_types::Timestamp>,
     #[prost(string, tag="5")]
     pub synced_model_id: ::prost::alloc::string::String,
-    #[prost(string, tag="6")]
-    pub user_email: ::prost::alloc::string::String,
-    #[prost(string, tag="7")]
-    pub id: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="8")]
-    pub error_status: ::core::option::Option<super::super::super::super::google::rpc::Status>,
+    #[prost(string, repeated, tag="16")]
+    pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -76,6 +90,16 @@ pub struct CancelTrainingJobRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CancelTrainingJobResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteCompletedTrainingJobRequest {
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteCompletedTrainingJobResponse {
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -105,6 +129,41 @@ impl ModelType {
             "MODEL_TYPE_SINGLE_LABEL_CLASSIFICATION" => Some(Self::SingleLabelClassification),
             "MODEL_TYPE_MULTI_LABEL_CLASSIFICATION" => Some(Self::MultiLabelClassification),
             "MODEL_TYPE_OBJECT_DETECTION" => Some(Self::ObjectDetection),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum ModelFramework {
+    Unspecified = 0,
+    Tflite = 1,
+    Tensorflow = 2,
+    Pytorch = 3,
+    Onnx = 4,
+}
+impl ModelFramework {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            ModelFramework::Unspecified => "MODEL_FRAMEWORK_UNSPECIFIED",
+            ModelFramework::Tflite => "MODEL_FRAMEWORK_TFLITE",
+            ModelFramework::Tensorflow => "MODEL_FRAMEWORK_TENSORFLOW",
+            ModelFramework::Pytorch => "MODEL_FRAMEWORK_PYTORCH",
+            ModelFramework::Onnx => "MODEL_FRAMEWORK_ONNX",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "MODEL_FRAMEWORK_UNSPECIFIED" => Some(Self::Unspecified),
+            "MODEL_FRAMEWORK_TFLITE" => Some(Self::Tflite),
+            "MODEL_FRAMEWORK_TENSORFLOW" => Some(Self::Tensorflow),
+            "MODEL_FRAMEWORK_PYTORCH" => Some(Self::Pytorch),
+            "MODEL_FRAMEWORK_ONNX" => Some(Self::Onnx),
             _ => None,
         }
     }

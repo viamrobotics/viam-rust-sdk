@@ -52,6 +52,8 @@ pub struct HandlerMap {
 pub struct ReadyRequest {
     #[prost(string, tag="1")]
     pub parent_address: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub webrtc_offer: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -60,6 +62,8 @@ pub struct ReadyResponse {
     pub ready: bool,
     #[prost(message, optional, tag="2")]
     pub handlermap: ::core::option::Option<HandlerMap>,
+    #[prost(string, tag="3")]
+    pub webrtc_answer: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

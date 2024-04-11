@@ -159,6 +159,38 @@ pub mod app_service_client {
                 .insert(GrpcMethod::new("viam.app.v1.AppService", "ListOrganizations"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn get_organizations_with_access_to_location(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::GetOrganizationsWithAccessToLocationRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::GetOrganizationsWithAccessToLocationResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/GetOrganizationsWithAccessToLocation",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.v1.AppService",
+                        "GetOrganizationsWithAccessToLocation",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn list_organizations_by_user(
             &mut self,
             request: impl tonic::IntoRequest<super::ListOrganizationsByUserRequest>,
@@ -968,6 +1000,31 @@ pub mod app_service_client {
                 .insert(GrpcMethod::new("viam.app.v1.AppService", "DeleteRobotPart"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn get_robot_api_keys(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetRobotApiKeysRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotApiKeysResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/GetRobotAPIKeys",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetRobotAPIKeys"));
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn mark_part_as_main(
             &mut self,
             request: impl tonic::IntoRequest<super::MarkPartAsMainRequest>,
@@ -1347,6 +1404,31 @@ pub mod app_service_client {
                 .insert(GrpcMethod::new("viam.app.v1.AppService", "RemoveRole"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn change_role(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ChangeRoleRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ChangeRoleResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ChangeRole",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ChangeRole"));
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn list_authorizations(
             &mut self,
             request: impl tonic::IntoRequest<super::ListAuthorizationsRequest>,
@@ -1395,6 +1477,131 @@ pub mod app_service_client {
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(GrpcMethod::new("viam.app.v1.AppService", "CheckPermissions"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn get_registry_item(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetRegistryItemRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetRegistryItemResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/GetRegistryItem",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "GetRegistryItem"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn create_registry_item(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateRegistryItemRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateRegistryItemResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateRegistryItem",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "CreateRegistryItem"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn update_registry_item(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpdateRegistryItemRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateRegistryItemResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/UpdateRegistryItem",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "UpdateRegistryItem"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn list_registry_items(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListRegistryItemsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListRegistryItemsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ListRegistryItems",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ListRegistryItems"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn delete_registry_item(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteRegistryItemRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteRegistryItemResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/DeleteRegistryItem",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "DeleteRegistryItem"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn create_module(
@@ -1524,6 +1731,138 @@ pub mod app_service_client {
                 .insert(GrpcMethod::new("viam.app.v1.AppService", "ListModules"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn create_key(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateKeyRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateKeyResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateKey",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "CreateKey"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn delete_key(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeleteKeyRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteKeyResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/DeleteKey",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "DeleteKey"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn list_keys(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListKeysRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListKeysResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/ListKeys",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "ListKeys"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn rotate_key(
+            &mut self,
+            request: impl tonic::IntoRequest<super::RotateKeyRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::RotateKeyResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/RotateKey",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.AppService", "RotateKey"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn create_key_from_existing_key_authorizations(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::CreateKeyFromExistingKeyAuthorizationsRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateKeyFromExistingKeyAuthorizationsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.AppService/CreateKeyFromExistingKeyAuthorizations",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.v1.AppService",
+                        "CreateKeyFromExistingKeyAuthorizations",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -1552,6 +1891,13 @@ pub mod app_service_server {
             request: tonic::Request<super::ListOrganizationsRequest>,
         ) -> std::result::Result<
             tonic::Response<super::ListOrganizationsResponse>,
+            tonic::Status,
+        >;
+        async fn get_organizations_with_access_to_location(
+            &self,
+            request: tonic::Request<super::GetOrganizationsWithAccessToLocationRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetOrganizationsWithAccessToLocationResponse>,
             tonic::Status,
         >;
         async fn list_organizations_by_user(
@@ -1780,6 +2126,13 @@ pub mod app_service_server {
             tonic::Response<super::DeleteRobotPartResponse>,
             tonic::Status,
         >;
+        async fn get_robot_api_keys(
+            &self,
+            request: tonic::Request<super::GetRobotApiKeysRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetRobotApiKeysResponse>,
+            tonic::Status,
+        >;
         async fn mark_part_as_main(
             &self,
             request: tonic::Request<super::MarkPartAsMainRequest>,
@@ -1882,6 +2235,13 @@ pub mod app_service_server {
             tonic::Response<super::RemoveRoleResponse>,
             tonic::Status,
         >;
+        async fn change_role(
+            &self,
+            request: tonic::Request<super::ChangeRoleRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ChangeRoleResponse>,
+            tonic::Status,
+        >;
         async fn list_authorizations(
             &self,
             request: tonic::Request<super::ListAuthorizationsRequest>,
@@ -1894,6 +2254,41 @@ pub mod app_service_server {
             request: tonic::Request<super::CheckPermissionsRequest>,
         ) -> std::result::Result<
             tonic::Response<super::CheckPermissionsResponse>,
+            tonic::Status,
+        >;
+        async fn get_registry_item(
+            &self,
+            request: tonic::Request<super::GetRegistryItemRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetRegistryItemResponse>,
+            tonic::Status,
+        >;
+        async fn create_registry_item(
+            &self,
+            request: tonic::Request<super::CreateRegistryItemRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateRegistryItemResponse>,
+            tonic::Status,
+        >;
+        async fn update_registry_item(
+            &self,
+            request: tonic::Request<super::UpdateRegistryItemRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateRegistryItemResponse>,
+            tonic::Status,
+        >;
+        async fn list_registry_items(
+            &self,
+            request: tonic::Request<super::ListRegistryItemsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListRegistryItemsResponse>,
+            tonic::Status,
+        >;
+        async fn delete_registry_item(
+            &self,
+            request: tonic::Request<super::DeleteRegistryItemRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteRegistryItemResponse>,
             tonic::Status,
         >;
         async fn create_module(
@@ -1929,6 +2324,41 @@ pub mod app_service_server {
             request: tonic::Request<super::ListModulesRequest>,
         ) -> std::result::Result<
             tonic::Response<super::ListModulesResponse>,
+            tonic::Status,
+        >;
+        async fn create_key(
+            &self,
+            request: tonic::Request<super::CreateKeyRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateKeyResponse>,
+            tonic::Status,
+        >;
+        async fn delete_key(
+            &self,
+            request: tonic::Request<super::DeleteKeyRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::DeleteKeyResponse>,
+            tonic::Status,
+        >;
+        async fn list_keys(
+            &self,
+            request: tonic::Request<super::ListKeysRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListKeysResponse>,
+            tonic::Status,
+        >;
+        async fn rotate_key(
+            &self,
+            request: tonic::Request<super::RotateKeyRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::RotateKeyResponse>,
+            tonic::Status,
+        >;
+        async fn create_key_from_existing_key_authorizations(
+            &self,
+            request: tonic::Request<super::CreateKeyFromExistingKeyAuthorizationsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateKeyFromExistingKeyAuthorizationsResponse>,
             tonic::Status,
         >;
     }
@@ -2134,6 +2564,59 @@ pub mod app_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = ListOrganizationsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/GetOrganizationsWithAccessToLocation" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetOrganizationsWithAccessToLocationSvc<T: AppService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<
+                        super::GetOrganizationsWithAccessToLocationRequest,
+                    > for GetOrganizationsWithAccessToLocationSvc<T> {
+                        type Response = super::GetOrganizationsWithAccessToLocationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::GetOrganizationsWithAccessToLocationRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner)
+                                    .get_organizations_with_access_to_location(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetOrganizationsWithAccessToLocationSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -3601,6 +4084,52 @@ pub mod app_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/viam.app.v1.AppService/GetRobotAPIKeys" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetRobotAPIKeysSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::GetRobotApiKeysRequest>
+                    for GetRobotAPIKeysSvc<T> {
+                        type Response = super::GetRobotApiKeysResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetRobotApiKeysRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).get_robot_api_keys(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetRobotAPIKeysSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.app.v1.AppService/MarkPartAsMain" => {
                     #[allow(non_camel_case_types)]
                     struct MarkPartAsMainSvc<T: AppService>(pub Arc<T>);
@@ -4283,6 +4812,50 @@ pub mod app_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/viam.app.v1.AppService/ChangeRole" => {
+                    #[allow(non_camel_case_types)]
+                    struct ChangeRoleSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ChangeRoleRequest>
+                    for ChangeRoleSvc<T> {
+                        type Response = super::ChangeRoleResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ChangeRoleRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move { (*inner).change_role(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ChangeRoleSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/viam.app.v1.AppService/ListAuthorizations" => {
                     #[allow(non_camel_case_types)]
                     struct ListAuthorizationsSvc<T: AppService>(pub Arc<T>);
@@ -4360,6 +4933,236 @@ pub mod app_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = CheckPermissionsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/GetRegistryItem" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetRegistryItemSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::GetRegistryItemRequest>
+                    for GetRegistryItemSvc<T> {
+                        type Response = super::GetRegistryItemResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetRegistryItemRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).get_registry_item(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetRegistryItemSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/CreateRegistryItem" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateRegistryItemSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CreateRegistryItemRequest>
+                    for CreateRegistryItemSvc<T> {
+                        type Response = super::CreateRegistryItemResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateRegistryItemRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).create_registry_item(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateRegistryItemSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/UpdateRegistryItem" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateRegistryItemSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::UpdateRegistryItemRequest>
+                    for UpdateRegistryItemSvc<T> {
+                        type Response = super::UpdateRegistryItemResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::UpdateRegistryItemRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).update_registry_item(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateRegistryItemSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ListRegistryItems" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListRegistryItemsSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ListRegistryItemsRequest>
+                    for ListRegistryItemsSvc<T> {
+                        type Response = super::ListRegistryItemsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListRegistryItemsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).list_registry_items(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListRegistryItemsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/DeleteRegistryItem" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteRegistryItemSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::DeleteRegistryItemRequest>
+                    for DeleteRegistryItemSvc<T> {
+                        type Response = super::DeleteRegistryItemResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::DeleteRegistryItemRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).delete_registry_item(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteRegistryItemSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -4606,6 +5409,235 @@ pub mod app_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/viam.app.v1.AppService/CreateKey" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateKeySvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::CreateKeyRequest>
+                    for CreateKeySvc<T> {
+                        type Response = super::CreateKeyResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateKeyRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move { (*inner).create_key(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateKeySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/DeleteKey" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteKeySvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::DeleteKeyRequest>
+                    for DeleteKeySvc<T> {
+                        type Response = super::DeleteKeyResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::DeleteKeyRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move { (*inner).delete_key(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteKeySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/ListKeys" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListKeysSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::ListKeysRequest>
+                    for ListKeysSvc<T> {
+                        type Response = super::ListKeysResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListKeysRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move { (*inner).list_keys(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ListKeysSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/RotateKey" => {
+                    #[allow(non_camel_case_types)]
+                    struct RotateKeySvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<super::RotateKeyRequest>
+                    for RotateKeySvc<T> {
+                        type Response = super::RotateKeyResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::RotateKeyRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move { (*inner).rotate_key(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RotateKeySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.AppService/CreateKeyFromExistingKeyAuthorizations" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateKeyFromExistingKeyAuthorizationsSvc<T: AppService>(
+                        pub Arc<T>,
+                    );
+                    impl<
+                        T: AppService,
+                    > tonic::server::UnaryService<
+                        super::CreateKeyFromExistingKeyAuthorizationsRequest,
+                    > for CreateKeyFromExistingKeyAuthorizationsSvc<T> {
+                        type Response = super::CreateKeyFromExistingKeyAuthorizationsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::CreateKeyFromExistingKeyAuthorizationsRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner)
+                                    .create_key_from_existing_key_authorizations(request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateKeyFromExistingKeyAuthorizationsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 _ => {
                     Box::pin(async move {
                         Ok(
@@ -4732,144 +5764,6 @@ pub mod billing_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn get_current_month_usage_summary(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetCurrentMonthUsageSummaryRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetCurrentMonthUsageSummaryResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.v1.BillingService/GetCurrentMonthUsageSummary",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "viam.app.v1.BillingService",
-                        "GetCurrentMonthUsageSummary",
-                    ),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn get_unpaid_balance(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetUnpaidBalanceRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetUnpaidBalanceResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.v1.BillingService/GetUnpaidBalance",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("viam.app.v1.BillingService", "GetUnpaidBalance"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn get_invoice_history(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetInvoiceHistoryRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetInvoiceHistoryResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.v1.BillingService/GetInvoiceHistory",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("viam.app.v1.BillingService", "GetInvoiceHistory"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn get_itemized_invoice(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetItemizedInvoiceRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetItemizedInvoiceResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.v1.BillingService/GetItemizedInvoice",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("viam.app.v1.BillingService", "GetItemizedInvoice"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn get_billing_summary(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetBillingSummaryRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetBillingSummaryResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/viam.app.v1.BillingService/GetBillingSummary",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("viam.app.v1.BillingService", "GetBillingSummary"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
         pub async fn get_current_month_usage(
             &mut self,
             request: impl tonic::IntoRequest<super::GetCurrentMonthUsageRequest>,
@@ -4988,41 +5882,6 @@ pub mod billing_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with BillingServiceServer.
     #[async_trait]
     pub trait BillingService: Send + Sync + 'static {
-        async fn get_current_month_usage_summary(
-            &self,
-            request: tonic::Request<super::GetCurrentMonthUsageSummaryRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetCurrentMonthUsageSummaryResponse>,
-            tonic::Status,
-        >;
-        async fn get_unpaid_balance(
-            &self,
-            request: tonic::Request<super::GetUnpaidBalanceRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetUnpaidBalanceResponse>,
-            tonic::Status,
-        >;
-        async fn get_invoice_history(
-            &self,
-            request: tonic::Request<super::GetInvoiceHistoryRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetInvoiceHistoryResponse>,
-            tonic::Status,
-        >;
-        async fn get_itemized_invoice(
-            &self,
-            request: tonic::Request<super::GetItemizedInvoiceRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetItemizedInvoiceResponse>,
-            tonic::Status,
-        >;
-        async fn get_billing_summary(
-            &self,
-            request: tonic::Request<super::GetBillingSummaryRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetBillingSummaryResponse>,
-            tonic::Status,
-        >;
         async fn get_current_month_usage(
             &self,
             request: tonic::Request<super::GetCurrentMonthUsageRequest>,
@@ -5137,239 +5996,6 @@ pub mod billing_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/viam.app.v1.BillingService/GetCurrentMonthUsageSummary" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetCurrentMonthUsageSummarySvc<T: BillingService>(pub Arc<T>);
-                    impl<
-                        T: BillingService,
-                    > tonic::server::UnaryService<
-                        super::GetCurrentMonthUsageSummaryRequest,
-                    > for GetCurrentMonthUsageSummarySvc<T> {
-                        type Response = super::GetCurrentMonthUsageSummaryResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<
-                                super::GetCurrentMonthUsageSummaryRequest,
-                            >,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).get_current_month_usage_summary(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetCurrentMonthUsageSummarySvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.app.v1.BillingService/GetUnpaidBalance" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetUnpaidBalanceSvc<T: BillingService>(pub Arc<T>);
-                    impl<
-                        T: BillingService,
-                    > tonic::server::UnaryService<super::GetUnpaidBalanceRequest>
-                    for GetUnpaidBalanceSvc<T> {
-                        type Response = super::GetUnpaidBalanceResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetUnpaidBalanceRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).get_unpaid_balance(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetUnpaidBalanceSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.app.v1.BillingService/GetInvoiceHistory" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetInvoiceHistorySvc<T: BillingService>(pub Arc<T>);
-                    impl<
-                        T: BillingService,
-                    > tonic::server::UnaryService<super::GetInvoiceHistoryRequest>
-                    for GetInvoiceHistorySvc<T> {
-                        type Response = super::GetInvoiceHistoryResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetInvoiceHistoryRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).get_invoice_history(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetInvoiceHistorySvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.app.v1.BillingService/GetItemizedInvoice" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetItemizedInvoiceSvc<T: BillingService>(pub Arc<T>);
-                    impl<
-                        T: BillingService,
-                    > tonic::server::UnaryService<super::GetItemizedInvoiceRequest>
-                    for GetItemizedInvoiceSvc<T> {
-                        type Response = super::GetItemizedInvoiceResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetItemizedInvoiceRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).get_itemized_invoice(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetItemizedInvoiceSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/viam.app.v1.BillingService/GetBillingSummary" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetBillingSummarySvc<T: BillingService>(pub Arc<T>);
-                    impl<
-                        T: BillingService,
-                    > tonic::server::UnaryService<super::GetBillingSummaryRequest>
-                    for GetBillingSummarySvc<T> {
-                        type Response = super::GetBillingSummaryResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetBillingSummaryRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                (*inner).get_billing_summary(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetBillingSummarySvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
                 "/viam.app.v1.BillingService/GetCurrentMonthUsage" => {
                     #[allow(non_camel_case_types)]
                     struct GetCurrentMonthUsageSvc<T: BillingService>(pub Arc<T>);
@@ -5596,6 +6222,547 @@ pub mod billing_service_server {
     }
     impl<T: BillingService> tonic::server::NamedService for BillingServiceServer<T> {
         const NAME: &'static str = "viam.app.v1.BillingService";
+    }
+}
+/// Generated client implementations.
+pub mod end_user_service_client {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
+    #[derive(Debug, Clone)]
+    pub struct EndUserServiceClient<T> {
+        inner: tonic::client::Grpc<T>,
+    }
+    impl EndUserServiceClient<tonic::transport::Channel> {
+        /// Attempt to create a new client by connecting to a given endpoint.
+        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
+        where
+            D: TryInto<tonic::transport::Endpoint>,
+            D::Error: Into<StdError>,
+        {
+            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
+            Ok(Self::new(conn))
+        }
+    }
+    impl<T> EndUserServiceClient<T>
+    where
+        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::Error: Into<StdError>,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    {
+        pub fn new(inner: T) -> Self {
+            let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
+            Self { inner }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> EndUserServiceClient<InterceptedService<T, F>>
+        where
+            F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
+            T: tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                >,
+            >,
+            <T as tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+            >>::Error: Into<StdError> + Send + Sync,
+        {
+            EndUserServiceClient::new(InterceptedService::new(inner, interceptor))
+        }
+        /// Compress requests with the given encoding.
+        ///
+        /// This requires the server to support it otherwise it might respond with an
+        /// error.
+        #[must_use]
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
+            self
+        }
+        /// Enable decompressing responses.
+        #[must_use]
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
+        pub async fn is_legal_accepted(
+            &mut self,
+            request: impl tonic::IntoRequest<super::IsLegalAcceptedRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::IsLegalAcceptedResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.EndUserService/IsLegalAccepted",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("viam.app.v1.EndUserService", "IsLegalAccepted"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn accept_legal(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AcceptLegalRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AcceptLegalResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.EndUserService/AcceptLegal",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("viam.app.v1.EndUserService", "AcceptLegal"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn register_auth_application(
+            &mut self,
+            request: impl tonic::IntoRequest<super::RegisterAuthApplicationRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::RegisterAuthApplicationResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.EndUserService/RegisterAuthApplication",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.v1.EndUserService",
+                        "RegisterAuthApplication",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn update_auth_application(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpdateAuthApplicationRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateAuthApplicationResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/viam.app.v1.EndUserService/UpdateAuthApplication",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "viam.app.v1.EndUserService",
+                        "UpdateAuthApplication",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+    }
+}
+/// Generated server implementations.
+pub mod end_user_service_server {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    /// Generated trait containing gRPC methods that should be implemented for use with EndUserServiceServer.
+    #[async_trait]
+    pub trait EndUserService: Send + Sync + 'static {
+        async fn is_legal_accepted(
+            &self,
+            request: tonic::Request<super::IsLegalAcceptedRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::IsLegalAcceptedResponse>,
+            tonic::Status,
+        >;
+        async fn accept_legal(
+            &self,
+            request: tonic::Request<super::AcceptLegalRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AcceptLegalResponse>,
+            tonic::Status,
+        >;
+        async fn register_auth_application(
+            &self,
+            request: tonic::Request<super::RegisterAuthApplicationRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::RegisterAuthApplicationResponse>,
+            tonic::Status,
+        >;
+        async fn update_auth_application(
+            &self,
+            request: tonic::Request<super::UpdateAuthApplicationRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateAuthApplicationResponse>,
+            tonic::Status,
+        >;
+    }
+    #[derive(Debug)]
+    pub struct EndUserServiceServer<T: EndUserService> {
+        inner: _Inner<T>,
+        accept_compression_encodings: EnabledCompressionEncodings,
+        send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
+    }
+    struct _Inner<T>(Arc<T>);
+    impl<T: EndUserService> EndUserServiceServer<T> {
+        pub fn new(inner: T) -> Self {
+            Self::from_arc(Arc::new(inner))
+        }
+        pub fn from_arc(inner: Arc<T>) -> Self {
+            let inner = _Inner(inner);
+            Self {
+                inner,
+                accept_compression_encodings: Default::default(),
+                send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
+            }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> InterceptedService<Self, F>
+        where
+            F: tonic::service::Interceptor,
+        {
+            InterceptedService::new(Self::new(inner), interceptor)
+        }
+        /// Enable decompressing requests with the given encoding.
+        #[must_use]
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
+            self
+        }
+        /// Compress responses with the given encoding, if the client supports it.
+        #[must_use]
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
+            self
+        }
+    }
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for EndUserServiceServer<T>
+    where
+        T: EndUserService,
+        B: Body + Send + 'static,
+        B::Error: Into<StdError> + Send + 'static,
+    {
+        type Response = http::Response<tonic::body::BoxBody>;
+        type Error = std::convert::Infallible;
+        type Future = BoxFuture<Self::Response, Self::Error>;
+        fn poll_ready(
+            &mut self,
+            _cx: &mut Context<'_>,
+        ) -> Poll<std::result::Result<(), Self::Error>> {
+            Poll::Ready(Ok(()))
+        }
+        fn call(&mut self, req: http::Request<B>) -> Self::Future {
+            let inner = self.inner.clone();
+            match req.uri().path() {
+                "/viam.app.v1.EndUserService/IsLegalAccepted" => {
+                    #[allow(non_camel_case_types)]
+                    struct IsLegalAcceptedSvc<T: EndUserService>(pub Arc<T>);
+                    impl<
+                        T: EndUserService,
+                    > tonic::server::UnaryService<super::IsLegalAcceptedRequest>
+                    for IsLegalAcceptedSvc<T> {
+                        type Response = super::IsLegalAcceptedResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::IsLegalAcceptedRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).is_legal_accepted(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = IsLegalAcceptedSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.EndUserService/AcceptLegal" => {
+                    #[allow(non_camel_case_types)]
+                    struct AcceptLegalSvc<T: EndUserService>(pub Arc<T>);
+                    impl<
+                        T: EndUserService,
+                    > tonic::server::UnaryService<super::AcceptLegalRequest>
+                    for AcceptLegalSvc<T> {
+                        type Response = super::AcceptLegalResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AcceptLegalRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).accept_legal(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AcceptLegalSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.EndUserService/RegisterAuthApplication" => {
+                    #[allow(non_camel_case_types)]
+                    struct RegisterAuthApplicationSvc<T: EndUserService>(pub Arc<T>);
+                    impl<
+                        T: EndUserService,
+                    > tonic::server::UnaryService<super::RegisterAuthApplicationRequest>
+                    for RegisterAuthApplicationSvc<T> {
+                        type Response = super::RegisterAuthApplicationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::RegisterAuthApplicationRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).register_auth_application(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RegisterAuthApplicationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/viam.app.v1.EndUserService/UpdateAuthApplication" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateAuthApplicationSvc<T: EndUserService>(pub Arc<T>);
+                    impl<
+                        T: EndUserService,
+                    > tonic::server::UnaryService<super::UpdateAuthApplicationRequest>
+                    for UpdateAuthApplicationSvc<T> {
+                        type Response = super::UpdateAuthApplicationResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::UpdateAuthApplicationRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                (*inner).update_auth_application(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateAuthApplicationSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                _ => {
+                    Box::pin(async move {
+                        Ok(
+                            http::Response::builder()
+                                .status(200)
+                                .header("grpc-status", "12")
+                                .header("content-type", "application/grpc")
+                                .body(empty_body())
+                                .unwrap(),
+                        )
+                    })
+                }
+            }
+        }
+    }
+    impl<T: EndUserService> Clone for EndUserServiceServer<T> {
+        fn clone(&self) -> Self {
+            let inner = self.inner.clone();
+            Self {
+                inner,
+                accept_compression_encodings: self.accept_compression_encodings,
+                send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
+            }
+        }
+    }
+    impl<T: EndUserService> Clone for _Inner<T> {
+        fn clone(&self) -> Self {
+            Self(Arc::clone(&self.0))
+        }
+    }
+    impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "{:?}", self.0)
+        }
+    }
+    impl<T: EndUserService> tonic::server::NamedService for EndUserServiceServer<T> {
+        const NAME: &'static str = "viam.app.v1.EndUserService";
     }
 }
 /// Generated client implementations.

@@ -80,6 +80,8 @@ pub struct Organization {
     /// associated with this org will be stored in this region.
     #[prost(string, tag="5")]
     pub default_region: ::prost::alloc::string::String,
+    #[prost(string, optional, tag="6")]
+    pub cid: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -90,6 +92,8 @@ pub struct OrganizationMember {
     pub emails: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     #[prost(message, optional, tag="3")]
     pub date_added: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(message, optional, tag="4")]
+    pub last_login: ::core::option::Option<::prost_types::Timestamp>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -106,8 +110,8 @@ pub struct OrganizationInvite {
     pub email: ::prost::alloc::string::String,
     #[prost(message, optional, tag="3")]
     pub created_on: ::core::option::Option<::prost_types::Timestamp>,
-    #[prost(int64, tag="4")]
-    pub robot_count: i64,
+    #[prost(message, repeated, tag="4")]
+    pub authorizations: ::prost::alloc::vec::Vec<Authorization>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -157,6 +161,8 @@ pub struct UpdateOrganizationRequest {
     /// The new GCS region to associate the org with.
     #[prost(string, optional, tag="4")]
     pub region: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag="5")]
+    pub cid: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -199,6 +205,10 @@ pub struct CreateOrganizationInviteRequest {
     pub email: ::prost::alloc::string::String,
     #[prost(message, repeated, tag="3")]
     pub authorizations: ::prost::alloc::vec::Vec<Authorization>,
+    /// Set to true (the default) to send an email to the recipient of an invite. The user must accept the email to be added to the associated authorizations.
+    /// When set to false, the user automatically receives the associated authorization on the next login of the user with the associated email address.
+    #[prost(bool, optional, tag="4")]
+    pub send_email_invite: ::core::option::Option<bool>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -265,6 +275,18 @@ pub struct DeleteOrganizationMemberResponse {
 // Location
 //
 
+/// Used for rendering an organization's information on the frontend (limited
+/// to id, name, or both).
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OrganizationIdentity {
+    /// Organization ID.
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    /// Organization name.
+    #[prost(string, tag="2")]
+    pub name: ::prost::alloc::string::String,
+}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LocationOrganization {
@@ -445,6 +467,18 @@ pub struct DeleteLocationResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetOrganizationsWithAccessToLocationRequest {
+    #[prost(string, tag="1")]
+    pub location_id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetOrganizationsWithAccessToLocationResponse {
+    #[prost(message, repeated, tag="1")]
+    pub organization_identities: ::prost::alloc::vec::Vec<OrganizationIdentity>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListLocationsRequest {
     /// Organization ID under which to list all locations.
     #[prost(string, tag="1")]
@@ -589,38 +623,23 @@ pub struct GetRobotPartResponse {
 pub struct GetRobotPartLogsRequest {
     #[prost(string, tag="1")]
     pub id: ::prost::alloc::string::String,
+    /// TODO(<https://viam.atlassian.net/browse/APP-3877>): Remove this field
+    #[deprecated]
     #[prost(bool, tag="2")]
     pub errors_only: bool,
     #[prost(string, optional, tag="3")]
     pub filter: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(string, optional, tag="4")]
     pub page_token: ::core::option::Option<::prost::alloc::string::String>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LogEntry {
-    #[prost(string, tag="1")]
-    pub host: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
-    pub level: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="3")]
-    pub time: ::core::option::Option<::prost_types::Timestamp>,
-    #[prost(string, tag="4")]
-    pub logger_name: ::prost::alloc::string::String,
-    #[prost(string, tag="5")]
-    pub message: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="6")]
-    pub caller: ::core::option::Option<::prost_types::Struct>,
-    #[prost(string, tag="7")]
-    pub stack: ::prost::alloc::string::String,
-    #[prost(message, repeated, tag="8")]
-    pub fields: ::prost::alloc::vec::Vec<::prost_types::Struct>,
+    /// logs of all levels are returned when the levels field is empty
+    #[prost(string, repeated, tag="5")]
+    pub levels: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetRobotPartLogsResponse {
     #[prost(message, repeated, tag="1")]
-    pub logs: ::prost::alloc::vec::Vec<LogEntry>,
+    pub logs: ::prost::alloc::vec::Vec<super::super::common::v1::LogEntry>,
     #[prost(string, tag="2")]
     pub next_page_token: ::prost::alloc::string::String,
 }
@@ -638,7 +657,7 @@ pub struct TailRobotPartLogsRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TailRobotPartLogsResponse {
     #[prost(message, repeated, tag="1")]
-    pub logs: ::prost::alloc::vec::Vec<LogEntry>,
+    pub logs: ::prost::alloc::vec::Vec<super::super::common::v1::LogEntry>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -687,6 +706,30 @@ pub struct NewRobotPartResponse {
 pub struct DeleteRobotPartRequest {
     #[prost(string, tag="1")]
     pub part_id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetRobotApiKeysRequest {
+    #[prost(string, tag="1")]
+    pub robot_id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ApiKey {
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub key: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="4")]
+    pub created_on: ::core::option::Option<::prost_types::Timestamp>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetRobotApiKeysResponse {
+    #[prost(message, repeated, tag="1")]
+    pub api_keys: ::prost::alloc::vec::Vec<ApiKeyWithAuthorizations>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -902,6 +945,8 @@ pub struct Authorization {
     pub identity_id: ::prost::alloc::string::String,
     #[prost(string, tag="6")]
     pub organization_id: ::prost::alloc::string::String,
+    #[prost(string, tag="7")]
+    pub identity_type: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -922,6 +967,18 @@ pub struct RemoveRoleRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RemoveRoleResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ChangeRoleRequest {
+    #[prost(message, optional, tag="1")]
+    pub old_authorization: ::core::option::Option<Authorization>,
+    #[prost(message, optional, tag="2")]
+    pub new_authorization: ::core::option::Option<Authorization>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ChangeRoleResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -960,6 +1017,203 @@ pub struct CheckPermissionsResponse {
     #[prost(message, repeated, tag="1")]
     pub authorized_permissions: ::prost::alloc::vec::Vec<AuthorizedPermissions>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ModuleVersion {
+    /// The semver string that represents the major/minor/patch version of the module
+    #[prost(string, tag="1")]
+    pub version: ::prost::alloc::string::String,
+    /// The uploads that are available for this module version
+    #[prost(message, repeated, tag="2")]
+    pub files: ::prost::alloc::vec::Vec<Uploads>,
+    /// The models that this verion of the module provides
+    #[prost(message, repeated, tag="3")]
+    pub models: ::prost::alloc::vec::Vec<Model>,
+    /// The entrypoint for this version of the module
+    #[prost(string, tag="4")]
+    pub entrypoint: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ModuleMetadata {
+    /// A list of models that are available in the module
+    #[prost(message, repeated, tag="1")]
+    pub models: ::prost::alloc::vec::Vec<Model>,
+    /// A list of versions of the module that are available
+    /// When this is returned from the backend, the versions are sorted in ascending order by the semver version
+    #[prost(message, repeated, tag="2")]
+    pub versions: ::prost::alloc::vec::Vec<ModuleVersion>,
+    /// The executable to run to start the module program
+    #[prost(string, tag="3")]
+    pub entrypoint: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MlModelMetadata {
+    /// A list of package versions for a ML model
+    #[prost(string, repeated, tag="1")]
+    pub versions: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MlTrainingMetadata {
+    /// A list of package versions for ML training source distribution
+    #[prost(string, repeated, tag="1")]
+    pub versions: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(enumeration="super::mltraining::v1::ModelType", tag="2")]
+    pub model_type: i32,
+    #[prost(enumeration="super::mltraining::v1::ModelFramework", tag="3")]
+    pub model_framework: i32,
+    #[prost(bool, tag="4")]
+    pub draft: bool,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RegistryItem {
+    /// The id of the item, containing either:
+    /// namespace:item_name when a namespace exists on the org.
+    /// org_id:item_name when a namespace does not exist.
+    #[prost(string, tag="1")]
+    pub item_id: ::prost::alloc::string::String,
+    /// The id of the organization that owns the item
+    #[prost(string, tag="2")]
+    pub organization_id: ::prost::alloc::string::String,
+    /// The public namespace of the organization that owns the module
+    /// This is empty if no public namespace is set
+    #[prost(string, tag="3")]
+    pub public_namespace: ::prost::alloc::string::String,
+    /// The name of the registry item
+    #[prost(string, tag="4")]
+    pub name: ::prost::alloc::string::String,
+    /// The type of the item in the registry
+    #[prost(enumeration="super::packages::v1::PackageType", tag="5")]
+    pub r#type: i32,
+    /// The visibility of the registry item
+    #[prost(enumeration="Visibility", tag="6")]
+    pub visibility: i32,
+    /// The url to reference for documentation, code, etc.
+    #[prost(string, tag="7")]
+    pub url: ::prost::alloc::string::String,
+    /// A short description of the item that explains its purpose
+    #[prost(string, tag="8")]
+    pub description: ::prost::alloc::string::String,
+    /// The total number of robots using this item
+    #[prost(int64, tag="9")]
+    pub total_robot_usage: i64,
+    /// The total number of robots using this item outside of the owning org
+    #[prost(int64, tag="13")]
+    pub total_external_robot_usage: i64,
+    /// The total number of organizations using this item
+    #[prost(int64, tag="10")]
+    pub total_organization_usage: i64,
+    /// The total number of organizations using this item outside of the owning org
+    #[prost(int64, tag="14")]
+    pub total_external_organization_usage: i64,
+    /// When the item was created
+    #[prost(message, optional, tag="15")]
+    pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// When the item was last updated, either through an update or upload.
+    #[prost(message, optional, tag="16")]
+    pub updated_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// Type-specific metadata
+    #[prost(oneof="registry_item::Metadata", tags="11, 12, 18")]
+    pub metadata: ::core::option::Option<registry_item::Metadata>,
+}
+/// Nested message and enum types in `RegistryItem`.
+pub mod registry_item {
+    /// Type-specific metadata
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Metadata {
+        #[prost(message, tag="11")]
+        ModuleMetadata(super::ModuleMetadata),
+        #[prost(message, tag="12")]
+        MlModelMetadata(super::MlModelMetadata),
+        #[prost(message, tag="18")]
+        MlTrainingMetadata(super::MlTrainingMetadata),
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetRegistryItemRequest {
+    #[prost(string, tag="1")]
+    pub item_id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetRegistryItemResponse {
+    #[prost(message, optional, tag="1")]
+    pub item: ::core::option::Option<RegistryItem>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateRegistryItemRequest {
+    /// The organization to create the registry item under
+    #[prost(string, tag="1")]
+    pub organization_id: ::prost::alloc::string::String,
+    /// The name of the registry item, which must be unique within your org
+    #[prost(string, tag="2")]
+    pub name: ::prost::alloc::string::String,
+    /// The type of the item in the registry
+    #[prost(enumeration="super::packages::v1::PackageType", tag="3")]
+    pub r#type: i32,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateRegistryItemResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdateRegistryItemRequest {
+    #[prost(string, tag="1")]
+    pub item_id: ::prost::alloc::string::String,
+    #[prost(enumeration="super::packages::v1::PackageType", tag="2")]
+    pub r#type: i32,
+    #[prost(string, tag="3")]
+    pub description: ::prost::alloc::string::String,
+    #[prost(enumeration="Visibility", tag="4")]
+    pub visibility: i32,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdateRegistryItemResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListRegistryItemsRequest {
+    /// The id of the organization to return registry items for.
+    #[prost(string, optional, tag="1")]
+    pub organization_id: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(enumeration="super::packages::v1::PackageType", repeated, tag="2")]
+    pub types: ::prost::alloc::vec::Vec<i32>,
+    #[prost(enumeration="Visibility", repeated, tag="3")]
+    pub visibilities: ::prost::alloc::vec::Vec<i32>,
+    #[prost(string, repeated, tag="4")]
+    pub platforms: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(enumeration="RegistryItemStatus", repeated, tag="5")]
+    pub statuses: ::prost::alloc::vec::Vec<i32>,
+    #[prost(string, optional, tag="6")]
+    pub search_term: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag="7")]
+    pub page_token: ::core::option::Option<::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListRegistryItemsResponse {
+    #[prost(message, repeated, tag="1")]
+    pub items: ::prost::alloc::vec::Vec<RegistryItem>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteRegistryItemRequest {
+    /// The id of the item (formatted as prefix:name where prefix is the owner's orgid or namespace)
+    #[prost(string, tag="1")]
+    pub item_id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteRegistryItemResponse {
+}
 /// Modules
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -974,7 +1228,7 @@ pub struct CreateModuleRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateModuleResponse {
-    /// The id of the module containing the namespace and name
+    /// The id of the module (formatted as prefix:name where prefix is the module owner's orgid or namespace)
     #[prost(string, tag="1")]
     pub module_id: ::prost::alloc::string::String,
     /// The detail page of the module
@@ -984,12 +1238,9 @@ pub struct CreateModuleResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateModuleRequest {
-    /// The id of the module being updated, containing module name or namespace and module name
+    /// The id of the module (formatted as prefix:name where prefix is the module owner's orgid or namespace)
     #[prost(string, tag="1")]
     pub module_id: ::prost::alloc::string::String,
-    /// The organization of the module being updated, required if no namespace exists in the module_id
-    #[prost(string, optional, tag="7")]
-    pub organization_id: ::core::option::Option<::prost::alloc::string::String>,
     /// The visibility that should be set for the module
     #[prost(enumeration="Visibility", tag="2")]
     pub visibility: i32,
@@ -1026,12 +1277,9 @@ pub struct Model {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ModuleFileInfo {
-    /// The id of the module being uploaded, containing module name or namespace and module name
+    /// The id of the module (formatted as prefix:name where prefix is the module owner's orgid or namespace)
     #[prost(string, tag="1")]
     pub module_id: ::prost::alloc::string::String,
-    /// The organization of the module being updated, required if no namespace exists in the module_id
-    #[prost(string, optional, tag="4")]
-    pub organization_id: ::core::option::Option<::prost::alloc::string::String>,
     /// The semver string that represents the new major/minor/patch version of the module
     #[prost(string, tag="2")]
     pub version: ::prost::alloc::string::String,
@@ -1068,12 +1316,9 @@ pub struct UploadModuleFileResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetModuleRequest {
-    /// The id of the module being retrieved, containing module name or namespace and module name
+    /// The id of the module (formatted as prefix:name where prefix is the module owner's orgid or namespace)
     #[prost(string, tag="1")]
     pub module_id: ::prost::alloc::string::String,
-    /// The organization of the module being updated, required if no namespace exists in the module_id
-    #[prost(string, optional, tag="2")]
-    pub organization_id: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1085,12 +1330,9 @@ pub struct GetModuleResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Module {
-    /// The id of the module, containing module name or namespace and module name
+    /// The id of the module (formatted as prefix:name where prefix is the module owner's orgid or namespace)
     #[prost(string, tag="1")]
     pub module_id: ::prost::alloc::string::String,
-    /// The id of the organization that owns the module
-    #[prost(string, tag="10")]
-    pub organization_id: ::prost::alloc::string::String,
     /// The name of the module
     #[prost(string, tag="2")]
     pub name: ::prost::alloc::string::String,
@@ -1098,6 +1340,7 @@ pub struct Module {
     #[prost(enumeration="Visibility", tag="3")]
     pub visibility: i32,
     /// The versions of the module that are available
+    /// When this is returned from the backend, the versions are sorted in ascending order by the semver version
     #[prost(message, repeated, tag="4")]
     pub versions: ::prost::alloc::vec::Vec<VersionHistory>,
     /// The url to reference for documentation, code, etc.
@@ -1109,15 +1352,22 @@ pub struct Module {
     /// A list of models that are available in the module
     #[prost(message, repeated, tag="7")]
     pub models: ::prost::alloc::vec::Vec<Model>,
-    /// The executable to run to start the module program
-    #[prost(string, tag="11")]
-    pub entrypoint: ::prost::alloc::string::String,
     /// The total number of robots using this module
     #[prost(int64, tag="8")]
     pub total_robot_usage: i64,
     /// The total number of organizations using this module
     #[prost(int64, tag="9")]
     pub total_organization_usage: i64,
+    /// The id of the organization that owns the module
+    #[prost(string, tag="10")]
+    pub organization_id: ::prost::alloc::string::String,
+    /// The executable to run to start the module program
+    #[prost(string, tag="11")]
+    pub entrypoint: ::prost::alloc::string::String,
+    /// The public namespace of the organization that owns the module
+    /// This is empty if no public namespace is set
+    #[prost(string, tag="12")]
+    pub public_namespace: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1128,6 +1378,12 @@ pub struct VersionHistory {
     /// The uploads that are available for this module version
     #[prost(message, repeated, tag="2")]
     pub files: ::prost::alloc::vec::Vec<Uploads>,
+    /// The models that this verion of the module provides
+    #[prost(message, repeated, tag="3")]
+    pub models: ::prost::alloc::vec::Vec<Model>,
+    /// The entrypoint for this version of the module
+    #[prost(string, tag="4")]
+    pub entrypoint: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1185,6 +1441,123 @@ pub struct ListOrganizationsByUserResponse {
     #[prost(message, repeated, tag="1")]
     pub orgs: ::prost::alloc::vec::Vec<OrgDetails>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateKeyRequest {
+    #[prost(message, repeated, tag="1")]
+    pub authorizations: ::prost::alloc::vec::Vec<Authorization>,
+    #[prost(string, tag="2")]
+    pub name: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateKeyResponse {
+    #[prost(string, tag="1")]
+    pub key: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteKeyRequest {
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteKeyResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AuthorizationDetails {
+    #[prost(string, tag="1")]
+    pub authorization_type: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub authorization_id: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub resource_type: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub resource_id: ::prost::alloc::string::String,
+    #[prost(string, tag="5")]
+    pub org_id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ApiKeyWithAuthorizations {
+    #[prost(message, optional, tag="1")]
+    pub api_key: ::core::option::Option<ApiKey>,
+    #[prost(message, repeated, tag="2")]
+    pub authorizations: ::prost::alloc::vec::Vec<AuthorizationDetails>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListKeysRequest {
+    #[prost(string, tag="1")]
+    pub org_id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListKeysResponse {
+    #[prost(message, repeated, tag="1")]
+    pub api_keys: ::prost::alloc::vec::Vec<ApiKeyWithAuthorizations>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RotateKeyRequest {
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RotateKeyResponse {
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub key: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateKeyFromExistingKeyAuthorizationsRequest {
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateKeyFromExistingKeyAuthorizationsResponse {
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub key: ::prost::alloc::string::String,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum RegistryItemStatus {
+    Unspecified = 0,
+    Published = 1,
+    InDevelopment = 2,
+}
+impl RegistryItemStatus {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            RegistryItemStatus::Unspecified => "REGISTRY_ITEM_STATUS_UNSPECIFIED",
+            RegistryItemStatus::Published => "REGISTRY_ITEM_STATUS_PUBLISHED",
+            RegistryItemStatus::InDevelopment => "REGISTRY_ITEM_STATUS_IN_DEVELOPMENT",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "REGISTRY_ITEM_STATUS_UNSPECIFIED" => Some(Self::Unspecified),
+            "REGISTRY_ITEM_STATUS_PUBLISHED" => Some(Self::Published),
+            "REGISTRY_ITEM_STATUS_IN_DEVELOPMENT" => Some(Self::InDevelopment),
+            _ => None,
+        }
+    }
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum Visibility {
@@ -1215,35 +1588,6 @@ impl Visibility {
             _ => None,
         }
     }
-}
-/// TODO(APP-1865) should be deprecated/removed in favor of GetCurrentMonthUsage
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CurrentMonthUsageSummary {
-    #[prost(double, tag="1")]
-    pub cloud_storage_usage: f64,
-    #[prost(double, tag="2")]
-    pub cloud_storage_usage_cost: f64,
-    #[prost(double, tag="3")]
-    pub data_upload_usage_cost: f64,
-    #[prost(double, tag="4")]
-    pub data_upload_usage_quantity: f64,
-    #[prost(double, tag="5")]
-    pub data_egres_usage_cost: f64,
-    #[prost(double, tag="6")]
-    pub data_egres_usage_quantity: f64,
-    #[prost(double, tag="7")]
-    pub standard_compute_usage_cost: f64,
-    #[prost(double, tag="8")]
-    pub standard_compute_usage_quantity: f64,
-    #[prost(double, tag="9")]
-    pub total_usage_quantity: f64,
-    /// returns amt with any discounts applied
-    #[prost(double, tag="10")]
-    pub total_usage_with_discount: f64,
-    /// returns amt without any discounts applied
-    #[prost(double, tag="11")]
-    pub total_usage_without_discount: f64,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1305,42 +1649,6 @@ pub struct PaymentMethodCard {
     #[prost(string, tag="2")]
     pub last_four_digits: ::prost::alloc::string::String,
 }
-/// TODO(APP-1865) should be deprecated/removed in favor of GetCurrentMonthUsage
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetCurrentMonthUsageSummaryRequest {
-    #[prost(string, tag="1")]
-    pub org_id: ::prost::alloc::string::String,
-}
-/// TODO(APP-1865) should be deprecated/removed in favor of GetCurrentMonthUsage
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetCurrentMonthUsageSummaryResponse {
-    #[prost(double, tag="1")]
-    pub cloud_storage_usage: f64,
-    #[prost(double, tag="2")]
-    pub cloud_storage_usage_cost: f64,
-    #[prost(double, tag="3")]
-    pub data_upload_usage_cost: f64,
-    #[prost(double, tag="4")]
-    pub data_upload_usage_quantity: f64,
-    #[prost(double, tag="5")]
-    pub data_egres_usage_cost: f64,
-    #[prost(double, tag="6")]
-    pub data_egres_usage_quantity: f64,
-    #[prost(double, tag="7")]
-    pub standard_compute_usage_cost: f64,
-    #[prost(double, tag="8")]
-    pub standard_compute_usage_quantity: f64,
-    #[prost(double, tag="9")]
-    pub total_usage_quantity: f64,
-    /// returns amt with any discounts applied
-    #[prost(double, tag="10")]
-    pub total_usage_with_discount: f64,
-    /// returns amt without any discounts applied
-    #[prost(double, tag="11")]
-    pub total_usage_without_discount: f64,
-}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetCurrentMonthUsageRequest {
@@ -1371,50 +1679,6 @@ pub struct GetCurrentMonthUsageResponse {
     #[prost(double, tag="10")]
     pub total_usage_without_discount: f64,
 }
-/// TODO(APP-1865) may want to remove
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetUnpaidBalanceRequest {
-    #[prost(string, tag="1")]
-    pub org_id: ::prost::alloc::string::String,
-}
-/// TODO(APP-1865) may want to remove
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetUnpaidBalanceResponse {
-    #[prost(double, tag="1")]
-    pub unpaid_balance: f64,
-    #[prost(message, optional, tag="2")]
-    pub unpaid_balance_due_date: ::core::option::Option<::prost_types::Timestamp>,
-}
-/// TODO(APP-1865) may want to remove
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetInvoiceHistoryRequest {
-    #[prost(string, tag="1")]
-    pub org_id: ::prost::alloc::string::String,
-}
-/// TODO(APP-1865) may want to remove
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetInvoiceHistoryResponse {
-    #[prost(message, repeated, tag="1")]
-    pub invoices: ::prost::alloc::vec::Vec<InvoiceSummary>,
-}
-/// TODO(APP-1865) may want to remove
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetItemizedInvoiceRequest {
-    #[prost(string, tag="1")]
-    pub id: ::prost::alloc::string::String,
-}
-/// TODO(APP-1865) may want to remove
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetItemizedInvoiceResponse {
-    #[prost(message, optional, tag="1")]
-    pub invoice: ::core::option::Option<Invoice>,
-}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetOrgBillingInformationRequest {
@@ -1431,6 +1695,9 @@ pub struct GetOrgBillingInformationResponse {
     /// defined if type is PAYMENT_METHOD_TYPE_CARD
     #[prost(message, optional, tag="3")]
     pub method: ::core::option::Option<PaymentMethodCard>,
+    /// Only return billing_tier for billing dashboard admin users
+    #[prost(string, optional, tag="4")]
+    pub billing_tier: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1447,38 +1714,6 @@ pub struct GetInvoicesSummaryResponse {
     /// all previous invoices
     #[prost(message, repeated, tag="2")]
     pub invoices: ::prost::alloc::vec::Vec<InvoiceSummary>,
-}
-/// TODO(APP-1865) should be deprecated/removed
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetBillingSummaryRequest {
-    #[prost(string, tag="1")]
-    pub org_id: ::prost::alloc::string::String,
-}
-/// TODO(APP-1865) should be deprecated/removed
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetBillingSummaryResponse {
-    #[prost(message, optional, tag="1")]
-    pub usage_summary: ::core::option::Option<CurrentMonthUsageSummary>,
-    #[prost(message, repeated, tag="2")]
-    pub invoices: ::prost::alloc::vec::Vec<InvoiceSummary>,
-    /// all unpaid balances at the end of the last billing cycle
-    #[prost(double, tag="3")]
-    pub statement_balance: f64,
-    /// statement_balance + current_month_usage
-    #[prost(double, tag="4")]
-    pub current_balance: f64,
-    /// current_month_usage_cost
-    #[prost(double, tag="5")]
-    pub current_month_balance: f64,
-    /// due date for current month usage
-    #[prost(message, optional, tag="7")]
-    pub current_month_due_date: ::core::option::Option<::prost_types::Timestamp>,
-    #[prost(string, tag="8")]
-    pub invoice_email: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="9")]
-    pub payment_method: ::core::option::Option<PaymentMethodCard>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1522,6 +1757,73 @@ impl PaymentMethodType {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct IsLegalAcceptedRequest {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct IsLegalAcceptedResponse {
+    /// If false, the user should not be able to use the application.
+    #[prost(bool, tag="1")]
+    pub accepted_legal: bool,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AcceptLegalRequest {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AcceptLegalResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RegisterAuthApplicationRequest {
+    #[prost(string, tag="1")]
+    pub application_name: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub org_id: ::prost::alloc::string::String,
+    #[prost(string, repeated, tag="3")]
+    pub origin_uris: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, repeated, tag="4")]
+    pub redirect_uris: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, tag="5")]
+    pub logout_uri: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RegisterAuthApplicationResponse {
+    #[prost(string, tag="1")]
+    pub application_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub application_name: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub secret: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdateAuthApplicationRequest {
+    #[prost(string, tag="1")]
+    pub org_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub application_id: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub application_name: ::prost::alloc::string::String,
+    #[prost(string, repeated, tag="4")]
+    pub origin_uris: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, repeated, tag="5")]
+    pub redirect_uris: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, tag="6")]
+    pub logout_uri: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdateAuthApplicationResponse {
+    #[prost(string, tag="1")]
+    pub application_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub application_name: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RobotConfig {
     #[prost(message, optional, tag="1")]
     pub cloud: ::core::option::Option<CloudConfig>,
@@ -1546,6 +1848,8 @@ pub struct RobotConfig {
     pub disable_partial_start: ::core::option::Option<bool>,
     #[prost(message, repeated, tag="11")]
     pub packages: ::prost::alloc::vec::Vec<PackageConfig>,
+    #[prost(message, repeated, tag="12")]
+    pub overwrite_fragment_status: ::prost::alloc::vec::Vec<AppValidationStatus>,
 }
 /// Valid location secret that can be used for authentication to the robot.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1556,6 +1860,12 @@ pub struct LocationSecret {
     /// secret payload
     #[prost(string, tag="2")]
     pub secret: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AppValidationStatus {
+    #[prost(string, tag="1")]
+    pub error: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1583,6 +1893,12 @@ pub struct CloudConfig {
     /// All valid location secrets.
     #[prost(message, repeated, tag="9")]
     pub location_secrets: ::prost::alloc::vec::Vec<LocationSecret>,
+    #[prost(string, tag="10")]
+    pub primary_org_id: ::prost::alloc::string::String,
+    #[prost(string, tag="11")]
+    pub location_id: ::prost::alloc::string::String,
+    #[prost(string, tag="12")]
+    pub machine_id: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1607,6 +1923,8 @@ pub struct ComponentConfig {
     pub attributes: ::core::option::Option<::prost_types::Struct>,
     #[prost(string, tag="9")]
     pub api: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="10")]
+    pub log_configuration: ::core::option::Option<LogConfiguration>,
 }
 /// A ResourceLevelServiceConfig describes component or remote configuration for a service.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1638,6 +1956,9 @@ pub struct ProcessConfig {
     pub stop_signal: i32,
     #[prost(message, optional, tag="8")]
     pub stop_timeout: ::core::option::Option<::prost_types::Duration>,
+    /// additional environment variables passed to the process
+    #[prost(map="string, string", tag="9")]
+    pub env: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1658,6 +1979,8 @@ pub struct ServiceConfig {
     pub model: ::prost::alloc::string::String,
     #[prost(string, tag="9")]
     pub api: ::prost::alloc::string::String,
+    #[prost(message, repeated, tag="10")]
+    pub service_configs: ::prost::alloc::vec::Vec<ResourceLevelServiceConfig>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1724,6 +2047,12 @@ pub struct Frame {
     pub orientation: ::core::option::Option<Orientation>,
     #[prost(message, optional, tag="4")]
     pub geometry: ::core::option::Option<super::super::common::v1::Geometry>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LogConfiguration {
+    #[prost(string, tag="1")]
+    pub level: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1957,7 +2286,7 @@ pub struct LogRequest {
     #[prost(string, tag="1")]
     pub id: ::prost::alloc::string::String,
     #[prost(message, repeated, tag="2")]
-    pub logs: ::prost::alloc::vec::Vec<LogEntry>,
+    pub logs: ::prost::alloc::vec::Vec<super::super::common::v1::LogEntry>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1993,6 +2322,18 @@ pub struct ModuleConfig {
     /// log level for module
     #[prost(string, tag="3")]
     pub log_level: ::prost::alloc::string::String,
+    /// type of the module ("local" or "registry")
+    #[prost(string, tag="4")]
+    pub r#type: ::prost::alloc::string::String,
+    /// the id of the module if it is a registry module
+    #[prost(string, tag="5")]
+    pub module_id: ::prost::alloc::string::String,
+    /// additional environment variables passed to the module process
+    #[prost(map="string, string", tag="6")]
+    pub env: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    /// info about the validity of the module
+    #[prost(message, optional, tag="7")]
+    pub status: ::core::option::Option<AppValidationStatus>,
 }
 /// PackageConfig is the configration for deployed Packages.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2010,6 +2351,9 @@ pub struct PackageConfig {
     /// type of the package
     #[prost(string, tag="4")]
     pub r#type: ::prost::alloc::string::String,
+    /// info about the validity of the package
+    #[prost(message, optional, tag="5")]
+    pub status: ::core::option::Option<AppValidationStatus>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
