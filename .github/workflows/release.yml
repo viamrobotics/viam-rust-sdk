@@ -15,72 +15,72 @@ on:
           - nobump
 
 jobs:
-  prepare:
-    # if: github.repository_owner == 'viamrobotics'
-    runs-on: [self-hosted, x64]
-    container:
-      image: ghcr.io/viamrobotics/canon:amd64
-    outputs:
-      version: ${{ steps.which_version.outputs.version }}
-      sha: ${{ steps.commit.outputs.commit_long_sha }}
-    steps:
-      - name: Check if organization member
-        id: is_organization_member
-        uses: jamessingleton/is-organization-member@1.0.1
-        with:
-          organization: viamrobotics
-          username: ${{ github.actor }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+  # prepare:
+  #   if: github.repository_owner == 'viamrobotics'
+  #   runs-on: [self-hosted, x64]
+  #   container:
+  #     image: ghcr.io/viamrobotics/canon:amd64
+  #   outputs:
+  #     version: ${{ steps.which_version.outputs.version }}
+  #     sha: ${{ steps.commit.outputs.commit_long_sha }}
+  #   steps:
+  #     - name: Check if organization member
+  #       id: is_organization_member
+  #       uses: jamessingleton/is-organization-member@1.0.1
+  #       with:
+  #         organization: viamrobotics
+  #         username: ${{ github.actor }}
+  #         token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cancelling - user not part of organization
-        uses: andymckay/cancel-action@0.2
-        if: |
-          steps.is_organization_member.outputs.result == 'false'
+  #     - name: Cancelling - user not part of organization
+  #       uses: andymckay/cancel-action@0.2
+  #       if: |
+  #         steps.is_organization_member.outputs.result == 'false'
 
-      - name: Checkout Code
-        uses: actions/checkout@v3
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
 
-      - name: Setup rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+  #     - name: Setup rust toolchain
+  #       uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
 
-      - name: Bump Version
-        shell: bash
-        if: inputs.version != 'nobump'
-        run: |
-          cargo install cargo-bump
-          cargo bump ${{ inputs.version }}
+  #     - name: Bump Version
+  #       shell: bash
+  #       if: inputs.version != 'nobump'
+  #       run: |
+  #         cargo install cargo-bump
+  #         cargo bump ${{ inputs.version }}
 
-      - name: Which Version
-        id: which_version
-        shell: bash
-        run: |
-          echo "version=$(cargo pkgid | sed 's/.*@//g')" >> $GITHUB_OUTPUT
+  #     - name: Which Version
+  #       id: which_version
+  #       shell: bash
+  #       run: |
+  #         echo "version=$(cargo pkgid | sed 's/.*@//g')" >> $GITHUB_OUTPUT
 
-      - name: Check if release exists
-        uses: cardinalby/git-get-release-action@1.2.4
-        id: release_exists
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          releaseName: v${{ steps.which_version.outputs.version }}
-          doNotFailIfNotFound: "true"
+  #     - name: Check if release exists
+  #       uses: cardinalby/git-get-release-action@1.2.4
+  #       id: release_exists
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         releaseName: v${{ steps.which_version.outputs.version }}
+  #         doNotFailIfNotFound: "true"
 
-      - name: Cancelling - release already exists
-        uses: andymckay/cancel-action@0.2
-        if: steps.release_exists.outputs.id != ''
+  #     - name: Cancelling - release already exists
+  #       uses: andymckay/cancel-action@0.2
+  #       if: steps.release_exists.outputs.id != ''
 
-      - name: Commit + Push
-        id: commit
-        uses: EndBug/add-and-commit@v9.0.0
-        with:
-          default_author: github_actions
-          message: Bumping version to v${{ steps.which_version.outputs.version }} [skip ci]
+  #     - name: Commit + Push
+  #       id: commit
+  #       uses: EndBug/add-and-commit@v9.0.0
+  #       with:
+  #         default_author: github_actions
+  #         message: Bumping version to v${{ steps.which_version.outputs.version }} [skip ci]
 
   build_macos:
-    if: github.repository_owner == 'viamrobotics'
-    needs: [prepare]
+    # if: github.repository_owner == 'viamrobotics'
+    # needs: [prepare]
     runs-on: [self-hosted, ARM64, macOS]
     strategy:
       fail-fast: false
@@ -114,8 +114,8 @@ jobs:
           path: builds
 
   build_linux:
-    if: github.repository_owner == 'viamrobotics'
-    needs: [prepare]
+    # if: github.repository_owner == 'viamrobotics'
+    # needs: [prepare]
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/cross-rs/${{ matrix.image }}
