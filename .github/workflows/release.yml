@@ -9,10 +9,10 @@ on:
         required: true
         default: nobump
         options:
-        - major
-        - minor
-        - patch
-        - nobump
+          - major
+          - minor
+          - patch
+          - nobump
 
 jobs:
   prepare:
@@ -30,7 +30,7 @@ jobs:
         with:
           organization: viamrobotics
           username: ${{ github.actor }}
-          token:  ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cancelling - user not part of organization
         uses: andymckay/cancel-action@0.2
@@ -65,7 +65,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseName: v${{ steps.which_version.outputs.version }}
-          doNotFailIfNotFound: 'true'
+          doNotFailIfNotFound: "true"
 
       - name: Cancelling - release already exists
         uses: andymckay/cancel-action@0.2
@@ -176,3 +176,5 @@ jobs:
           draft: true
           prerelease: false
           fail_on_unmatched_files: true
+  #         prerelease: false
+  #         fail_on_unmatched_files: true
