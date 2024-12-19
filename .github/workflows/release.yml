@@ -16,7 +16,7 @@ on:
 
 jobs:
   prepare:
-    if: github.repository_owner == 'viamrobotics'
+    # if: github.repository_owner == 'viamrobotics'
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/viamrobotics/canon:amd64
@@ -158,23 +158,21 @@ jobs:
           name: linux-builds-${{ matrix.platform }}
           path: builds
 
-  release:
-    needs: [prepare, build_macos, build_linux]
-    if: github.repository_owner == 'viamrobotics'
-    runs-on: [self-hosted, x64]
-    container:
-      image: ghcr.io/viamrobotics/canon:amd64
+  # release:
+  #   needs: [prepare, build_macos, build_linux]
+  #   if: github.repository_owner == 'viamrobotics'
+  #   runs-on: [self-hosted, x64]
+  #   container:
+  #     image: ghcr.io/viamrobotics/canon:amd64
 
-    steps:
-      - uses: actions/download-artifact@v3
+  #   steps:
+  #     - uses: actions/download-artifact@v3
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ needs.prepare.outputs.version }}
-          files: builds/*
-          draft: true
-          prerelease: false
-          fail_on_unmatched_files: true
+  #     - name: Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         tag_name: v${{ needs.prepare.outputs.version }}
+  #         files: builds/*
+  #         draft: true
   #         prerelease: false
   #         fail_on_unmatched_files: true
