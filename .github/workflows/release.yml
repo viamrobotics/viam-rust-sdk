@@ -108,9 +108,9 @@ jobs:
       - name: Copy
         run: cp target/${{ matrix.target }}/release/libviam.dylib builds/libviam-${{ matrix.platform }}.dylib
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: builds
+          name: macos-builds-${{ matrix.platform }}
           path: builds
 
   build_linux:
@@ -153,9 +153,9 @@ jobs:
       - name: Copy
         run: cp target/${{ matrix.target }}/release/libviam.so builds/libviam-${{ matrix.platform }}.so
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: builds
+          name: linux-builds-${{ matrix.platform }}
           path: builds
 
   release:
