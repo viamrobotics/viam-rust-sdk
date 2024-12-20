@@ -9,10 +9,10 @@ on:
         required: true
         default: nobump
         options:
-        - major
-        - minor
-        - patch
-        - nobump
+          - major
+          - minor
+          - patch
+          - nobump
 
 jobs:
   prepare:
@@ -30,7 +30,7 @@ jobs:
         with:
           organization: viamrobotics
           username: ${{ github.actor }}
-          token:  ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cancelling - user not part of organization
         uses: andymckay/cancel-action@0.2
@@ -65,7 +65,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseName: v${{ steps.which_version.outputs.version }}
-          doNotFailIfNotFound: 'true'
+          doNotFailIfNotFound: "true"
 
       - name: Cancelling - release already exists
         uses: andymckay/cancel-action@0.2
@@ -108,9 +108,9 @@ jobs:
       - name: Copy
         run: cp target/${{ matrix.target }}/release/libviam.dylib builds/libviam-${{ matrix.platform }}.dylib
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: builds
+          name: macos-builds-${{ matrix.platform }}
           path: builds
 
   build_linux:
@@ -153,9 +153,9 @@ jobs:
       - name: Copy
         run: cp target/${{ matrix.target }}/release/libviam.so builds/libviam-${{ matrix.platform }}.so
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: builds
+          name: linux-builds-${{ matrix.platform }}
           path: builds
 
   release:
