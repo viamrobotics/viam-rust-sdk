@@ -3,3 +3,7 @@ target/
 **/*.rs.bk
 
 *.DS_Store
+
+# Claude Code
+.claude/worktrees
+.claude/settings.local.json
