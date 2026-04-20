@@ -166,7 +166,7 @@ jobs:
       image: ghcr.io/viamrobotics/canon:amd64
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
 
       - name: Release
         uses: softprops/action-gh-release@v1
